@@ -5,7 +5,7 @@ import { useColor } from 'hooks/useColor';
 import { PageWrapper, ThemedBackground } from 'pages/styled';
 import { getEtherscanLink, swapFeePercent, tokenWeightPercent } from 'utils';
 import { AutoColumn } from 'components/Column';
-import { AutoRow, RowBetween, RowFixed } from 'components/Row';
+import Row, { AutoRow, RowBetween, RowFixed } from 'components/Row';
 import { StyledInternalLink, TYPE } from 'theme';
 import Loader, { LocalLoader } from 'components/Loader';
 import { Download, ExternalLink } from 'react-feather';
@@ -52,6 +52,15 @@ const TokenButton = styled(GreyCard)`
 `;
 
 const ResponsiveRow = styled(RowBetween)`
+    ${({ theme }) => theme.mediaWidth.upToSmall`
+    flex-direction: column;
+    align-items: flex-start;
+    row-gap: 24px;
+    width: 100%:
+  `};
+`;
+
+const TokenResponsiveRow = styled(Row)`
     ${({ theme }) => theme.mediaWidth.upToSmall`
     flex-direction: column;
     align-items: flex-start;
@@ -133,7 +142,7 @@ export default function PoolPage({
                                 <TYPE.label ml="8px" mr="8px" fontSize="24px">{`${poolData.name}`}</TYPE.label>
                                 <GreyBadge>{swapFeePercent(poolData.swapFee)}</GreyBadge>
                             </RowFixed>
-                            <ResponsiveRow>
+                            <TokenResponsiveRow>
                                 {poolData.tokens.map((token) => (
                                     <StyledInternalLink
                                         to={networkPrefix(activeNetwork) + 'tokens/' + token.address}
@@ -157,11 +166,11 @@ export default function PoolPage({
                                         </TokenButton>
                                     </StyledInternalLink>
                                 ))}
-                            </ResponsiveRow>
+                            </TokenResponsiveRow>
                         </AutoColumn>
                         <RowFixed>
                             <StyledExternalLink href={`https://app.beets.fi/#/pool/${poolId}`}>
-                                <ButtonGray width="170px" mr="12px" style={{ height: '44px' }}>
+                                <ButtonGray width="128px" mr="12px" style={{ height: '44px' }}>
                                     <RowBetween>
                                         <Download size={24} />
                                         <div style={{ display: 'flex', alignItems: 'center' }}>Invest</div>
