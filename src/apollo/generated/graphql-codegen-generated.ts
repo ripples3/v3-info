@@ -3269,12 +3269,12 @@ export type GetTokenDataQuery = {
     }>;
 };
 
-export type GetTokenSnapshotsQueryVariables = Exact<{
+export type GetTokenPageDataQueryVariables = Exact<{
     address: Scalars['String'];
     startTimestamp: Scalars['Int'];
 }>;
 
-export type GetTokenSnapshotsQuery = {
+export type GetTokenPageDataQuery = {
     __typename: 'Query';
     tokenSnapshots: Array<{
         __typename: 'TokenSnapshot';
@@ -3285,6 +3285,59 @@ export type GetTokenSnapshotsQuery = {
         totalVolumeUSD: string;
         totalVolumeNotional: string;
         totalSwapCount: string;
+    }>;
+};
+
+export type GetTransactionDataQueryVariables = Exact<{
+    addresses: Array<Scalars['Bytes']> | Scalars['Bytes'];
+    poolIds: Array<Scalars['String']> | Scalars['String'];
+    startTimestamp: Scalars['Int'];
+}>;
+
+export type GetTransactionDataQuery = {
+    __typename: 'Query';
+    swapsIn: Array<{
+        __typename: 'Swap';
+        id: string;
+        caller: string;
+        tokenIn: string;
+        tokenInSym: string;
+        tokenOut: string;
+        tokenOutSym: string;
+        tokenAmountIn: string;
+        tokenAmountOut: string;
+        timestamp: number;
+        tx: string;
+        value: string;
+        poolId: { __typename: 'Pool'; id: string; name?: string | null | undefined; address: string; swapFee: string };
+        userAddress: { __typename: 'User'; id: string };
+    }>;
+    swapsOut: Array<{
+        __typename: 'Swap';
+        id: string;
+        caller: string;
+        tokenIn: string;
+        tokenInSym: string;
+        tokenOut: string;
+        tokenOutSym: string;
+        tokenAmountIn: string;
+        tokenAmountOut: string;
+        timestamp: number;
+        tx: string;
+        value: string;
+        poolId: { __typename: 'Pool'; id: string; name?: string | null | undefined; address: string; swapFee: string };
+        userAddress: { __typename: 'User'; id: string };
+    }>;
+    joinExits: Array<{
+        __typename: 'JoinExit';
+        amounts: Array<string>;
+        id: string;
+        sender: string;
+        timestamp: number;
+        tx: string;
+        type: InvestType;
+        user: { __typename: 'User'; id: string };
+        pool: { __typename: 'Pool'; id: string; tokensList: Array<string> };
     }>;
 };
 
@@ -4017,7 +4070,7 @@ export type BalancerSwapsQuery = {
         timestamp: number;
         tx: string;
         value: string;
-        poolId: { __typename: 'Pool'; id: string; address: string; swapFee: string };
+        poolId: { __typename: 'Pool'; id: string; name?: string | null | undefined; address: string; swapFee: string };
         userAddress: { __typename: 'User'; id: string };
     }>;
 };
@@ -4035,7 +4088,7 @@ export type BalancerSwapFragment = {
     timestamp: number;
     tx: string;
     value: string;
-    poolId: { __typename: 'Pool'; id: string; address: string; swapFee: string };
+    poolId: { __typename: 'Pool'; id: string; name?: string | null | undefined; address: string; swapFee: string };
     userAddress: { __typename: 'User'; id: string };
 };
 
@@ -4410,6 +4463,7 @@ export const BalancerSwapFragmentDoc = gql`
         tokenAmountOut
         poolId {
             id
+            name
             address
             swapFee
         }
@@ -4593,8 +4647,8 @@ export function useGetTokenDataLazyQuery(
 export type GetTokenDataQueryHookResult = ReturnType<typeof useGetTokenDataQuery>;
 export type GetTokenDataLazyQueryHookResult = ReturnType<typeof useGetTokenDataLazyQuery>;
 export type GetTokenDataQueryResult = Apollo.QueryResult<GetTokenDataQuery, GetTokenDataQueryVariables>;
-export const GetTokenSnapshotsDocument = gql`
-    query GetTokenSnapshots($address: String!, $startTimestamp: Int!) {
+export const GetTokenPageDataDocument = gql`
+    query GetTokenPageData($address: String!, $startTimestamp: Int!) {
         tokenSnapshots(
             first: 1000
             orderBy: timestamp
@@ -4608,40 +4662,113 @@ export const GetTokenSnapshotsDocument = gql`
 `;
 
 /**
- * __useGetTokenSnapshotsQuery__
+ * __useGetTokenPageDataQuery__
  *
- * To run a query within a React component, call `useGetTokenSnapshotsQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetTokenSnapshotsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * To run a query within a React component, call `useGetTokenPageDataQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetTokenPageDataQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
  *
  * @example
- * const { data, loading, error } = useGetTokenSnapshotsQuery({
+ * const { data, loading, error } = useGetTokenPageDataQuery({
  *   variables: {
  *      address: // value for 'address'
  *      startTimestamp: // value for 'startTimestamp'
  *   },
  * });
  */
-export function useGetTokenSnapshotsQuery(
-    baseOptions: Apollo.QueryHookOptions<GetTokenSnapshotsQuery, GetTokenSnapshotsQueryVariables>,
+export function useGetTokenPageDataQuery(
+    baseOptions: Apollo.QueryHookOptions<GetTokenPageDataQuery, GetTokenPageDataQueryVariables>,
 ) {
     const options = { ...defaultOptions, ...baseOptions };
-    return Apollo.useQuery<GetTokenSnapshotsQuery, GetTokenSnapshotsQueryVariables>(GetTokenSnapshotsDocument, options);
+    return Apollo.useQuery<GetTokenPageDataQuery, GetTokenPageDataQueryVariables>(GetTokenPageDataDocument, options);
 }
-export function useGetTokenSnapshotsLazyQuery(
-    baseOptions?: Apollo.LazyQueryHookOptions<GetTokenSnapshotsQuery, GetTokenSnapshotsQueryVariables>,
+export function useGetTokenPageDataLazyQuery(
+    baseOptions?: Apollo.LazyQueryHookOptions<GetTokenPageDataQuery, GetTokenPageDataQueryVariables>,
 ) {
     const options = { ...defaultOptions, ...baseOptions };
-    return Apollo.useLazyQuery<GetTokenSnapshotsQuery, GetTokenSnapshotsQueryVariables>(
-        GetTokenSnapshotsDocument,
+    return Apollo.useLazyQuery<GetTokenPageDataQuery, GetTokenPageDataQueryVariables>(
+        GetTokenPageDataDocument,
         options,
     );
 }
-export type GetTokenSnapshotsQueryHookResult = ReturnType<typeof useGetTokenSnapshotsQuery>;
-export type GetTokenSnapshotsLazyQueryHookResult = ReturnType<typeof useGetTokenSnapshotsLazyQuery>;
-export type GetTokenSnapshotsQueryResult = Apollo.QueryResult<GetTokenSnapshotsQuery, GetTokenSnapshotsQueryVariables>;
+export type GetTokenPageDataQueryHookResult = ReturnType<typeof useGetTokenPageDataQuery>;
+export type GetTokenPageDataLazyQueryHookResult = ReturnType<typeof useGetTokenPageDataLazyQuery>;
+export type GetTokenPageDataQueryResult = Apollo.QueryResult<GetTokenPageDataQuery, GetTokenPageDataQueryVariables>;
+export const GetTransactionDataDocument = gql`
+    query GetTransactionData($addresses: [Bytes!]!, $poolIds: [String!]!, $startTimestamp: Int!) {
+        swapsIn: swaps(
+            first: 150
+            orderBy: timestamp
+            orderDirection: desc
+            where: { tokenIn_in: $addresses, timestamp_gte: $startTimestamp }
+        ) {
+            ...BalancerSwap
+        }
+        swapsOut: swaps(
+            first: 150
+            orderBy: timestamp
+            orderDirection: desc
+            where: { tokenOut_in: $addresses, timestamp_gte: $startTimestamp }
+        ) {
+            ...BalancerSwap
+        }
+        joinExits(
+            first: 150
+            orderBy: timestamp
+            orderDirection: desc
+            where: { pool_in: $poolIds, timestamp_gte: $startTimestamp }
+        ) {
+            ...BalancerJoinExit
+        }
+    }
+    ${BalancerSwapFragmentDoc}
+    ${BalancerJoinExitFragmentDoc}
+`;
+
+/**
+ * __useGetTransactionDataQuery__
+ *
+ * To run a query within a React component, call `useGetTransactionDataQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetTransactionDataQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetTransactionDataQuery({
+ *   variables: {
+ *      addresses: // value for 'addresses'
+ *      poolIds: // value for 'poolIds'
+ *      startTimestamp: // value for 'startTimestamp'
+ *   },
+ * });
+ */
+export function useGetTransactionDataQuery(
+    baseOptions: Apollo.QueryHookOptions<GetTransactionDataQuery, GetTransactionDataQueryVariables>,
+) {
+    const options = { ...defaultOptions, ...baseOptions };
+    return Apollo.useQuery<GetTransactionDataQuery, GetTransactionDataQueryVariables>(
+        GetTransactionDataDocument,
+        options,
+    );
+}
+export function useGetTransactionDataLazyQuery(
+    baseOptions?: Apollo.LazyQueryHookOptions<GetTransactionDataQuery, GetTransactionDataQueryVariables>,
+) {
+    const options = { ...defaultOptions, ...baseOptions };
+    return Apollo.useLazyQuery<GetTransactionDataQuery, GetTransactionDataQueryVariables>(
+        GetTransactionDataDocument,
+        options,
+    );
+}
+export type GetTransactionDataQueryHookResult = ReturnType<typeof useGetTransactionDataQuery>;
+export type GetTransactionDataLazyQueryHookResult = ReturnType<typeof useGetTransactionDataLazyQuery>;
+export type GetTransactionDataQueryResult = Apollo.QueryResult<
+    GetTransactionDataQuery,
+    GetTransactionDataQueryVariables
+>;
 export const GetPoolDataDocument = gql`
     query GetPoolData($block24: Block_height!, $block48: Block_height!, $blockWeek: Block_height!) {
         pools(first: 1000, orderBy: totalLiquidity, orderDirection: desc, where: { totalLiquidity_gt: "0.01" }) {

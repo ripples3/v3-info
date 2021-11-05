@@ -22,7 +22,7 @@ import LineChart from 'components/LineChart/alt';
 import { ToggleElementFree, ToggleWrapper } from 'components/Toggle/index';
 import BarChart from 'components/BarChart/alt';
 import CandleChart from 'components/CandleChart';
-import TransactionTable from 'components/TransactionsTable';
+import TransactionTable from 'components/TransactionsTable/SwapsTable';
 import { useSavedTokens } from 'state/user/hooks';
 import { TimeWindow } from 'constants/intervals';
 import { MonoSpace } from 'components/shared';
@@ -37,6 +37,8 @@ import CMCLogo from '../../assets/images/cmc.png';
 import { useBalancerTokenData, useBalancerTokenPageData } from '../../data/balancer/useTokens';
 import { useBalancerPoolsForToken } from '../../data/balancer/usePools';
 import { PriceChartEntry, Transaction } from '../../types';
+import { useBalancerTransactionData } from '../../data/balancer/useTransactions';
+import SwapsTable from 'components/TransactionsTable/SwapsTable';
 
 const PriceText = styled(TYPE.label)`
     font-size: 36px;
@@ -96,10 +98,13 @@ export default function TokenPage({
         window.scrollTo(0, 0);
     }, []);
 
-    const transactions: Transaction[] = [];
     const cmcLink = useCMCLink(address);
     const tokenData = useBalancerTokenData(address);
     const poolData = useBalancerPoolsForToken(address);
+    const { swaps, joinExits } = useBalancerTransactionData(
+        [address],
+        poolData.map((pool) => pool.id),
+    );
     const { tvlData, volumeData, priceData } = useBalancerTokenPageData(address);
 
     // chart labels
@@ -107,25 +112,6 @@ export default function TokenPage({
     const [latestValue, setLatestValue] = useState<number | undefined>();
     const [valueLabel, setValueLabel] = useState<string | undefined>();
     const [timeWindow] = useState(DEFAULT_TIME_WINDOW);
-
-    // pricing data
-    //const priceData = useTokenPriceData(address, ONE_HOUR_SECONDS, timeWindow);
-    /*const priceData: PriceChartEntry[] = [];
-    const adjustedToCurrent = useMemo(() => {
-        if (priceData && tokenData && priceData.length > 0) {
-            const adjusted = Object.assign([], priceData);
-            adjusted.push({
-                time: currentTimestamp() / 1000,
-                open: priceData[priceData.length - 1].close,
-                close: tokenData?.priceUSD,
-                high: tokenData?.priceUSD,
-                low: priceData[priceData.length - 1].close,
-            });
-            return adjusted;
-        } else {
-            return undefined;
-        }
-    }, [priceData, tokenData]);*/
 
     // watchlist
     const [savedTokens, addSavedToken] = useSavedTokens();
@@ -137,10 +123,7 @@ export default function TokenPage({
                 !tokenData.exists ? (
                     <LightGreyCard style={{ textAlign: 'center' }}>
                         No pool has been created with this token yet. Create one
-                        <StyledExternalLink
-                            style={{ marginLeft: '4px' }}
-                            href={`https://app.uniswap.org/#/add/${address}`}
-                        >
+                        <StyledExternalLink style={{ marginLeft: '4px' }} href={`https://app.beets.fi/#/pool-create`}>
                             here.
                         </StyledExternalLink>
                     </LightGreyCard>
@@ -214,9 +197,7 @@ export default function TokenPage({
                                 </AutoColumn>
                                 {activeNetwork !== EthereumNetworkInfo ? null : (
                                     <RowFixed>
-                                        <StyledExternalLink
-                                            href={`https://app.uniswap.org/#/swap?inputCurrency=${address}`}
-                                        >
+                                        <StyledExternalLink href={`https://app.beets.fi/#/trade/${address}`}>
                                             <ButtonPrimary
                                                 width="100px"
                                                 bgColor={backgroundColor}
@@ -380,10 +361,10 @@ export default function TokenPage({
                         <DarkGreyCard>
                             <PoolTable poolDatas={poolData} />
                         </DarkGreyCard>
-                        <TYPE.main>Transactions</TYPE.main>
+                        <TYPE.main>Swaps</TYPE.main>
                         <DarkGreyCard>
-                            {transactions ? (
-                                <TransactionTable transactions={transactions} color={backgroundColor} />
+                            {swaps.length > 0 ? (
+                                <SwapsTable swaps={swaps} color={backgroundColor} />
                             ) : (
                                 <LocalLoader fill={false} />
                             )}

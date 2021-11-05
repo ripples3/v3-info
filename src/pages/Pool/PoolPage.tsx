@@ -20,7 +20,7 @@ import LineChart from 'components/LineChart/alt';
 import { ToggleElementFree, ToggleWrapper } from 'components/Toggle/index';
 import BarChart from 'components/BarChart/alt';
 import PoolCurrencyLogo from 'components/PoolCurrencyLogo';
-import TransactionTable from 'components/TransactionsTable';
+import TransactionTable from 'components/TransactionsTable/SwapsTable';
 import { useSavedPools } from 'state/user/hooks';
 import { MonoSpace } from 'components/shared';
 import { useActiveNetworkVersion } from 'state/application/hooks';
@@ -289,9 +289,9 @@ export default function PoolPage({
                         </DarkGreyCard>
                     </ContentLayout>
                     <TYPE.main fontSize="24px">Transactions</TYPE.main>
-                    <DarkGreyCard>
-                        {transactions ? <TransactionTable transactions={transactions} /> : <LocalLoader fill={false} />}
-                    </DarkGreyCard>
+                    {/*<DarkGreyCard>
+                        {transactions ? <TransactionTable swaps={transactions} /> : <LocalLoader fill={false} />}
+                    </DarkGreyCard>*/}
                 </AutoColumn>
             ) : (
                 <Loader />

@@ -130,6 +130,7 @@ export const BalancerSwap = gql`
         tokenAmountOut
         poolId {
             id
+            name
             address
             swapFee
         }
@@ -246,8 +247,8 @@ export const GetTokenData = gql`
     ${BalancerToken}
     ${LatestPrice}
 `;
-export const GetTokenSnapshots = gql`
-    query GetTokenSnapshots($address: String!, $startTimestamp: Int!) {
+export const GetTokenPageData = gql`
+    query GetTokenPageData($address: String!, $startTimestamp: Int!) {
         tokenSnapshots(
             first: 1000
             orderBy: timestamp
@@ -258,6 +259,36 @@ export const GetTokenSnapshots = gql`
         }
     }
     ${TokenSnapshot}
+`;
+export const GetTransactionData = gql`
+    query GetTransactionData($addresses: [Bytes!]!, $poolIds: [String!]!, $startTimestamp: Int!) {
+        swapsIn: swaps(
+            first: 150
+            orderBy: timestamp
+            orderDirection: desc
+            where: { tokenIn_in: $addresses, timestamp_gte: $startTimestamp }
+        ) {
+            ...BalancerSwap
+        }
+        swapsOut: swaps(
+            first: 150
+            orderBy: timestamp
+            orderDirection: desc
+            where: { tokenOut_in: $addresses, timestamp_gte: $startTimestamp }
+        ) {
+            ...BalancerSwap
+        }
+        joinExits(
+            first: 150
+            orderBy: timestamp
+            orderDirection: desc
+            where: { pool_in: $poolIds, timestamp_gte: $startTimestamp }
+        ) {
+            ...BalancerJoinExit
+        }
+    }
+    ${BalancerSwap}
+    ${BalancerJoinExit}
 `;
 export const GetPoolData = gql`
     query GetPoolData($block24: Block_height!, $block48: Block_height!, $blockWeek: Block_height!) {

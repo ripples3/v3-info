@@ -2,20 +2,18 @@ import { useDeltaTimestamps } from '../../utils/queries';
 import { useBlocksFromTimestamps } from '../../hooks/useBlocksFromTimestamps';
 import {
     BalancerTokenFragment,
-    BalancerTokenPriceFragment,
-    BalancerTokenPricesQuery,
-    BalancerTokenPricesQueryVariables,
     LatestPriceFragment,
     useGetTokenDataLazyQuery,
-    useGetTokenSnapshotsQuery,
+    useGetTokenPageDataQuery,
+    useGetTransactionDataLazyQuery,
 } from '../../apollo/generated/graphql-codegen-generated';
-import { useEffect, useState } from 'react';
-import { TokenChartEntry, TokenData } from '../../state/tokens/reducer';
+import { useEffect } from 'react';
+import { TokenData } from '../../state/tokens/reducer';
 import { unixToDate } from '../../utils/date';
-import { tokenListTokens } from '../../state/token-lists/token-lists';
-import { client } from '../../apollo/client';
-import { BalancerTokenPrices } from '../../apollo/generated/operations';
 import { BALANCER_SUBGRAPH_START_TIMESTAMP } from './constants';
+import { orderBy } from 'lodash';
+import { BalancerChartDataItem } from './balancerTypes';
+import { BalancerTransaction, TransactionType } from '../../types';
 
 function getTokenValues(
     tokenAddress: string,
@@ -109,28 +107,14 @@ export function useBalancerTokenData(address: string): TokenData | null {
 }
 
 export function useBalancerTokenPageData(address: string): {
-    tvlData: { value: number; time: string }[];
-    volumeData: { value: number; time: string }[];
-    priceData: { value: number; time: string }[];
+    tvlData: BalancerChartDataItem[];
+    volumeData: BalancerChartDataItem[];
+    priceData: BalancerChartDataItem[];
 } {
-    const { data } = useGetTokenSnapshotsQuery({
+    const { data } = useGetTokenPageDataQuery({
         variables: { address, startTimestamp: BALANCER_SUBGRAPH_START_TIMESTAMP },
     });
     const snapshots = data?.tokenSnapshots || [];
-    const [tokenPrices, setTokenPrices] = useState<BalancerTokenPriceFragment[]>([]);
-
-    /*useEffect(() => {
-        async function load() {
-            console.log('inside load');
-            const tokenPrices = await loadAllTokenPrices(address);
-            console.log('after');
-
-            console.log('token prices', tokenPrices);
-            setTokenPrices(tokenPrices);
-        }
-
-        load().catch();
-    }, []);*/
 
     const tvlData = snapshots.map((snapshot) => {
         const value = parseFloat(snapshot.totalBalanceUSD);

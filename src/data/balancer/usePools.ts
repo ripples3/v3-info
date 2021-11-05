@@ -1,17 +1,12 @@
 import {
     BalancerPoolFragment,
-    BalancerTokenPriceFragment,
-    LatestPriceFragment,
     useGetPoolChartDataQuery,
     useGetPoolDataLazyQuery,
-    useGetTokenSnapshotsQuery,
 } from '../../apollo/generated/graphql-codegen-generated';
 import { useDeltaTimestamps } from '../../utils/queries';
 import { useBlocksFromTimestamps } from '../../hooks/useBlocksFromTimestamps';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { PoolData } from '../../state/pools/reducer';
-import { TokenData } from '../../state/tokens/reducer';
-import { useBalancerTokens } from './useTokens';
 import { unixToDate } from '../../utils/date';
 import { BalancerChartDataItem } from './balancerTypes';
 import { BALANCER_SUBGRAPH_START_TIMESTAMP } from './constants';

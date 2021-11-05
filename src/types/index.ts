@@ -26,6 +26,21 @@ export enum TransactionType {
     BURN,
 }
 
+export type BalancerTransaction = {
+    type: TransactionType;
+    hash: string;
+    timestamp: string;
+    sender: string;
+    tokens: BalancerTransactionToken[];
+};
+
+export type BalancerTransactionToken = {
+    symbol: string;
+    address: string;
+    amountUSD: number;
+    amountToken: number;
+};
+
 export type Transaction = {
     type: TransactionType;
     hash: string;

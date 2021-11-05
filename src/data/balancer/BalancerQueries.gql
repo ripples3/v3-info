@@ -74,9 +74,21 @@ query GetTokenData($block24: Block_height!, $blockWeek: Block_height!) {
     }
 }
 
-query GetTokenSnapshots($address: String!, $startTimestamp: Int!) {
+query GetTokenPageData($address: String!, $startTimestamp: Int!) {
     tokenSnapshots(first: 1000, orderBy: timestamp, orderDirection: asc, where: {token: $address, timestamp_gte: $startTimestamp}) {
         ...TokenSnapshot
+    }
+}
+
+query GetTransactionData($addresses: [Bytes!]!, $poolIds: [String!]!, $startTimestamp: Int!) {
+    swapsIn: swaps(first: 150, orderBy: timestamp, orderDirection: desc, where: {tokenIn_in: $addresses, timestamp_gte: $startTimestamp}) {
+        ...BalancerSwap
+    }
+    swapsOut: swaps(first: 150, orderBy: timestamp, orderDirection: desc, where: {tokenOut_in: $addresses, timestamp_gte: $startTimestamp}) {
+        ...BalancerSwap
+    }
+    joinExits(first: 150, orderBy: timestamp, orderDirection: desc, where: {pool_in: $poolIds, timestamp_gte: $startTimestamp}) {
+        ...BalancerJoinExit
     }
 }
 
@@ -509,6 +521,7 @@ fragment BalancerSwap on Swap {
     tokenAmountOut
     poolId {
         id
+        name
         address
         swapFee
     }

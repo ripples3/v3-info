@@ -15,6 +15,7 @@ import useTheme from 'hooks/useTheme';
 import HoverInlineText from 'components/HoverInlineText';
 import { useActiveNetworkVersion } from 'state/application/hooks';
 import { OptimismNetworkInfo } from 'constants/networks';
+import { BalancerSwapFragment } from '../../apollo/generated/graphql-codegen-generated';
 
 const Wrapper = styled(DarkGreyCard)`
     width: 100%;
@@ -87,55 +88,49 @@ const SORT_FIELD = {
     amountToken1: 'amountToken1',
 };
 
-const DataRow = ({ transaction, color }: { transaction: Transaction; color?: string }) => {
-    const abs0 = Math.abs(transaction.amountToken0);
-    const abs1 = Math.abs(transaction.amountToken1);
-    const outputTokenSymbol = transaction.amountToken0 < 0 ? transaction.token0Symbol : transaction.token1Symbol;
-    const inputTokenSymbol = transaction.amountToken1 < 0 ? transaction.token0Symbol : transaction.token1Symbol;
+const DataRow = ({ swap, color }: { swap: BalancerSwapFragment; color?: string }) => {
+    const abs0 = Math.abs(parseFloat(swap.tokenAmountIn));
+    const abs1 = Math.abs(parseFloat(swap.tokenAmountOut));
     const [activeNetwork] = useActiveNetworkVersion();
     const theme = useTheme();
 
     return (
         <ResponsiveGrid>
-            <ExternalLink href={getEtherscanLink(1, transaction.hash, 'transaction', activeNetwork)}>
+            <ExternalLink href={getEtherscanLink(1, swap.tx, 'transaction', activeNetwork)}>
                 <Label color={color ?? theme.blue1} fontWeight={400}>
-                    {transaction.type === TransactionType.MINT
-                        ? `Add ${transaction.token0Symbol} and ${transaction.token1Symbol}`
-                        : transaction.type === TransactionType.SWAP
-                        ? `Swap ${inputTokenSymbol} for ${outputTokenSymbol}`
-                        : `Remove ${transaction.token0Symbol} and ${transaction.token1Symbol}`}
+                    {`Swap ${swap.tokenInSym} for ${swap.tokenOutSym}`}
                 </Label>
             </ExternalLink>
             <Label end={1} fontWeight={400}>
-                {formatDollarAmount(transaction.amountUSD)}
+                {formatDollarAmount(parseFloat(swap.value))}
             </Label>
             <Label end={1} fontWeight={400}>
-                <HoverInlineText text={`${formatAmount(abs0)}  ${transaction.token0Symbol}`} maxCharacters={16} />
+                <HoverInlineText text={`${formatAmount(abs0)}  ${swap.tokenInSym}`} maxCharacters={16} />
             </Label>
             <Label end={1} fontWeight={400}>
-                <HoverInlineText text={`${formatAmount(abs1)}  ${transaction.token1Symbol}`} maxCharacters={16} />
+                <HoverInlineText text={`${formatAmount(abs1)}  ${swap.tokenOutSym}`} maxCharacters={16} />
             </Label>
             <Label end={1} fontWeight={400}>
                 <ExternalLink
-                    href={getEtherscanLink(1, transaction.sender, 'address', activeNetwork)}
+                    href={getEtherscanLink(1, swap.userAddress.id, 'address', activeNetwork)}
                     style={{ color: color ?? theme.blue1 }}
                 >
-                    {shortenAddress(transaction.sender)}
+                    {shortenAddress(swap.userAddress.id)}
                 </ExternalLink>
             </Label>
             <Label end={1} fontWeight={400}>
-                {formatTime(transaction.timestamp, activeNetwork === OptimismNetworkInfo ? 8 : 0)}
+                {formatTime(`${swap.timestamp}`)}
             </Label>
         </ResponsiveGrid>
     );
 };
 
-export default function TransactionTable({
-    transactions,
+export default function SwapsTable({
+    swaps,
     maxItems = 10,
     color,
 }: {
-    transactions: Transaction[];
+    swaps: BalancerSwapFragment[];
     maxItems?: number;
     color?: string;
 }) {
@@ -152,34 +147,31 @@ export default function TransactionTable({
 
     useEffect(() => {
         let extraPages = 1;
-        if (transactions.length % maxItems === 0) {
+        if (swaps.length % maxItems === 0) {
             extraPages = 0;
         }
-        setMaxPage(Math.floor(transactions.length / maxItems) + extraPages);
-    }, [maxItems, transactions]);
+        setMaxPage(Math.floor(swaps.length / maxItems) + extraPages);
+    }, [maxItems, swaps]);
 
     // filter on txn type
     const [txFilter, setTxFilter] = useState<TransactionType | undefined>(undefined);
 
     const sortedTransactions = useMemo(() => {
-        return transactions
-            ? transactions
+        return swaps
+            ? swaps
                   .slice()
                   .sort((a, b) => {
                       if (a && b) {
-                          return a[sortField as keyof Transaction] > b[sortField as keyof Transaction]
+                          return a[sortField as keyof BalancerSwapFragment] > b[sortField as keyof BalancerSwapFragment]
                               ? (sortDirection ? -1 : 1) * 1
                               : (sortDirection ? -1 : 1) * -1;
                       } else {
                           return -1;
                       }
                   })
-                  .filter((x) => {
-                      return txFilter === undefined || x.type === txFilter;
-                  })
                   .slice(maxItems * (page - 1), page * maxItems)
             : [];
-    }, [transactions, maxItems, page, sortField, sortDirection, txFilter]);
+    }, [swaps, maxItems, page, sortField, sortDirection, txFilter]);
 
     const handleSort = useCallback(
         (newField: string) => {
@@ -196,7 +188,7 @@ export default function TransactionTable({
         [sortDirection, sortField],
     );
 
-    if (!transactions) {
+    if (!swaps) {
         return <Loader />;
     }
 
@@ -204,40 +196,7 @@ export default function TransactionTable({
         <Wrapper>
             <AutoColumn gap="16px">
                 <ResponsiveGrid>
-                    <RowFixed>
-                        <SortText
-                            onClick={() => {
-                                setTxFilter(undefined);
-                            }}
-                            active={txFilter === undefined}
-                        >
-                            All
-                        </SortText>
-                        <SortText
-                            onClick={() => {
-                                setTxFilter(TransactionType.SWAP);
-                            }}
-                            active={txFilter === TransactionType.SWAP}
-                        >
-                            Swaps
-                        </SortText>
-                        <SortText
-                            onClick={() => {
-                                setTxFilter(TransactionType.MINT);
-                            }}
-                            active={txFilter === TransactionType.MINT}
-                        >
-                            Adds
-                        </SortText>
-                        <SortText
-                            onClick={() => {
-                                setTxFilter(TransactionType.BURN);
-                            }}
-                            active={txFilter === TransactionType.BURN}
-                        >
-                            Removes
-                        </SortText>
-                    </RowFixed>
+                    <RowFixed></RowFixed>
                     <ClickableText color={theme.text2} onClick={() => handleSort(SORT_FIELD.amountUSD)} end={1}>
                         Total Value {arrow(SORT_FIELD.amountUSD)}
                     </ClickableText>
@@ -256,11 +215,11 @@ export default function TransactionTable({
                 </ResponsiveGrid>
                 <Break />
 
-                {sortedTransactions.map((t, i) => {
-                    if (t) {
+                {sortedTransactions.map((swap, i) => {
+                    if (swap) {
                         return (
                             <React.Fragment key={i}>
-                                <DataRow transaction={t} color={color} />
+                                <DataRow swap={swap} color={color} />
                                 <Break />
                             </React.Fragment>
                         );
