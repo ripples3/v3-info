@@ -266,7 +266,7 @@ export const GetTransactionData = gql`
             first: 150
             orderBy: timestamp
             orderDirection: desc
-            where: { tokenIn_in: $addresses, timestamp_gte: $startTimestamp }
+            where: { tokenIn_in: $addresses, poolId_in: $poolIds, timestamp_gte: $startTimestamp }
         ) {
             ...BalancerSwap
         }
@@ -274,7 +274,7 @@ export const GetTransactionData = gql`
             first: 150
             orderBy: timestamp
             orderDirection: desc
-            where: { tokenOut_in: $addresses, timestamp_gte: $startTimestamp }
+            where: { tokenOut_in: $addresses, poolId_in: $poolIds, timestamp_gte: $startTimestamp }
         ) {
             ...BalancerSwap
         }
