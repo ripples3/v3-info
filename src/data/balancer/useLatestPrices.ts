@@ -1,9 +1,17 @@
-import { PoolData } from '../../state/pools/reducer';
-import { useBalancerPools } from './usePools';
+import { useGetLatestPricesQuery } from '../../apollo/generated/graphql-codegen-generated';
 
-export function useLatestPrices(poolId: string): PoolData | null {
-    const pools = useBalancerPools();
-    const pool = pools.find((pool) => pool.id === poolId);
+const WFTM_ADDRESS = '0x21be370d5312f44cb42ce377bc9b8a0cef1a4c83';
+const BEETS_ADDRESS = '0xf24bcf4d1e507740041c9cfd2dddb29585adce1e';
 
-    return pool || null;
+export function useLatestPrices(): { ftm?: number; beets?: number } {
+    // eslint-disable-next-line
+    const { data } = useGetLatestPricesQuery({ variables: { where: { asset_in: [WFTM_ADDRESS, BEETS_ADDRESS] } } });
+    const prices = data?.latestPrices || [];
+    const ftm = prices.find((price) => price.asset === WFTM_ADDRESS);
+    const beets = prices.find((price) => price.asset === BEETS_ADDRESS);
+
+    return {
+        ftm: ftm ? parseFloat(ftm.priceUsd) : undefined,
+        beets: beets ? parseFloat(beets.priceUsd) : undefined,
+    };
 }

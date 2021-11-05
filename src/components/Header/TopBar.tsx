@@ -1,10 +1,10 @@
 import React from 'react';
 import styled from 'styled-components';
-import { RowBetween, RowFixed, AutoRow } from 'components/Row';
-import { TYPE, ExternalLink } from 'theme';
-import { useEthPrices } from 'hooks/useEthPrices';
+import { AutoRow, RowBetween, RowFixed } from 'components/Row';
+import { ExternalLink, TYPE } from 'theme';
 import { formatDollarAmount } from 'utils/numbers';
 import Polling from './Polling';
+import { useLatestPrices } from '../../data/balancer/useLatestPrices';
 
 const Wrapper = styled.div`
     width: 100%;
@@ -22,7 +22,7 @@ const StyledLink = styled(ExternalLink)`
 `;
 
 const TopBar = () => {
-    const ethPrices = useEthPrices();
+    const { ftm, beets } = useLatestPrices();
 
     return (
         <Wrapper>
@@ -32,15 +32,13 @@ const TopBar = () => {
                     <RowFixed>
                         <Item>FTM Price:</Item>
                         <Item fontWeight="700" ml="4px">
-                            $2.80
-                            {/*formatDollarAmount(ethPrices?.current)*/}
+                            {formatDollarAmount(ftm)}
                         </Item>
                     </RowFixed>
                     <RowFixed>
                         <Item>BEETS Price:</Item>
                         <Item fontWeight="700" ml="4px">
-                            $0.91
-                            {/*formatDollarAmount(ethPrices?.current)*/}
+                            {formatDollarAmount(beets)}
                         </Item>
                     </RowFixed>
                 </AutoRow>
