@@ -1,10 +1,8 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect } from 'react';
 import { PageWrapper } from 'pages/styled';
 import { AutoColumn } from 'components/Column';
 import { TYPE } from 'theme';
 import PoolTable from 'components/pools/PoolTable';
-import { useAllPoolData, usePoolDatas } from 'state/pools/hooks';
-import { notEmpty } from 'utils';
 import { useSavedPools } from 'state/user/hooks';
 import { DarkGreyCard } from 'components/Card';
 import { useBalancerPools } from '../../data/balancer/usePools';
@@ -16,9 +14,9 @@ export default function PoolPage() {
     }, []);
 
     const [savedPools] = useSavedPools();
-    const watchlistPools = usePoolDatas(savedPools);
 
     const poolData = useBalancerPools();
+    const watchlistPools = poolData.filter((pool) => savedPools.includes(pool.id));
 
     return (
         <PageWrapper>
