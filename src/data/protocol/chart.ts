@@ -1,4 +1,4 @@
-import { ChartDayData } from '../../types/index';
+import { ChartDayData } from '../../types';
 import { useState, useEffect } from 'react';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';

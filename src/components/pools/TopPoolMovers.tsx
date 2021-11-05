@@ -9,7 +9,7 @@ import { formatDollarAmount } from 'utils/numbers';
 import Percent from 'components/Percent';
 import { useAllPoolData } from 'state/pools/hooks';
 import { PoolData } from 'state/pools/reducer';
-import DoubleCurrencyLogo from 'components/DoubleLogo';
+import PoolCurrencyLogo from 'components/PoolCurrencyLogo';
 import HoverInlineText from 'components/HoverInlineText';
 import { feeTierPercent } from 'utils';
 
@@ -29,19 +29,15 @@ const Wrapper = styled(GreyCard)`
 
 const DataCard = ({ poolData }: { poolData: PoolData }) => {
     return (
-        <Container to={'pools/' + poolData.address}>
+        <Container to={'pools/' + poolData.id}>
             <Wrapper>
                 <AutoColumn gap="sm">
                     <RowFixed>
-                        <DoubleCurrencyLogo
-                            address0={poolData.token0.address}
-                            address1={poolData.token1.address}
-                            size={16}
-                        />
+                        <PoolCurrencyLogo tokens={poolData.tokens} size={16} />
                         <TYPE.label ml="8px">
                             <HoverInlineText
                                 maxCharacters={10}
-                                text={`${poolData.token0.symbol}/${poolData.token1.symbol}`}
+                                text={`${poolData.tokens[0].symbol}/${poolData.tokens[1].symbol}`}
                             />
                         </TYPE.label>
                         <GreyBadge ml="10px" fontSize="12px">

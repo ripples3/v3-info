@@ -43,6 +43,7 @@ const EMPTY_LIST: TokenAddressMap = {
     [ChainId.ROPSTEN]: {},
     [ChainId.GÖRLI]: {},
     [ChainId.MAINNET]: {},
+    [250]: {},
     [10]: {},
 };
 
@@ -106,6 +107,7 @@ function combineMaps(map1: TokenAddressMap, map2: TokenAddressMap): TokenAddress
         [ChainId.GÖRLI]: { ...map1[ChainId.GÖRLI], ...map2[ChainId.GÖRLI] },
         [10]: { ...map1[10], ...map2[10] },
         [42161]: { ...map1[42161], ...map2[42161] },
+        [250]: { ...map1[250], ...map2[250] },
     };
 }
 

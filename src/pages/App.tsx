@@ -17,6 +17,7 @@ import { ExternalLink, TYPE } from 'theme';
 import { useActiveNetworkVersion, useSubgraphStatus } from 'state/application/hooks';
 import { DarkGreyCard } from 'components/Card';
 import { SUPPORTED_NETWORK_VERSIONS, EthereumNetworkInfo, OptimismNetworkInfo } from 'constants/networks';
+import { loadTokenListTokens } from '../state/token-lists/token-lists';
 
 const AppWrapper = styled.div`
     display: flex;
@@ -89,6 +90,7 @@ export default function App() {
     const [loading, setLoading] = useState(true);
     useEffect(() => {
         setTimeout(() => setLoading(false), 1300);
+        loadTokenListTokens().catch();
     }, []);
 
     // update network based on route
@@ -156,7 +158,7 @@ export default function App() {
                         <BodyWrapper warningActive={showNotSyncedWarning}>
                             <Popups />
                             <Switch>
-                                <Route exact strict path="/:networkID?/pools/:address" component={PoolPage} />
+                                <Route exact strict path="/:networkID?/pools/:poolId" component={PoolPage} />
                                 <Route exact strict path="/:networkID?/pools" component={PoolsOverview} />
                                 <Route
                                     exact

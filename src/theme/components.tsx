@@ -97,12 +97,14 @@ export const LinkStyledButton = styled.button<{ disabled?: boolean }>`
 `;
 
 // An internal link from the react-router-dom library that is correctly styled
-export const StyledInternalLink = styled(Link)<{ fontSize?: string }>`
+export const StyledInternalLink = styled(Link)<{ fontSize?: string; mr?: string; ml?: string }>`
     text-decoration: none;
     cursor: pointer;
     color: inherit;
     font-weight: 500;
     font-size: ${({ fontSize }) => fontSize ?? '16px'};
+    margin-right: ${({ mr }) => mr ?? 0};
+    margin-left: ${({ ml }) => ml ?? 0};
 
     :hover {
         text-decoration: none;

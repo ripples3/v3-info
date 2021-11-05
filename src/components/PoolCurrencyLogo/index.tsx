@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import CurrencyLogo from '../CurrencyLogo';
+import { PoolTokenData } from '../../state/pools/reducer';
 
 const Wrapper = styled.div<{ margin: boolean; sizeraw: number }>`
     position: relative;
@@ -9,11 +10,10 @@ const Wrapper = styled.div<{ margin: boolean; sizeraw: number }>`
     margin-right: ${({ sizeraw, margin }) => margin && (sizeraw / 3 + 8).toString() + 'px'};
 `;
 
-interface DoubleCurrencyLogoProps {
+interface PoolCurrencyLogoProps {
     margin?: boolean;
     size?: number;
-    address0?: string;
-    address1?: string;
+    tokens: PoolTokenData[];
 }
 
 const HigherLogo = styled(CurrencyLogo)`
@@ -24,11 +24,21 @@ const CoveredLogo = styled(CurrencyLogo)<{ sizeraw: number }>`
     // left: ${({ sizeraw }) => '-' + (sizeraw / 2).toString() + 'px'} !important;
 `;
 
-export default function DoubleCurrencyLogo({ address0, address1, size = 16, margin = false }: DoubleCurrencyLogoProps) {
+export default function PoolCurrencyLogo({ tokens, size = 16, margin = false }: PoolCurrencyLogoProps) {
     return (
         <Wrapper sizeraw={size} margin={margin}>
-            {address0 && <HigherLogo address={address0} size={size.toString() + 'px'} />}
-            {address1 && <CoveredLogo address={address1} size={size.toString() + 'px'} sizeraw={size} />}
+            {tokens.map((token, index) =>
+                index === 0 ? (
+                    <HigherLogo address={token.address} size={size.toString() + 'px'} key={token.address} />
+                ) : (
+                    <CoveredLogo
+                        address={token.address}
+                        size={size.toString() + 'px'}
+                        sizeraw={size}
+                        key={token.address}
+                    />
+                ),
+            )}
         </Wrapper>
     );
 }

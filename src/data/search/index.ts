@@ -252,14 +252,14 @@ export function useFetchSearchResults(value: string): {
                 if (key === 'address' && isAddress) {
                     return t[key].match(new RegExp(escapeRegExp(value), 'i'));
                 }
-                if ((key === 'token0' || key === 'token1') && !isAddress) {
+                /*if ((key === 'token0' || key === 'token1') && !isAddress) {
                     return (
                         t[key].name.match(new RegExp(escapeRegExp(value), 'i')) ||
                         t[key].symbol
                             .toLocaleLowerCase()
                             .match(new RegExp(escapeRegExp(value.toLocaleLowerCase()), 'i'))
                     );
-                }
+                }*/
                 return false;
             });
             return regexMatches.some((m) => m);

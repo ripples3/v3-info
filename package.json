@@ -6,6 +6,13 @@
     "devDependencies": {
         "@emotion/core": "^11.0.0",
         "@ethersproject/experimental": "^5.0.1",
+        "@graphql-codegen/add": "^3.1.0",
+        "@graphql-codegen/cli": "^2.2.2",
+        "@graphql-codegen/fragment-matcher": "^3.2.0",
+        "@graphql-codegen/schema-ast": "^2.3.0",
+        "@graphql-codegen/typescript-document-nodes": "^2.2.0",
+        "@graphql-codegen/typescript-operations": "^2.2.0",
+        "@graphql-codegen/typescript-react-apollo": "^3.2.0",
         "@popperjs/core": "^2.4.4",
         "@reach/dialog": "^0.10.3",
         "@reach/portal": "^0.10.3",
@@ -104,6 +111,7 @@
         "integration-test": "start-server-and-test 'serve build -l 3000' http://localhost:3000 'cypress run'",
         "storybook": "start-storybook -p 6006",
         "test": "react-scripts test --env=jsdom",
+        "generate": "graphql-codegen --config codegen.yml -r dotenv/config",
         "codegen:schema": "npx apollo client:download-schema --endpoint=https://api.thegraph.com/subgraphs/name/ianlapham/uniswap-v3-rinkeby",
         "codegen:generate": "apollo codegen:generate --localSchemaFile=schema.json --target=typescript --includes=src/**/*.ts --tagName=gql --addTypename --globalTypesFile=src/types/graphql-global-types.ts types"
     },

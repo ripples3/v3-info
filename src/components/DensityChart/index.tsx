@@ -89,19 +89,19 @@ export default function DensityChart({ address }: DensityChartProps) {
 
     // poolData
     const poolData: PoolData = usePoolDatas([address])[0];
-    const formattedAddress0 = isAddress(poolData.token0.address);
-    const formattedAddress1 = isAddress(poolData.token1.address);
+    const formattedAddress0 = isAddress(poolData.tokens[0].address);
+    const formattedAddress1 = isAddress(poolData.tokens[1].address);
     const feeTier = poolData?.feeTier;
 
     // parsed tokens
     const token0 = useMemo(() => {
         return poolData && formattedAddress0 && formattedAddress1
-            ? new Token(1, formattedAddress0, poolData.token0.decimals)
+            ? new Token(1, formattedAddress0, poolData.tokens[0].decimals)
             : undefined;
     }, [formattedAddress0, formattedAddress1, poolData]);
     const token1 = useMemo(() => {
         return poolData && formattedAddress1 && formattedAddress1
-            ? new Token(1, formattedAddress1, poolData.token1.decimals)
+            ? new Token(1, formattedAddress1, poolData.tokens[1].decimals)
             : undefined;
     }, [formattedAddress1, poolData]);
 
@@ -295,7 +295,7 @@ export default function DensityChart({ address }: DensityChartProps) {
                                 <CustomToolTip
                                     chartProps={props}
                                     poolData={poolData}
-                                    currentPrice={poolData.token0Price}
+                                    currentPrice={poolData.tokens[0].price}
                                 />
                             )}
                         />
@@ -304,8 +304,7 @@ export default function DensityChart({ address }: DensityChartProps) {
                             dataKey="activeLiquidity"
                             fill="#2172E5"
                             isAnimationActive={false}
-                            shape={(props) => {
-                                // eslint-disable-next-line react/prop-types
+                            shape={(props: { x: number; y: number; width: number; height: number; fill: string }) => {
                                 return (
                                     <CustomBar
                                         height={props.height}

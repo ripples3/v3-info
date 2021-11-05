@@ -1,29 +1,23 @@
-import React, { useMemo, useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { PageWrapper } from 'pages/styled';
 import { AutoColumn } from 'components/Column';
-import { TYPE, HideSmall } from 'theme';
+import { HideSmall, TYPE } from 'theme';
 import TokenTable from 'components/tokens/TokenTable';
 import { useAllTokenData, useTokenDatas } from 'state/tokens/hooks';
 import { notEmpty } from 'utils';
 import { useSavedTokens } from 'state/user/hooks';
 import { DarkGreyCard } from 'components/Card';
 import TopTokenMovers from 'components/tokens/TopTokenMovers';
+import { useBalancerTokens } from '../../data/balancer/useTokens';
 
 export default function TokensOverview() {
     useEffect(() => {
         window.scrollTo(0, 0);
     }, []);
 
-    const allTokens = useAllTokenData();
-
-    const formattedTokens = useMemo(() => {
-        return Object.values(allTokens)
-            .map((t) => t.data)
-            .filter(notEmpty);
-    }, [allTokens]);
-
     const [savedTokens] = useSavedTokens();
     const watchListTokens = useTokenDatas(savedTokens);
+    const formattedTokens = useBalancerTokens();
 
     return (
         <PageWrapper>

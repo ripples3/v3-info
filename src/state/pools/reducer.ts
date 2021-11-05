@@ -12,26 +12,27 @@ export interface Pool {
     token1: SerializedToken;
 }
 
+export interface PoolTokenData {
+    name: string;
+    symbol: string;
+    address: string;
+    decimals: number;
+    derivedETH: number;
+    price: number;
+    tvl: number;
+    weight: number;
+}
+
 export interface PoolData {
+    id: string;
+    name: string;
+    symbol: string;
     // basic token info
     address: string;
     feeTier: number;
+    swapFee: number;
 
-    token0: {
-        name: string;
-        symbol: string;
-        address: string;
-        decimals: number;
-        derivedETH: number;
-    };
-
-    token1: {
-        name: string;
-        symbol: string;
-        address: string;
-        decimals: number;
-        derivedETH: number;
-    };
+    tokens: PoolTokenData[];
 
     // for tick math
     liquidity: number;
@@ -47,13 +48,7 @@ export interface PoolData {
     tvlUSD: number;
     tvlUSDChange: number;
 
-    // prices
-    token0Price: number;
-    token1Price: number;
-
-    // token amounts
-    tvlToken0: number;
-    tvlToken1: number;
+    feesUSD: number;
 }
 
 export type PoolChartEntry = {

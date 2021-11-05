@@ -7,6 +7,7 @@ import { useAllPoolData, usePoolDatas } from 'state/pools/hooks';
 import { notEmpty } from 'utils';
 import { useSavedPools } from 'state/user/hooks';
 import { DarkGreyCard } from 'components/Card';
+import { useBalancerPools } from '../../data/balancer/usePools';
 // import TopPoolMovers from 'components/pools/TopPoolMovers'
 
 export default function PoolPage() {
@@ -14,16 +15,10 @@ export default function PoolPage() {
         window.scrollTo(0, 0);
     }, []);
 
-    // get all the pool datas that exist
-    const allPoolData = useAllPoolData();
-    const poolDatas = useMemo(() => {
-        return Object.values(allPoolData)
-            .map((p) => p.data)
-            .filter(notEmpty);
-    }, [allPoolData]);
-
     const [savedPools] = useSavedPools();
     const watchlistPools = usePoolDatas(savedPools);
+
+    const poolData = useBalancerPools();
 
     return (
         <PageWrapper>
@@ -45,7 +40,7 @@ export default function PoolPage() {
           </DarkGreyCard>
         </HideSmall> */}
                 <TYPE.main>All Pools</TYPE.main>
-                <PoolTable poolDatas={poolDatas} />
+                <PoolTable poolDatas={poolData} />
             </AutoColumn>
         </PageWrapper>
     );

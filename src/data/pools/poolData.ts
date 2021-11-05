@@ -173,62 +173,93 @@ export function usePoolDatas(poolAddresses: string[]): {
 
         const [volumeUSD, volumeUSDChange] =
             current && oneDay && twoDay
-                ? get2DayChange(current.volumeUSD, oneDay.volumeUSD, twoDay.volumeUSD)
+                ? get2DayChange(current.totalSwapVolume, oneDay.totalSwapVolume, twoDay.totalSwapVolume)
                 : current
-                ? [parseFloat(current.volumeUSD), 0]
+                ? [parseFloat(current.totalSwapVolume), 0]
                 : [0, 0];
 
         const volumeUSDWeek =
             current && week
-                ? parseFloat(current.volumeUSD) - parseFloat(week.volumeUSD)
+                ? parseFloat(current.totalSwapVolume) - parseFloat(week.totalSwapVolume)
                 : current
-                ? parseFloat(current.volumeUSD)
+                ? parseFloat(current.totalSwapVolume)
                 : 0;
 
-        const tvlUSD = current ? parseFloat(current.totalValueLockedUSD) : 0;
+        const tvlUSD = current ? parseFloat(current.totalLiquidity) : 0;
 
         const tvlUSDChange =
             current && oneDay
-                ? ((parseFloat(current.totalValueLockedUSD) - parseFloat(oneDay.totalValueLockedUSD)) /
-                      parseFloat(oneDay.totalValueLockedUSD)) *
+                ? ((parseFloat(current.totalLiquidity) - parseFloat(oneDay.totalLiquidity)) /
+                      parseFloat(oneDay.totalLiquidity)) *
                   100
                 : 0;
 
-        const tvlToken0 = current ? parseFloat(current.totalValueLockedToken0) : 0;
-        const tvlToken1 = current ? parseFloat(current.totalValueLockedToken1) : 0;
+        //const tvlToken0 = current ? parseFloat(current.totalValueLockedToken0) : 0;
+        //const tvlToken1 = current ? parseFloat(current.totalValueLockedToken1) : 0;
+        const tvlToken0 = 0;
+        const tvlToken1 = 0;
 
-        const feeTier = current ? parseInt(current.feeTier) : 0;
+        //const feeTier = current ? parseInt(current.feeTier) : 0;
+        const feeTier = 0;
 
         if (current) {
             accum[address] = {
+                id: '',
                 address,
                 feeTier,
-                liquidity: parseFloat(current.liquidity),
-                sqrtPrice: parseFloat(current.sqrtPrice),
-                tick: parseFloat(current.tick),
-                token0: {
-                    address: current.token0.id,
-                    name: formatTokenName(current.token0.id, current.token0.name),
-                    symbol: formatTokenSymbol(current.token0.id, current.token0.symbol),
-                    decimals: parseInt(current.token0.decimals),
-                    derivedETH: parseFloat(current.token0.derivedETH),
+                liquidity: parseFloat(current.totalLiquidity),
+                sqrtPrice: 0,
+                tick: 0,
+                tokens: [],
+                swapFee: 0,
+                name: '',
+                symbol: '',
+                /*token0: {
+                    address: current.tokens[0].address,
+                    name: formatTokenName(current.tokens[0].address, current.tokens[0].symbol),
+                    symbol: formatTokenSymbol(current.tokens[0].address, current.tokens[0].symbol),
+                    //decimals: parseInt(current.tokens[0].decimals),
+                    //derivedETH: parseFloat(current.tokens[0].derivedETH),
+                    decimals: 18,
+                    derivedETH: 0,
                 },
                 token1: {
-                    address: current.token1.id,
-                    name: formatTokenName(current.token1.id, current.token1.name),
-                    symbol: formatTokenSymbol(current.token1.id, current.token1.symbol),
-                    decimals: parseInt(current.token1.decimals),
-                    derivedETH: parseFloat(current.token1.derivedETH),
+                    address: current.tokens[1].address,
+                    name: formatTokenName(current.tokens[1].address, current.tokens[1].symbol),
+                    symbol: formatTokenSymbol(current.tokens[1].address, current.tokens[1].symbol),
+                    //decimals: parseInt(current.tokens[1].decimals),
+                    //derivedETH: parseFloat(current.tokens[1].derivedETH),
+                    decimals: 18,
+                    derivedETH: 0,
+                },*/
+                //token0Price: 0,
+                //token1Price: 0,
+                /*sqrtPrice: parseFloat(current.sqrtPrice),
+                tick: parseFloat(current.tick),
+                token0: {
+                    address: current.tokens[0].id,
+                    name: formatTokenName(current.tokens[0].id, current.tokens[0].name),
+                    symbol: formatTokenSymbol(current.tokens[0].id, current.tokens[0].symbol),
+                    decimals: parseInt(current.tokens[0].decimals),
+                    derivedETH: parseFloat(current.tokens[0].derivedETH),
+                },
+                token1: {
+                    address: current.tokens[1].id,
+                    name: formatTokenName(current.tokens[1].id, current.tokens[1].name),
+                    symbol: formatTokenSymbol(current.tokens[1].id, current.tokens[1].symbol),
+                    decimals: parseInt(current.tokens[1].decimals),
+                    derivedETH: parseFloat(current.tokens[1].derivedETH),
                 },
                 token0Price: parseFloat(current.token0Price),
-                token1Price: parseFloat(current.token1Price),
+                token1Price: parseFloat(current.token1Price),*/
                 volumeUSD,
                 volumeUSDChange,
                 volumeUSDWeek,
                 tvlUSD,
                 tvlUSDChange,
-                tvlToken0,
-                tvlToken1,
+                feesUSD: 0,
+                //tvlToken0,
+                //tvlToken1,
             };
         }
 

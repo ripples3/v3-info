@@ -15,6 +15,7 @@ import { PageButtons, Arrow, Break } from 'components/shared';
 import HoverInlineText from '../HoverInlineText';
 import useTheme from 'hooks/useTheme';
 import { TOKEN_HIDE } from '../../constants/index';
+import { TokenListToken } from '../../state/token-lists/token-lists';
 
 const Wrapper = styled(DarkGreyCard)`
     width: 100%;

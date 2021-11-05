@@ -52,12 +52,12 @@ export function CurrentPriceLabel({ data, chartProps, poolData }: CurrentPriceLa
                                     }}
                                 ></div>
                             </RowFixed>
-                            <TYPE.label>{`1 ${poolData.token0.symbol} = ${Number(price0).toLocaleString(undefined, {
+                            <TYPE.label>{`1 ${poolData.tokens[0].symbol} = ${Number(price0).toLocaleString(undefined, {
                                 minimumSignificantDigits: 1,
-                            })} ${poolData.token1.symbol}`}</TYPE.label>
-                            <TYPE.label>{`1 ${poolData.token1.symbol} = ${Number(price1).toLocaleString(undefined, {
+                            })} ${poolData.tokens[1].symbol}`}</TYPE.label>
+                            <TYPE.label>{`1 ${poolData.tokens[1].symbol} = ${Number(price1).toLocaleString(undefined, {
                                 minimumSignificantDigits: 1,
-                            })} ${poolData.token0.symbol}`}</TYPE.label>
+                            })} ${poolData.tokens[0].symbol}`}</TYPE.label>
                         </AutoColumn>
                     </Wrapper>
                 </foreignObject>

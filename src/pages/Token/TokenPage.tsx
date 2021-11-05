@@ -1,39 +1,30 @@
-import React, { useMemo, useState, useEffect } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { RouteComponentProps } from 'react-router-dom';
-import {
-    useTokenData,
-    usePoolsForToken,
-    useTokenChartData,
-    useTokenPriceData,
-    useTokenTransactions,
-} from 'state/tokens/hooks';
 import styled from 'styled-components';
 import { useColor } from 'hooks/useColor';
 import ReactGA from 'react-ga';
-import { ThemedBackground, PageWrapper } from 'pages/styled';
-import { shortenAddress, getEtherscanLink, currentTimestamp } from 'utils';
+import { PageWrapper, ThemedBackground } from 'pages/styled';
+import { currentTimestamp, getEtherscanLink, shortenAddress } from 'utils';
 import { AutoColumn } from 'components/Column';
-import { RowBetween, RowFixed, AutoRow, RowFlat } from 'components/Row';
-import { TYPE, StyledInternalLink } from 'theme';
+import { AutoRow, RowBetween, RowFixed, RowFlat } from 'components/Row';
+import { StyledInternalLink, TYPE } from 'theme';
 import Loader, { LocalLoader } from 'components/Loader';
-import { ExternalLink, Download } from 'react-feather';
+import { Download, ExternalLink } from 'react-feather';
 import { ExternalLink as StyledExternalLink } from '../../theme/components';
 import useTheme from 'hooks/useTheme';
 import CurrencyLogo from 'components/CurrencyLogo';
 import { formatDollarAmount } from 'utils/numbers';
 import Percent from 'components/Percent';
-import { ButtonPrimary, ButtonGray, SavedIcon } from 'components/Button';
+import { ButtonGray, ButtonPrimary, SavedIcon } from 'components/Button';
 import { DarkGreyCard, LightGreyCard } from 'components/Card';
-import { usePoolDatas } from 'state/pools/hooks';
 import PoolTable from 'components/pools/PoolTable';
 import LineChart from 'components/LineChart/alt';
-import { unixToDate } from 'utils/date';
-import { ToggleWrapper, ToggleElementFree } from 'components/Toggle/index';
+import { ToggleElementFree, ToggleWrapper } from 'components/Toggle/index';
 import BarChart from 'components/BarChart/alt';
 import CandleChart from 'components/CandleChart';
 import TransactionTable from 'components/TransactionsTable';
 import { useSavedTokens } from 'state/user/hooks';
-import { ONE_HOUR_SECONDS, TimeWindow } from 'constants/intervals';
+import { TimeWindow } from 'constants/intervals';
 import { MonoSpace } from 'components/shared';
 import dayjs from 'dayjs';
 import { useActiveNetworkVersion } from 'state/application/hooks';
@@ -43,6 +34,9 @@ import { GenericImageWrapper } from 'components/Logo';
 // import { SmallOptionButton } from '../../components/Button'
 import { useCMCLink } from 'hooks/useCMCLink';
 import CMCLogo from '../../assets/images/cmc.png';
+import { useBalancerTokenData, useBalancerTokenPageData } from '../../data/balancer/useTokens';
+import { useBalancerPoolsForToken } from '../../data/balancer/usePools';
+import { PriceChartEntry, Transaction } from '../../types';
 
 const PriceText = styled(TYPE.label)`
     font-size: 36px;
@@ -91,52 +85,22 @@ export default function TokenPage({
     },
 }: RouteComponentProps<{ address: string }>) {
     const [activeNetwork] = useActiveNetworkVersion();
+    const theme = useTheme();
 
     address = address.toLowerCase();
     // theming
     const backgroundColor = useColor(address);
-    const theme = useTheme();
 
     // scroll on page view
     useEffect(() => {
         window.scrollTo(0, 0);
     }, []);
 
-    const tokenData = useTokenData(address);
-    const poolsForToken = usePoolsForToken(address);
-    const poolDatas = usePoolDatas(poolsForToken ?? []);
-    const transactions = useTokenTransactions(address);
-    const chartData = useTokenChartData(address);
-
-    // check for link to CMC
+    const transactions: Transaction[] = [];
     const cmcLink = useCMCLink(address);
-
-    // format for chart component
-    const formattedTvlData = useMemo(() => {
-        if (chartData) {
-            return chartData.map((day) => {
-                return {
-                    time: unixToDate(day.date),
-                    value: day.totalValueLockedUSD,
-                };
-            });
-        } else {
-            return [];
-        }
-    }, [chartData]);
-
-    const formattedVolumeData = useMemo(() => {
-        if (chartData) {
-            return chartData.map((day) => {
-                return {
-                    time: unixToDate(day.date),
-                    value: day.volumeUSD,
-                };
-            });
-        } else {
-            return [];
-        }
-    }, [chartData]);
+    const tokenData = useBalancerTokenData(address);
+    const poolData = useBalancerPoolsForToken(address);
+    const { tvlData, volumeData, priceData } = useBalancerTokenPageData(address);
 
     // chart labels
     const [view, setView] = useState(ChartView.PRICE);
@@ -145,7 +109,8 @@ export default function TokenPage({
     const [timeWindow] = useState(DEFAULT_TIME_WINDOW);
 
     // pricing data
-    const priceData = useTokenPriceData(address, ONE_HOUR_SECONDS, timeWindow);
+    //const priceData = useTokenPriceData(address, ONE_HOUR_SECONDS, timeWindow);
+    /*const priceData: PriceChartEntry[] = [];
     const adjustedToCurrent = useMemo(() => {
         if (priceData && tokenData && priceData.length > 0) {
             const adjusted = Object.assign([], priceData);
@@ -160,7 +125,7 @@ export default function TokenPage({
         } else {
             return undefined;
         }
-    }, [priceData, tokenData]);
+    }, [priceData, tokenData]);*/
 
     // watchlist
     const [savedTokens, addSavedToken] = useSavedTokens();
@@ -249,21 +214,6 @@ export default function TokenPage({
                                 </AutoColumn>
                                 {activeNetwork !== EthereumNetworkInfo ? null : (
                                     <RowFixed>
-                                        <StyledExternalLink href={`https://app.uniswap.org/#/add/${address}`}>
-                                            <ButtonGray
-                                                width="170px"
-                                                mr="12px"
-                                                height={'100%'}
-                                                style={{ height: '44px' }}
-                                            >
-                                                <RowBetween>
-                                                    <Download size={24} />
-                                                    <div style={{ display: 'flex', alignItems: 'center' }}>
-                                                        Add Liquidity
-                                                    </div>
-                                                </RowBetween>
-                                            </ButtonGray>
-                                        </StyledExternalLink>
                                         <StyledExternalLink
                                             href={`https://app.uniswap.org/#/swap?inputCurrency=${address}`}
                                         >
@@ -315,14 +265,9 @@ export default function TokenPage({
                                                     {latestValue
                                                         ? formatDollarAmount(latestValue, 2)
                                                         : view === ChartView.VOL
-                                                        ? formatDollarAmount(
-                                                              formattedVolumeData[formattedVolumeData.length - 1]
-                                                                  ?.value,
-                                                          )
+                                                        ? formatDollarAmount(volumeData[volumeData.length - 1]?.value)
                                                         : view === ChartView.TVL
-                                                        ? formatDollarAmount(
-                                                              formattedTvlData[formattedTvlData.length - 1]?.value,
-                                                          )
+                                                        ? formatDollarAmount(tvlData[tvlData.length - 1]?.value)
                                                         : formatDollarAmount(tokenData.priceUSD, 2)}
                                                 </MonoSpace>
                                             </TYPE.label>
@@ -367,7 +312,7 @@ export default function TokenPage({
                                 </RowBetween>
                                 {view === ChartView.TVL ? (
                                     <LineChart
-                                        data={formattedTvlData}
+                                        data={tvlData}
                                         color={backgroundColor}
                                         minHeight={340}
                                         value={latestValue}
@@ -377,7 +322,7 @@ export default function TokenPage({
                                     />
                                 ) : view === ChartView.VOL ? (
                                     <BarChart
-                                        data={formattedVolumeData}
+                                        data={volumeData}
                                         color={backgroundColor}
                                         minHeight={340}
                                         value={latestValue}
@@ -386,12 +331,15 @@ export default function TokenPage({
                                         setLabel={setValueLabel}
                                     />
                                 ) : view === ChartView.PRICE ? (
-                                    adjustedToCurrent ? (
-                                        <CandleChart
-                                            data={adjustedToCurrent}
+                                    priceData.length > 0 ? (
+                                        <LineChart
+                                            data={priceData}
+                                            color={backgroundColor}
+                                            minHeight={340}
+                                            value={latestValue}
+                                            label={valueLabel}
                                             setValue={setLatestValue}
                                             setLabel={setValueLabel}
-                                            color={backgroundColor}
                                         />
                                     ) : (
                                         <LocalLoader fill={false} />
@@ -430,7 +378,7 @@ export default function TokenPage({
                         </ContentLayout>
                         <TYPE.main>Pools</TYPE.main>
                         <DarkGreyCard>
-                            <PoolTable poolDatas={poolDatas} />
+                            <PoolTable poolDatas={poolData} />
                         </DarkGreyCard>
                         <TYPE.main>Transactions</TYPE.main>
                         <DarkGreyCard>

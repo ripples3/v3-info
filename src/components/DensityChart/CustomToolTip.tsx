@@ -34,39 +34,39 @@ export function CustomToolTip({ chartProps, poolData, currentPrice }: CustomTool
             <AutoColumn gap="sm">
                 <TYPE.main color={theme.text3}>Tick stats</TYPE.main>
                 <RowBetween>
-                    <TYPE.label>{poolData?.token0?.symbol} Price: </TYPE.label>
+                    <TYPE.label>{poolData?.tokens[0]?.symbol} Price: </TYPE.label>
                     <TYPE.label>
                         {price0
                             ? Number(price0).toLocaleString(undefined, {
                                   minimumSignificantDigits: 1,
                               })
                             : ''}{' '}
-                        {poolData?.token1?.symbol}
+                        {poolData?.tokens[1]?.symbol}
                     </TYPE.label>
                 </RowBetween>
                 <RowBetween>
-                    <TYPE.label>{poolData?.token1?.symbol} Price: </TYPE.label>
+                    <TYPE.label>{poolData?.tokens[1]?.symbol} Price: </TYPE.label>
                     <TYPE.label>
                         {price1
                             ? Number(price1).toLocaleString(undefined, {
                                   minimumSignificantDigits: 1,
                               })
                             : ''}{' '}
-                        {poolData?.token0?.symbol}
+                        {poolData?.tokens[0]?.symbol}
                     </TYPE.label>
                 </RowBetween>
                 {currentPrice && price0 && currentPrice > price1 ? (
                     <RowBetween>
-                        <TYPE.label>{poolData?.token0?.symbol} Locked: </TYPE.label>
+                        <TYPE.label>{poolData?.tokens[0]?.symbol} Locked: </TYPE.label>
                         <TYPE.label>
-                            {tvlToken0 ? formatAmount(tvlToken0) : ''} {poolData?.token0?.symbol}
+                            {tvlToken0 ? formatAmount(tvlToken0) : ''} {poolData?.tokens[0]?.symbol}
                         </TYPE.label>
                     </RowBetween>
                 ) : (
                     <RowBetween>
-                        <TYPE.label>{poolData?.token1?.symbol} Locked: </TYPE.label>
+                        <TYPE.label>{poolData?.tokens[1]?.symbol} Locked: </TYPE.label>
                         <TYPE.label>
-                            {tvlToken1 ? formatAmount(tvlToken1) : ''} {poolData?.token1?.symbol}
+                            {tvlToken1 ? formatAmount(tvlToken1) : ''} {poolData?.tokens[1]?.symbol}
                         </TYPE.label>
                     </RowBetween>
                 )}

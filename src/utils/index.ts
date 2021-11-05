@@ -20,26 +20,13 @@ export function isAddress(value: any): string | false {
     }
 }
 
-const ETHERSCAN_PREFIXES: { [chainId in ChainId]: string } = {
-    1: '',
-    3: 'ropsten.',
-    4: 'rinkeby.',
-    5: 'goerli.',
-    42: 'kovan.',
-};
-
 export function getEtherscanLink(
     chainId: ChainId,
     data: string,
     type: 'transaction' | 'token' | 'address' | 'block',
     networkVersion: NetworkInfo,
 ): string {
-    const prefix =
-        networkVersion === ArbitrumNetworkInfo
-            ? 'https://arbiscan.io/'
-            : networkVersion === OptimismNetworkInfo
-            ? 'https://optimistic.etherscan.io'
-            : `https://${ETHERSCAN_PREFIXES[chainId] || ETHERSCAN_PREFIXES[1]}etherscan.io`;
+    const prefix = 'https://ftmscan.com';
 
     if (networkVersion === OptimismNetworkInfo) {
         switch (type) {
@@ -154,6 +141,14 @@ export function isTokenOnList(tokenAddressMap: TokenAddressMap, token?: Token): 
 
 export function feeTierPercent(fee: number): string {
     return (fee / 10000).toPrecision(1) + '%';
+}
+
+export function swapFeePercent(swapFee: number): string {
+    return (swapFee * 100).toFixed(2) + '%';
+}
+
+export function tokenWeightPercent(weight: number): string {
+    return Math.round(weight * 100) + '%';
 }
 
 export function notEmpty<TValue>(value: TValue | null | undefined): value is TValue {

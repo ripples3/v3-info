@@ -23,6 +23,7 @@ const StyledLink = styled(ExternalLink)`
 
 const TopBar = () => {
     const ethPrices = useEthPrices();
+
     return (
         <Wrapper>
             <RowBetween>

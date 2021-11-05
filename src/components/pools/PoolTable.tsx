@@ -8,7 +8,7 @@ import { AutoColumn } from 'components/Column';
 import { RowFixed } from 'components/Row';
 import { formatDollarAmount } from 'utils/numbers';
 import { PoolData } from 'state/pools/reducer';
-import DoubleCurrencyLogo from 'components/DoubleLogo';
+import PoolCurrencyLogo from 'components/PoolCurrencyLogo';
 import { feeTierPercent } from 'utils';
 import { Label, ClickableText } from 'components/Text';
 import { PageButtons, Arrow, Break } from 'components/shared';
@@ -69,17 +69,15 @@ const DataRow = ({ poolData, index }: { poolData: PoolData; index: number }) => 
     const [activeNetwork] = useActiveNetworkVersion();
 
     return (
-        <LinkWrapper to={networkPrefix(activeNetwork) + 'pools/' + poolData.address}>
+        <LinkWrapper to={networkPrefix(activeNetwork) + 'pools/' + poolData.id}>
             <ResponsiveGrid>
                 <Label fontWeight={400}>{index + 1}</Label>
                 <Label fontWeight={400}>
                     <RowFixed>
-                        <DoubleCurrencyLogo address0={poolData.token0.address} address1={poolData.token1.address} />
-                        <TYPE.label ml="8px">
-                            {poolData.token0.symbol}/{poolData.token1.symbol}
-                        </TYPE.label>
+                        <TYPE.label mr="8px">{poolData.name}</TYPE.label>
+                        <PoolCurrencyLogo tokens={poolData.tokens} />
                         <GreyBadge ml="10px" fontSize="14px">
-                            {feeTierPercent(poolData.feeTier)}
+                            {(poolData.swapFee * 100).toFixed(2)}%
                         </GreyBadge>
                     </RowFixed>
                 </Label>
