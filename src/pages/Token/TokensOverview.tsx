@@ -34,7 +34,7 @@ export default function TokensOverview() {
                     <DarkGreyCard style={{ paddingTop: '12px' }}>
                         <AutoColumn gap="md">
                             <TYPE.mediumHeader fontSize="16px">Top Movers</TYPE.mediumHeader>
-                            <TopTokenMovers />
+                            <TopTokenMovers tokenDatas={formattedTokens} />
                         </AutoColumn>
                     </DarkGreyCard>
                 </HideSmall>

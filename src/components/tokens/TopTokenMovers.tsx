@@ -58,16 +58,12 @@ const DataCard = ({ tokenData }: { tokenData: TokenData }) => {
     );
 };
 
-export default function TopTokenMovers() {
-    const allTokens = useAllTokenData();
-
-    const topPriceIncrease = useMemo(() => {
-        return Object.values(allTokens)
-            .sort(({ data: a }, { data: b }) => {
-                return a && b ? (Math.abs(a?.priceUSDChange) > Math.abs(b?.priceUSDChange) ? -1 : 1) : -1;
-            })
-            .slice(0, Math.min(20, Object.values(allTokens).length));
-    }, [allTokens]);
+export default function TopTokenMovers({ tokenDatas }: { tokenDatas: TokenData[] }) {
+    const topPriceIncrease = tokenDatas
+        .sort((a, b) => {
+            return a && b ? (Math.abs(a?.priceUSDChange) > Math.abs(b?.priceUSDChange) ? -1 : 1) : -1;
+        })
+        .slice(0, Math.min(20, tokenDatas.length));
 
     const increaseRef = useRef<HTMLDivElement>(null);
     const [increaseSet, setIncreaseSet] = useState(false);
@@ -95,10 +91,8 @@ export default function TopTokenMovers() {
     return (
         <FixedContainer gap="md">
             <ScrollableRow ref={increaseRef}>
-                {topPriceIncrease.map((entry) =>
-                    entry.data ? (
-                        <DataCard key={'top-card-token-' + entry.data?.address} tokenData={entry.data} />
-                    ) : null,
+                {topPriceIncrease.map((data) =>
+                    data ? <DataCard key={'top-card-token-' + data.address} tokenData={data} /> : null,
                 )}
             </ScrollableRow>
         </FixedContainer>

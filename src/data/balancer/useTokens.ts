@@ -90,10 +90,12 @@ export function useBalancerTokens(): TokenData[] {
             tvlUSDChange: (tokenData.tvl - tokenData24.tvl) / tokenData24.tvl,
             priceUSD: priceData.price,
             priceUSDChange:
-                priceData.price && priceData24.price ? (priceData.price - priceData24.price) / priceData24.price : 0,
+                priceData.price && priceData24.price
+                    ? ((priceData.price - priceData24.price) / priceData24.price) * 100
+                    : 0,
             priceUSDChangeWeek:
                 priceData.price && priceDataWeek.price
-                    ? (priceData.price - priceDataWeek.price) / priceDataWeek.price
+                    ? ((priceData.price - priceDataWeek.price) / priceDataWeek.price) * 100
                     : 0,
         };
     });
