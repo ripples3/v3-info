@@ -3,6 +3,8 @@ import { useBlocksFromTimestamps } from '../../hooks/useBlocksFromTimestamps';
 import { useGetProtocolDataLazyQuery } from '../../apollo/generated/graphql-codegen-generated';
 import { useEffect } from 'react';
 import { unixToDate } from '../../utils/date';
+import { BalancerChartDataItem } from './balancerTypes';
+import { BALANCER_SUBGRAPH_START_TIMESTAMP } from './constants';
 
 interface ProtocolData {
     volume24?: number;
@@ -11,8 +13,8 @@ interface ProtocolData {
     feesChange?: number;
     tvl?: number;
     tvlChange?: number;
-    tvlData: { value: number; time: string }[];
-    volumeData: { value: number; time: string }[];
+    tvlData: BalancerChartDataItem[];
+    volumeData: BalancerChartDataItem[];
 }
 
 export function useBalancerProtocolData(): ProtocolData {
@@ -23,9 +25,9 @@ export function useBalancerProtocolData(): ProtocolData {
 
     useEffect(() => {
         if (block24) {
-            //TODO: replace this once the graph has caught up
             getProcotolData({
                 variables: {
+                    startTimestamp: BALANCER_SUBGRAPH_START_TIMESTAMP,
                     block24: { number: parseInt(block24.number) },
                     block48: { number: parseInt(block48.number) },
                 },

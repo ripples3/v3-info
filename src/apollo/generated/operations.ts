@@ -189,7 +189,7 @@ export const BalancerSnapshot = gql`
     }
 `;
 export const GetProtocolData = gql`
-    query GetProtocolData($block24: Block_height!, $block48: Block_height!) {
+    query GetProtocolData($startTimestamp: Int!, $block24: Block_height!, $block48: Block_height!) {
         balancers(first: 1) {
             totalLiquidity
             totalSwapCount
@@ -211,7 +211,12 @@ export const GetProtocolData = gql`
             totalSwapVolume
             poolCount
         }
-        balancerSnapshots(first: 1000, orderBy: timestamp, orderDirection: asc) {
+        balancerSnapshots(
+            first: 1000
+            orderBy: timestamp
+            orderDirection: asc
+            where: { timestamp_gte: $startTimestamp }
+        ) {
             ...BalancerSnapshot
         }
     }
@@ -242,8 +247,13 @@ export const GetTokenData = gql`
     ${LatestPrice}
 `;
 export const GetTokenSnapshots = gql`
-    query GetTokenSnapshots($address: String!) {
-        tokenSnapshots(first: 1000, orderBy: timestamp, orderDirection: asc, where: { token: $address }) {
+    query GetTokenSnapshots($address: String!, $startTimestamp: Int!) {
+        tokenSnapshots(
+            first: 1000
+            orderBy: timestamp
+            orderDirection: asc
+            where: { token: $address, timestamp_gte: $startTimestamp }
+        ) {
             ...TokenSnapshot
         }
     }
@@ -289,8 +299,13 @@ export const GetPoolData = gql`
     ${LatestPrice}
 `;
 export const GetPoolChartData = gql`
-    query GetPoolChartData($poolId: String!) {
-        poolSnapshots(first: 1000, orderBy: timestamp, orderDirection: asc, where: { pool: $poolId }) {
+    query GetPoolChartData($poolId: String!, $startTimestamp: Int!) {
+        poolSnapshots(
+            first: 1000
+            orderBy: timestamp
+            orderDirection: asc
+            where: { pool: $poolId, timestamp_gte: $startTimestamp }
+        ) {
             id
             amounts
             totalShares
@@ -305,15 +320,6 @@ export const GetPoolChartData = gql`
             pool {
                 id
             }
-        }
-        poolHistoricalLiquidities(first: 1000, orderBy: timestamp, orderDirection: asc, where: { poolId: $poolId }) {
-            poolTotalShares
-            poolLiquidity
-            poolLiquidityUSD
-            poolShareValue
-            pricingAsset
-            block
-            timestamp
         }
     }
 `;

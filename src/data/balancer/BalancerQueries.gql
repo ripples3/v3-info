@@ -1,5 +1,5 @@
 
-query GetProtocolData($block24: Block_height!, $block48: Block_height!) {
+query GetProtocolData($startTimestamp: Int!, $block24: Block_height!, $block48: Block_height!) {
     balancers(first: 1) {
         totalLiquidity
         totalSwapCount
@@ -25,6 +25,7 @@ query GetProtocolData($block24: Block_height!, $block48: Block_height!) {
         first: 1000
         orderBy: timestamp
         orderDirection: asc
+        where: {timestamp_gte: $startTimestamp}
     ) {
         ...BalancerSnapshot
     }
@@ -73,8 +74,8 @@ query GetTokenData($block24: Block_height!, $blockWeek: Block_height!) {
     }
 }
 
-query GetTokenSnapshots($address: String!) {
-    tokenSnapshots(first: 1000, orderBy: timestamp, orderDirection: asc, where: {token: $address}) {
+query GetTokenSnapshots($address: String!, $startTimestamp: Int!) {
+    tokenSnapshots(first: 1000, orderBy: timestamp, orderDirection: asc, where: {token: $address, timestamp_gte: $startTimestamp}) {
         ...TokenSnapshot
     }
 }
@@ -133,8 +134,8 @@ query GetPoolData($block24: Block_height!, $block48: Block_height!, $blockWeek: 
 }
 
 
-query GetPoolChartData($poolId: String!) {
-    poolSnapshots(first: 1000, orderBy: timestamp, orderDirection: asc, where: {pool: $poolId}) {
+query GetPoolChartData($poolId: String!, $startTimestamp: Int!) {
+    poolSnapshots(first: 1000, orderBy: timestamp, orderDirection: asc, where: {pool: $poolId, timestamp_gte: $startTimestamp}) {
         id
         amounts
         totalShares
@@ -149,15 +150,6 @@ query GetPoolChartData($poolId: String!) {
         pool {
             id
         }
-    }
-    poolHistoricalLiquidities(first: 1000, orderBy: timestamp, orderDirection: asc, where: {poolId: $poolId}) {
-        poolTotalShares
-        poolLiquidity
-        poolLiquidityUSD
-        poolShareValue
-        pricingAsset
-        block
-        timestamp
     }
 }
 

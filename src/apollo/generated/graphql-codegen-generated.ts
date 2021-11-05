@@ -3124,6 +3124,7 @@ export type _SubgraphErrorPolicy_ =
     | 'deny';
 
 export type GetProtocolDataQueryVariables = Exact<{
+    startTimestamp: Scalars['Int'];
     block24: Block_Height;
     block48: Block_Height;
 }>;
@@ -3270,6 +3271,7 @@ export type GetTokenDataQuery = {
 
 export type GetTokenSnapshotsQueryVariables = Exact<{
     address: Scalars['String'];
+    startTimestamp: Scalars['Int'];
 }>;
 
 export type GetTokenSnapshotsQuery = {
@@ -3461,6 +3463,7 @@ export type GetPoolDataQuery = {
 
 export type GetPoolChartDataQueryVariables = Exact<{
     poolId: Scalars['String'];
+    startTimestamp: Scalars['Int'];
 }>;
 
 export type GetPoolChartDataQuery = {
@@ -3479,16 +3482,6 @@ export type GetPoolChartDataQuery = {
         swapsCount: string;
         holdersCount: string;
         pool: { __typename: 'Pool'; id: string };
-    }>;
-    poolHistoricalLiquidities: Array<{
-        __typename: 'PoolHistoricalLiquidity';
-        poolTotalShares: string;
-        poolLiquidity: string;
-        poolLiquidityUSD: string;
-        poolShareValue: string;
-        pricingAsset: string;
-        block: string;
-        timestamp: number;
     }>;
 };
 
@@ -4476,7 +4469,7 @@ export const BalancerSnapshotFragmentDoc = gql`
     }
 `;
 export const GetProtocolDataDocument = gql`
-    query GetProtocolData($block24: Block_height!, $block48: Block_height!) {
+    query GetProtocolData($startTimestamp: Int!, $block24: Block_height!, $block48: Block_height!) {
         balancers(first: 1) {
             totalLiquidity
             totalSwapCount
@@ -4498,7 +4491,12 @@ export const GetProtocolDataDocument = gql`
             totalSwapVolume
             poolCount
         }
-        balancerSnapshots(first: 1000, orderBy: timestamp, orderDirection: asc) {
+        balancerSnapshots(
+            first: 1000
+            orderBy: timestamp
+            orderDirection: asc
+            where: { timestamp_gte: $startTimestamp }
+        ) {
             ...BalancerSnapshot
         }
     }
@@ -4517,6 +4515,7 @@ export const GetProtocolDataDocument = gql`
  * @example
  * const { data, loading, error } = useGetProtocolDataQuery({
  *   variables: {
+ *      startTimestamp: // value for 'startTimestamp'
  *      block24: // value for 'block24'
  *      block48: // value for 'block48'
  *   },
@@ -4595,8 +4594,13 @@ export type GetTokenDataQueryHookResult = ReturnType<typeof useGetTokenDataQuery
 export type GetTokenDataLazyQueryHookResult = ReturnType<typeof useGetTokenDataLazyQuery>;
 export type GetTokenDataQueryResult = Apollo.QueryResult<GetTokenDataQuery, GetTokenDataQueryVariables>;
 export const GetTokenSnapshotsDocument = gql`
-    query GetTokenSnapshots($address: String!) {
-        tokenSnapshots(first: 1000, orderBy: timestamp, orderDirection: asc, where: { token: $address }) {
+    query GetTokenSnapshots($address: String!, $startTimestamp: Int!) {
+        tokenSnapshots(
+            first: 1000
+            orderBy: timestamp
+            orderDirection: asc
+            where: { token: $address, timestamp_gte: $startTimestamp }
+        ) {
             ...TokenSnapshot
         }
     }
@@ -4616,6 +4620,7 @@ export const GetTokenSnapshotsDocument = gql`
  * const { data, loading, error } = useGetTokenSnapshotsQuery({
  *   variables: {
  *      address: // value for 'address'
+ *      startTimestamp: // value for 'startTimestamp'
  *   },
  * });
  */
@@ -4709,8 +4714,13 @@ export type GetPoolDataQueryHookResult = ReturnType<typeof useGetPoolDataQuery>;
 export type GetPoolDataLazyQueryHookResult = ReturnType<typeof useGetPoolDataLazyQuery>;
 export type GetPoolDataQueryResult = Apollo.QueryResult<GetPoolDataQuery, GetPoolDataQueryVariables>;
 export const GetPoolChartDataDocument = gql`
-    query GetPoolChartData($poolId: String!) {
-        poolSnapshots(first: 1000, orderBy: timestamp, orderDirection: asc, where: { pool: $poolId }) {
+    query GetPoolChartData($poolId: String!, $startTimestamp: Int!) {
+        poolSnapshots(
+            first: 1000
+            orderBy: timestamp
+            orderDirection: asc
+            where: { pool: $poolId, timestamp_gte: $startTimestamp }
+        ) {
             id
             amounts
             totalShares
@@ -4725,15 +4735,6 @@ export const GetPoolChartDataDocument = gql`
             pool {
                 id
             }
-        }
-        poolHistoricalLiquidities(first: 1000, orderBy: timestamp, orderDirection: asc, where: { poolId: $poolId }) {
-            poolTotalShares
-            poolLiquidity
-            poolLiquidityUSD
-            poolShareValue
-            pricingAsset
-            block
-            timestamp
         }
     }
 `;
@@ -4751,6 +4752,7 @@ export const GetPoolChartDataDocument = gql`
  * const { data, loading, error } = useGetPoolChartDataQuery({
  *   variables: {
  *      poolId: // value for 'poolId'
+ *      startTimestamp: // value for 'startTimestamp'
  *   },
  * });
  */

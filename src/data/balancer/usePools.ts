@@ -14,6 +14,7 @@ import { TokenData } from '../../state/tokens/reducer';
 import { useBalancerTokens } from './useTokens';
 import { unixToDate } from '../../utils/date';
 import { BalancerChartDataItem } from './balancerTypes';
+import { BALANCER_SUBGRAPH_START_TIMESTAMP } from './constants';
 
 function getPoolValues(
     poolId: string,
@@ -117,7 +118,9 @@ export function useBalancerPoolPageData(poolId: string): {
     volumeData: BalancerChartDataItem[];
     feesData: BalancerChartDataItem[];
 } {
-    const { data } = useGetPoolChartDataQuery({ variables: { poolId } });
+    const { data } = useGetPoolChartDataQuery({
+        variables: { poolId, startTimestamp: BALANCER_SUBGRAPH_START_TIMESTAMP },
+    });
 
     if (!data) {
         return { tvlData: [], volumeData: [], feesData: [] };

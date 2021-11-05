@@ -1,0 +1,3 @@
+export const BALANCER_SUBGRAPH_START_TIMESTAMP: number = parseInt(
+    process.env.REACT_APP_BALANCER_SUBGRAPH_START_TIMESTAMP ?? '0',
+);

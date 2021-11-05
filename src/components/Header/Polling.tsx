@@ -67,33 +67,16 @@ const Spinner = styled.div`
 export default function Polling() {
     const theme = useTheme();
     const [activeNetwork] = useActiveNetworkVersion();
-    const [status] = useSubgraphStatus();
-    const [isMounted, setIsMounted] = useState(true);
-    //const latestBlock = activeNetwork === EthereumNetworkInfo ? status.headBlock : status.syncedBlock;
-    const latestBlock = useLatestBlock();
-
-    useEffect(
-        () => {
-            const timer1 = setTimeout(() => setIsMounted(true), 1000);
-
-            // this will clear Timeout when component unmount like in willComponentUnmount
-            return () => {
-                setIsMounted(false);
-                clearTimeout(timer1);
-            };
-        },
-        [status], //useEffect will run only one time
-        //if you pass a value to array, like this [data] than clearTimeout will run every time this value changes (useEffect re-run)
-    );
+    const { blockNumber, loading } = useLatestBlock();
 
     return (
-        <ExternalLink href={latestBlock ? getEtherscanLink(1, latestBlock.toString(), 'block', activeNetwork) : ''}>
+        <ExternalLink href={blockNumber ? getEtherscanLink(1, blockNumber.toString(), 'block', activeNetwork) : ''}>
             <StyledPolling>
                 <TYPE.small mr="4px" color={theme.text3}>
                     Latest synced block:{' '}
                 </TYPE.small>
-                <TYPE.small style={{ opacity: isMounted ? '0.6' : '0.8' }}>{latestBlock}</TYPE.small>
-                <StyledPollingDot>{!isMounted && <Spinner />}</StyledPollingDot>
+                <TYPE.small style={{ opacity: loading ? '0.6' : '0.8' }}>{blockNumber}</TYPE.small>
+                <StyledPollingDot>{loading ? <Spinner /> : null}</StyledPollingDot>
             </StyledPolling>
         </ExternalLink>
     );

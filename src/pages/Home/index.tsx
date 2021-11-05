@@ -123,7 +123,7 @@ export default function Home() {
                             activeWindow={volumeWindow}
                             topRight={
                                 <RowFixed style={{ marginLeft: '-40px', marginTop: '8px' }}>
-                                    <SmallOptionButton
+                                    {/*<SmallOptionButton
                                         active={volumeWindow === VolumeWindow.daily}
                                         onClick={() => setVolumeWindow(VolumeWindow.daily)}
                                     >
@@ -142,7 +142,7 @@ export default function Home() {
                                         onClick={() => setVolumeWindow(VolumeWindow.monthly)}
                                     >
                                         M
-                                    </SmallOptionButton>
+                                    </SmallOptionButton>*/}
                                 </RowFixed>
                             }
                             topLeft={

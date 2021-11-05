@@ -103,7 +103,7 @@ export default function TokenPage({
     const { tvlData, volumeData, priceData } = useBalancerTokenPageData(address);
 
     // chart labels
-    const [view, setView] = useState(ChartView.PRICE);
+    const [view, setView] = useState(ChartView.VOL);
     const [latestValue, setLatestValue] = useState<number | undefined>();
     const [valueLabel, setValueLabel] = useState<string | undefined>();
     const [timeWindow] = useState(DEFAULT_TIME_WINDOW);
@@ -301,13 +301,13 @@ export default function TokenPage({
                                         >
                                             TVL
                                         </ToggleElementFree>
-                                        <ToggleElementFree
+                                        {/*<ToggleElementFree
                                             isActive={view === ChartView.PRICE}
                                             fontSize="12px"
                                             onClick={() => setView(ChartView.PRICE)}
                                         >
                                             Price
-                                        </ToggleElementFree>
+                                        </ToggleElementFree>*/}
                                     </ToggleWrapper>
                                 </RowBetween>
                                 {view === ChartView.TVL ? (

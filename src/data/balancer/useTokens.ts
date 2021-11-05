@@ -15,6 +15,7 @@ import { unixToDate } from '../../utils/date';
 import { tokenListTokens } from '../../state/token-lists/token-lists';
 import { client } from '../../apollo/client';
 import { BalancerTokenPrices } from '../../apollo/generated/operations';
+import { BALANCER_SUBGRAPH_START_TIMESTAMP } from './constants';
 
 function getTokenValues(
     tokenAddress: string,
@@ -112,7 +113,9 @@ export function useBalancerTokenPageData(address: string): {
     volumeData: { value: number; time: string }[];
     priceData: { value: number; time: string }[];
 } {
-    const { data } = useGetTokenSnapshotsQuery({ variables: { address } });
+    const { data } = useGetTokenSnapshotsQuery({
+        variables: { address, startTimestamp: BALANCER_SUBGRAPH_START_TIMESTAMP },
+    });
     const snapshots = data?.tokenSnapshots || [];
     const [tokenPrices, setTokenPrices] = useState<BalancerTokenPriceFragment[]>([]);
 
