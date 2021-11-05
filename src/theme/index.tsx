@@ -75,10 +75,10 @@ export function colors(darkMode: boolean): Colors {
 
         // other
         pink1: '#ff007a',
-        red1: '#FD4040',
+        red1: '#FF0000',
         red2: '#F82D3A',
         red3: '#D60000',
-        green1: '#27AE60',
+        green1: '#00E59D',
         yellow1: '#FFE270',
         yellow2: '#F3841E',
         yellow3: '#F3B71E',

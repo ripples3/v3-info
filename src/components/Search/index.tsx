@@ -3,13 +3,13 @@ import styled from 'styled-components';
 import Row, { RowFixed } from 'components/Row';
 import { HideSmall, TYPE } from 'theme';
 import Hotkeys from 'react-hot-keys';
-import { useFetchSearchResults } from 'data/search';
+import { useFetchSearchResults } from 'data/balancer/useSearch';
 import { AutoColumn } from 'components/Column';
 import CurrencyLogo from 'components/CurrencyLogo';
 import { formatDollarAmount } from 'utils/numbers';
 import PoolCurrencyLogo from 'components/PoolCurrencyLogo';
 import { GreyBadge } from 'components/Card';
-import { feeTierPercent } from 'utils';
+import { feeTierPercent, swapFeePercent } from 'utils';
 import { useSavedTokens, useSavedPools } from 'state/user/hooks';
 import { SavedIcon } from 'components/Button';
 import { useHistory } from 'react-router-dom';
@@ -81,7 +81,7 @@ const Menu = styled.div<{ hide: boolean }>`
     box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.04), 0px 4px 8px rgba(0, 0, 0, 0.04), 0px 16px 24px rgba(0, 0, 0, 0.04),
         0px 24px 32px rgba(0, 0, 0, 0.04);
     display: ${({ hide }) => hide && 'none'};
-    border: 1px solid ${({ theme }) => theme.pink1};
+    border: 1px solid ${({ theme }) => theme.green1};
 
     ${({ theme }) => theme.mediaWidth.upToMedium`
     position: absolute;
@@ -107,6 +107,16 @@ const ResponsiveGrid = styled.div`
     display: grid;
     grid-gap: 1em;
     grid-template-columns: 1.5fr repeat(3, 1fr);
+    align-items: center;
+    ${({ theme }) => theme.mediaWidth.upToSmall`
+    grid-template-columns: 1fr;
+  `};
+`;
+
+const ResponsivePoolGrid = styled.div`
+    display: grid;
+    grid-gap: 1em;
+    grid-template-columns: 1.5fr repeat(2, 1fr);
     align-items: center;
     ${({ theme }) => theme.mediaWidth.upToSmall`
     grid-template-columns: 1fr;
@@ -145,8 +155,8 @@ const OptionButton = styled.div<{ enabled: boolean }>`
     margin-right: 10px;
     justify-content: center;
     align-items: center;
-    background-color: ${({ theme, enabled }) => (enabled ? theme.pink1 : 'transparent')};
-    color: ${({ theme, enabled }) => (enabled ? theme.white : theme.pink1)};
+    background-color: ${({ theme, enabled }) => (enabled ? theme.green1 : 'transparent')};
+    color: ${({ theme, enabled }) => (enabled ? theme.white : theme.green1)};
     :hover {
         opacity: 0.6;
         cursor: pointer;
@@ -337,7 +347,7 @@ const Search = ({ ...rest }: React.HTMLAttributes<HTMLDivElement>) => {
                             See more...
                         </HoverText>
                         <Break />
-                        <ResponsiveGrid>
+                        <ResponsivePoolGrid>
                             <TYPE.main>Pools</TYPE.main>
                             <HideSmall>
                                 <TYPE.main textAlign="end" fontSize="12px">
@@ -349,12 +359,7 @@ const Search = ({ ...rest }: React.HTMLAttributes<HTMLDivElement>) => {
                                     TVL
                                 </TYPE.main>
                             </HideSmall>
-                            <HideSmall>
-                                <TYPE.main textAlign="end" fontSize="12px">
-                                    Price
-                                </TYPE.main>
-                            </HideSmall>
-                        </ResponsiveGrid>
+                        </ResponsivePoolGrid>
                         {poolForList
                             .filter((p) => !POOL_HIDE.includes(p.address))
                             .slice(0, poolsShown)
@@ -364,16 +369,13 @@ const Search = ({ ...rest }: React.HTMLAttributes<HTMLDivElement>) => {
                                         onClick={() => handleNav(networkPrefix(activeNetwork) + 'pools/' + p.address)}
                                         key={i}
                                     >
-                                        <ResponsiveGrid key={i}>
+                                        <ResponsivePoolGrid key={i}>
                                             <RowFixed>
-                                                <PoolCurrencyLogo tokens={[]} />
+                                                <PoolCurrencyLogo tokens={p.tokens} />
                                                 <TYPE.label ml="10px" style={{ whiteSpace: 'nowrap' }}>
-                                                    <HoverInlineText
-                                                        maxCharacters={12}
-                                                        text={`${p.tokens[0].symbol} / ${p.tokens[1].symbol}`}
-                                                    />
+                                                    <HoverInlineText maxCharacters={24} text={p.name} />
                                                 </TYPE.label>
-                                                <GreyBadge ml="10px">{feeTierPercent(p.feeTier)}</GreyBadge>
+                                                <GreyBadge ml="10px">{swapFeePercent(p.swapFee)}</GreyBadge>
                                                 <SavedIcon
                                                     id="watchlist-icon"
                                                     size={'16px'}
@@ -393,12 +395,7 @@ const Search = ({ ...rest }: React.HTMLAttributes<HTMLDivElement>) => {
                                             <HideSmall>
                                                 <TYPE.label textAlign="end">{formatDollarAmount(p.tvlUSD)}</TYPE.label>
                                             </HideSmall>
-                                            <HideSmall>
-                                                <TYPE.label textAlign="end">
-                                                    {formatDollarAmount(p.tokens[0].price)}
-                                                </TYPE.label>
-                                            </HideSmall>
-                                        </ResponsiveGrid>
+                                        </ResponsivePoolGrid>
                                     </HoverRowLink>
                                 );
                             })}
