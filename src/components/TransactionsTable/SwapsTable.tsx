@@ -153,9 +153,6 @@ export default function SwapsTable({
         setMaxPage(Math.floor(swaps.length / maxItems) + extraPages);
     }, [maxItems, swaps]);
 
-    // filter on txn type
-    const [txFilter, setTxFilter] = useState<TransactionType | undefined>(undefined);
-
     const sortedTransactions = useMemo(() => {
         return swaps
             ? swaps
@@ -171,7 +168,7 @@ export default function SwapsTable({
                   })
                   .slice(maxItems * (page - 1), page * maxItems)
             : [];
-    }, [swaps, maxItems, page, sortField, sortDirection, txFilter]);
+    }, [swaps, maxItems, page, sortField, sortDirection]);
 
     const handleSort = useCallback(
         (newField: string) => {

@@ -28,6 +28,8 @@ import { networkPrefix } from 'utils/networkPrefix';
 import { EthereumNetworkInfo } from 'constants/networks';
 import { Transaction } from '../../types';
 import { useBalancerPoolData, useBalancerPoolPageData } from '../../data/balancer/usePools';
+import { useBalancerTransactionData } from '../../data/balancer/useTransactions';
+import SwapsTable from 'components/TransactionsTable/SwapsTable';
 
 const ContentLayout = styled.div`
     display: grid;
@@ -89,7 +91,10 @@ export default function PoolPage({
 
     const poolData = useBalancerPoolData(poolId);
     const { tvlData, volumeData, feesData } = useBalancerPoolPageData(poolId);
-    const transactions: Transaction[] = [];
+    const { swaps, joinExits } = useBalancerTransactionData(
+        (poolData?.tokens || []).map((token) => token.address),
+        poolData ? [poolData.id] : [],
+    );
 
     const [view, setView] = useState(ChartView.VOL);
     const [latestValue, setLatestValue] = useState<number | undefined>();
@@ -288,10 +293,10 @@ export default function PoolPage({
                             )}
                         </DarkGreyCard>
                     </ContentLayout>
-                    <TYPE.main fontSize="24px">Transactions</TYPE.main>
-                    {/*<DarkGreyCard>
-                        {transactions ? <TransactionTable swaps={transactions} /> : <LocalLoader fill={false} />}
-                    </DarkGreyCard>*/}
+                    <TYPE.main fontSize="24px">Swaps</TYPE.main>
+                    <DarkGreyCard>
+                        {swaps.length > 0 ? <SwapsTable swaps={swaps} /> : <LocalLoader fill={false} />}
+                    </DarkGreyCard>
                 </AutoColumn>
             ) : (
                 <Loader />
