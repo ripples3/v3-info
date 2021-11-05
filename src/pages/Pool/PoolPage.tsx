@@ -149,7 +149,7 @@ export default function PoolPage({
                                                     style={{ whiteSpace: 'nowrap' }}
                                                     width={'fit-content'}
                                                 >
-                                                    {`${tokenWeightPercent(token.weight)} ${
+                                                    {`${token.weight ? tokenWeightPercent(token.weight) : ''} ${
                                                         poolData.tokens.length < 5 ? token.symbol : ''
                                                     } `}
                                                 </TYPE.label>
@@ -159,23 +159,21 @@ export default function PoolPage({
                                 ))}
                             </ResponsiveRow>
                         </AutoColumn>
-                        {activeNetwork !== EthereumNetworkInfo ? null : (
-                            <RowFixed>
-                                <StyledExternalLink href={`https://app.beets.fi/#/pool/${poolId}`}>
-                                    <ButtonGray width="170px" mr="12px" style={{ height: '44px' }}>
-                                        <RowBetween>
-                                            <Download size={24} />
-                                            <div style={{ display: 'flex', alignItems: 'center' }}>Invest</div>
-                                        </RowBetween>
-                                    </ButtonGray>
-                                </StyledExternalLink>
-                                <StyledExternalLink href={`https://app.beets.fi/#/trade`}>
-                                    <ButtonPrimary width="100px" style={{ height: '44px' }}>
-                                        Trade
-                                    </ButtonPrimary>
-                                </StyledExternalLink>
-                            </RowFixed>
-                        )}
+                        <RowFixed>
+                            <StyledExternalLink href={`https://app.beets.fi/#/pool/${poolId}`}>
+                                <ButtonGray width="170px" mr="12px" style={{ height: '44px' }}>
+                                    <RowBetween>
+                                        <Download size={24} />
+                                        <div style={{ display: 'flex', alignItems: 'center' }}>Invest</div>
+                                    </RowBetween>
+                                </ButtonGray>
+                            </StyledExternalLink>
+                            <StyledExternalLink href={`https://app.beets.fi/#/trade`}>
+                                <ButtonPrimary width="100px" style={{ height: '44px' }}>
+                                    Trade
+                                </ButtonPrimary>
+                            </StyledExternalLink>
+                        </RowFixed>
                     </ResponsiveRow>
                     <ContentLayout>
                         <DarkGreyCard>
