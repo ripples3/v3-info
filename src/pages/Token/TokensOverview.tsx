@@ -1,10 +1,8 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect } from 'react';
 import { PageWrapper } from 'pages/styled';
 import { AutoColumn } from 'components/Column';
 import { HideSmall, TYPE } from 'theme';
 import TokenTable from 'components/tokens/TokenTable';
-import { useAllTokenData, useTokenDatas } from 'state/tokens/hooks';
-import { notEmpty } from 'utils';
 import { useSavedTokens } from 'state/user/hooks';
 import { DarkGreyCard } from 'components/Card';
 import TopTokenMovers from 'components/tokens/TopTokenMovers';
@@ -16,8 +14,8 @@ export default function TokensOverview() {
     }, []);
 
     const [savedTokens] = useSavedTokens();
-    const watchListTokens = useTokenDatas(savedTokens);
     const formattedTokens = useBalancerTokens();
+    const watchListTokens = formattedTokens.filter((token) => savedTokens.includes(token.address));
 
     return (
         <PageWrapper>
