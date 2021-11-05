@@ -675,3 +675,12 @@ export const GetLatestPrices = gql`
     }
     ${LatestPrice}
 `;
+export const GetLatestBlock = gql`
+    query GetLatestBlock {
+        blocks(first: 1, orderBy: timestamp, orderDirection: desc) {
+            id
+            number
+            timestamp
+        }
+    }
+`;

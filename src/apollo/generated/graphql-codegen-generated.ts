@@ -277,10 +277,195 @@ export type Balancer_OrderBy =
     | 'totalSwapFee'
     | 'totalSwapVolume';
 
+export interface Block {
+    __typename: 'Block';
+    author?: Maybe<Scalars['String']>;
+    difficulty?: Maybe<Scalars['BigInt']>;
+    gasLimit?: Maybe<Scalars['BigInt']>;
+    gasUsed?: Maybe<Scalars['BigInt']>;
+    id: Scalars['ID'];
+    number: Scalars['BigInt'];
+    parentHash?: Maybe<Scalars['String']>;
+    receiptsRoot?: Maybe<Scalars['String']>;
+    size?: Maybe<Scalars['BigInt']>;
+    stateRoot?: Maybe<Scalars['String']>;
+    timestamp: Scalars['BigInt'];
+    totalDifficulty?: Maybe<Scalars['BigInt']>;
+    transactionsRoot?: Maybe<Scalars['String']>;
+    unclesHash?: Maybe<Scalars['String']>;
+}
+
+export interface Block_Filter {
+    author?: Maybe<Scalars['String']>;
+    author_contains?: Maybe<Scalars['String']>;
+    author_ends_with?: Maybe<Scalars['String']>;
+    author_gt?: Maybe<Scalars['String']>;
+    author_gte?: Maybe<Scalars['String']>;
+    author_in?: Maybe<Array<Scalars['String']>>;
+    author_lt?: Maybe<Scalars['String']>;
+    author_lte?: Maybe<Scalars['String']>;
+    author_not?: Maybe<Scalars['String']>;
+    author_not_contains?: Maybe<Scalars['String']>;
+    author_not_ends_with?: Maybe<Scalars['String']>;
+    author_not_in?: Maybe<Array<Scalars['String']>>;
+    author_not_starts_with?: Maybe<Scalars['String']>;
+    author_starts_with?: Maybe<Scalars['String']>;
+    difficulty?: Maybe<Scalars['BigInt']>;
+    difficulty_gt?: Maybe<Scalars['BigInt']>;
+    difficulty_gte?: Maybe<Scalars['BigInt']>;
+    difficulty_in?: Maybe<Array<Scalars['BigInt']>>;
+    difficulty_lt?: Maybe<Scalars['BigInt']>;
+    difficulty_lte?: Maybe<Scalars['BigInt']>;
+    difficulty_not?: Maybe<Scalars['BigInt']>;
+    difficulty_not_in?: Maybe<Array<Scalars['BigInt']>>;
+    gasLimit?: Maybe<Scalars['BigInt']>;
+    gasLimit_gt?: Maybe<Scalars['BigInt']>;
+    gasLimit_gte?: Maybe<Scalars['BigInt']>;
+    gasLimit_in?: Maybe<Array<Scalars['BigInt']>>;
+    gasLimit_lt?: Maybe<Scalars['BigInt']>;
+    gasLimit_lte?: Maybe<Scalars['BigInt']>;
+    gasLimit_not?: Maybe<Scalars['BigInt']>;
+    gasLimit_not_in?: Maybe<Array<Scalars['BigInt']>>;
+    gasUsed?: Maybe<Scalars['BigInt']>;
+    gasUsed_gt?: Maybe<Scalars['BigInt']>;
+    gasUsed_gte?: Maybe<Scalars['BigInt']>;
+    gasUsed_in?: Maybe<Array<Scalars['BigInt']>>;
+    gasUsed_lt?: Maybe<Scalars['BigInt']>;
+    gasUsed_lte?: Maybe<Scalars['BigInt']>;
+    gasUsed_not?: Maybe<Scalars['BigInt']>;
+    gasUsed_not_in?: Maybe<Array<Scalars['BigInt']>>;
+    id?: Maybe<Scalars['ID']>;
+    id_gt?: Maybe<Scalars['ID']>;
+    id_gte?: Maybe<Scalars['ID']>;
+    id_in?: Maybe<Array<Scalars['ID']>>;
+    id_lt?: Maybe<Scalars['ID']>;
+    id_lte?: Maybe<Scalars['ID']>;
+    id_not?: Maybe<Scalars['ID']>;
+    id_not_in?: Maybe<Array<Scalars['ID']>>;
+    number?: Maybe<Scalars['BigInt']>;
+    number_gt?: Maybe<Scalars['BigInt']>;
+    number_gte?: Maybe<Scalars['BigInt']>;
+    number_in?: Maybe<Array<Scalars['BigInt']>>;
+    number_lt?: Maybe<Scalars['BigInt']>;
+    number_lte?: Maybe<Scalars['BigInt']>;
+    number_not?: Maybe<Scalars['BigInt']>;
+    number_not_in?: Maybe<Array<Scalars['BigInt']>>;
+    parentHash?: Maybe<Scalars['String']>;
+    parentHash_contains?: Maybe<Scalars['String']>;
+    parentHash_ends_with?: Maybe<Scalars['String']>;
+    parentHash_gt?: Maybe<Scalars['String']>;
+    parentHash_gte?: Maybe<Scalars['String']>;
+    parentHash_in?: Maybe<Array<Scalars['String']>>;
+    parentHash_lt?: Maybe<Scalars['String']>;
+    parentHash_lte?: Maybe<Scalars['String']>;
+    parentHash_not?: Maybe<Scalars['String']>;
+    parentHash_not_contains?: Maybe<Scalars['String']>;
+    parentHash_not_ends_with?: Maybe<Scalars['String']>;
+    parentHash_not_in?: Maybe<Array<Scalars['String']>>;
+    parentHash_not_starts_with?: Maybe<Scalars['String']>;
+    parentHash_starts_with?: Maybe<Scalars['String']>;
+    receiptsRoot?: Maybe<Scalars['String']>;
+    receiptsRoot_contains?: Maybe<Scalars['String']>;
+    receiptsRoot_ends_with?: Maybe<Scalars['String']>;
+    receiptsRoot_gt?: Maybe<Scalars['String']>;
+    receiptsRoot_gte?: Maybe<Scalars['String']>;
+    receiptsRoot_in?: Maybe<Array<Scalars['String']>>;
+    receiptsRoot_lt?: Maybe<Scalars['String']>;
+    receiptsRoot_lte?: Maybe<Scalars['String']>;
+    receiptsRoot_not?: Maybe<Scalars['String']>;
+    receiptsRoot_not_contains?: Maybe<Scalars['String']>;
+    receiptsRoot_not_ends_with?: Maybe<Scalars['String']>;
+    receiptsRoot_not_in?: Maybe<Array<Scalars['String']>>;
+    receiptsRoot_not_starts_with?: Maybe<Scalars['String']>;
+    receiptsRoot_starts_with?: Maybe<Scalars['String']>;
+    size?: Maybe<Scalars['BigInt']>;
+    size_gt?: Maybe<Scalars['BigInt']>;
+    size_gte?: Maybe<Scalars['BigInt']>;
+    size_in?: Maybe<Array<Scalars['BigInt']>>;
+    size_lt?: Maybe<Scalars['BigInt']>;
+    size_lte?: Maybe<Scalars['BigInt']>;
+    size_not?: Maybe<Scalars['BigInt']>;
+    size_not_in?: Maybe<Array<Scalars['BigInt']>>;
+    stateRoot?: Maybe<Scalars['String']>;
+    stateRoot_contains?: Maybe<Scalars['String']>;
+    stateRoot_ends_with?: Maybe<Scalars['String']>;
+    stateRoot_gt?: Maybe<Scalars['String']>;
+    stateRoot_gte?: Maybe<Scalars['String']>;
+    stateRoot_in?: Maybe<Array<Scalars['String']>>;
+    stateRoot_lt?: Maybe<Scalars['String']>;
+    stateRoot_lte?: Maybe<Scalars['String']>;
+    stateRoot_not?: Maybe<Scalars['String']>;
+    stateRoot_not_contains?: Maybe<Scalars['String']>;
+    stateRoot_not_ends_with?: Maybe<Scalars['String']>;
+    stateRoot_not_in?: Maybe<Array<Scalars['String']>>;
+    stateRoot_not_starts_with?: Maybe<Scalars['String']>;
+    stateRoot_starts_with?: Maybe<Scalars['String']>;
+    timestamp?: Maybe<Scalars['BigInt']>;
+    timestamp_gt?: Maybe<Scalars['BigInt']>;
+    timestamp_gte?: Maybe<Scalars['BigInt']>;
+    timestamp_in?: Maybe<Array<Scalars['BigInt']>>;
+    timestamp_lt?: Maybe<Scalars['BigInt']>;
+    timestamp_lte?: Maybe<Scalars['BigInt']>;
+    timestamp_not?: Maybe<Scalars['BigInt']>;
+    timestamp_not_in?: Maybe<Array<Scalars['BigInt']>>;
+    totalDifficulty?: Maybe<Scalars['BigInt']>;
+    totalDifficulty_gt?: Maybe<Scalars['BigInt']>;
+    totalDifficulty_gte?: Maybe<Scalars['BigInt']>;
+    totalDifficulty_in?: Maybe<Array<Scalars['BigInt']>>;
+    totalDifficulty_lt?: Maybe<Scalars['BigInt']>;
+    totalDifficulty_lte?: Maybe<Scalars['BigInt']>;
+    totalDifficulty_not?: Maybe<Scalars['BigInt']>;
+    totalDifficulty_not_in?: Maybe<Array<Scalars['BigInt']>>;
+    transactionsRoot?: Maybe<Scalars['String']>;
+    transactionsRoot_contains?: Maybe<Scalars['String']>;
+    transactionsRoot_ends_with?: Maybe<Scalars['String']>;
+    transactionsRoot_gt?: Maybe<Scalars['String']>;
+    transactionsRoot_gte?: Maybe<Scalars['String']>;
+    transactionsRoot_in?: Maybe<Array<Scalars['String']>>;
+    transactionsRoot_lt?: Maybe<Scalars['String']>;
+    transactionsRoot_lte?: Maybe<Scalars['String']>;
+    transactionsRoot_not?: Maybe<Scalars['String']>;
+    transactionsRoot_not_contains?: Maybe<Scalars['String']>;
+    transactionsRoot_not_ends_with?: Maybe<Scalars['String']>;
+    transactionsRoot_not_in?: Maybe<Array<Scalars['String']>>;
+    transactionsRoot_not_starts_with?: Maybe<Scalars['String']>;
+    transactionsRoot_starts_with?: Maybe<Scalars['String']>;
+    unclesHash?: Maybe<Scalars['String']>;
+    unclesHash_contains?: Maybe<Scalars['String']>;
+    unclesHash_ends_with?: Maybe<Scalars['String']>;
+    unclesHash_gt?: Maybe<Scalars['String']>;
+    unclesHash_gte?: Maybe<Scalars['String']>;
+    unclesHash_in?: Maybe<Array<Scalars['String']>>;
+    unclesHash_lt?: Maybe<Scalars['String']>;
+    unclesHash_lte?: Maybe<Scalars['String']>;
+    unclesHash_not?: Maybe<Scalars['String']>;
+    unclesHash_not_contains?: Maybe<Scalars['String']>;
+    unclesHash_not_ends_with?: Maybe<Scalars['String']>;
+    unclesHash_not_in?: Maybe<Array<Scalars['String']>>;
+    unclesHash_not_starts_with?: Maybe<Scalars['String']>;
+    unclesHash_starts_with?: Maybe<Scalars['String']>;
+}
+
 export interface Block_Height {
     hash?: Maybe<Scalars['Bytes']>;
     number?: Maybe<Scalars['Int']>;
 }
+
+export type Block_OrderBy =
+    | 'author'
+    | 'difficulty'
+    | 'gasLimit'
+    | 'gasUsed'
+    | 'id'
+    | 'number'
+    | 'parentHash'
+    | 'receiptsRoot'
+    | 'size'
+    | 'stateRoot'
+    | 'timestamp'
+    | 'totalDifficulty'
+    | 'transactionsRoot'
+    | 'unclesHash';
 
 export interface GradualWeightUpdate {
     __typename: 'GradualWeightUpdate';
@@ -1478,6 +1663,8 @@ export interface Query {
     balancerSnapshot?: Maybe<BalancerSnapshot>;
     balancerSnapshots: Array<BalancerSnapshot>;
     balancers: Array<Balancer>;
+    block?: Maybe<Block>;
+    blocks: Array<Block>;
     gradualWeightUpdate?: Maybe<GradualWeightUpdate>;
     gradualWeightUpdates: Array<GradualWeightUpdate>;
     investment?: Maybe<Investment>;
@@ -1560,6 +1747,20 @@ export interface QueryBalancersArgs {
     orderDirection?: Maybe<OrderDirection>;
     skip?: Maybe<Scalars['Int']>;
     where?: Maybe<Balancer_Filter>;
+}
+
+export interface QueryBlockArgs {
+    block?: Maybe<Block_Height>;
+    id: Scalars['ID'];
+}
+
+export interface QueryBlocksArgs {
+    block?: Maybe<Block_Height>;
+    first?: Maybe<Scalars['Int']>;
+    orderBy?: Maybe<Block_OrderBy>;
+    orderDirection?: Maybe<OrderDirection>;
+    skip?: Maybe<Scalars['Int']>;
+    where?: Maybe<Block_Filter>;
 }
 
 export interface QueryGradualWeightUpdateArgs {
@@ -1824,6 +2025,8 @@ export interface Subscription {
     balancerSnapshot?: Maybe<BalancerSnapshot>;
     balancerSnapshots: Array<BalancerSnapshot>;
     balancers: Array<Balancer>;
+    block?: Maybe<Block>;
+    blocks: Array<Block>;
     gradualWeightUpdate?: Maybe<GradualWeightUpdate>;
     gradualWeightUpdates: Array<GradualWeightUpdate>;
     investment?: Maybe<Investment>;
@@ -1906,6 +2109,20 @@ export interface SubscriptionBalancersArgs {
     orderDirection?: Maybe<OrderDirection>;
     skip?: Maybe<Scalars['Int']>;
     where?: Maybe<Balancer_Filter>;
+}
+
+export interface SubscriptionBlockArgs {
+    block?: Maybe<Block_Height>;
+    id: Scalars['ID'];
+}
+
+export interface SubscriptionBlocksArgs {
+    block?: Maybe<Block_Height>;
+    first?: Maybe<Scalars['Int']>;
+    orderBy?: Maybe<Block_OrderBy>;
+    orderDirection?: Maybe<OrderDirection>;
+    skip?: Maybe<Scalars['Int']>;
+    where?: Maybe<Block_Filter>;
 }
 
 export interface SubscriptionGradualWeightUpdateArgs {
@@ -4062,6 +4279,13 @@ export type GetLatestPricesQuery = {
     }>;
 };
 
+export type GetLatestBlockQueryVariables = Exact<{ [key: string]: never }>;
+
+export type GetLatestBlockQuery = {
+    __typename: 'Query';
+    blocks: Array<{ __typename: 'Block'; id: string; number: string; timestamp: string }>;
+};
+
 export const TokenSnapshotFragmentDoc = gql`
     fragment TokenSnapshot on TokenSnapshot {
         id
@@ -5623,3 +5847,43 @@ export function useGetLatestPricesLazyQuery(
 export type GetLatestPricesQueryHookResult = ReturnType<typeof useGetLatestPricesQuery>;
 export type GetLatestPricesLazyQueryHookResult = ReturnType<typeof useGetLatestPricesLazyQuery>;
 export type GetLatestPricesQueryResult = Apollo.QueryResult<GetLatestPricesQuery, GetLatestPricesQueryVariables>;
+export const GetLatestBlockDocument = gql`
+    query GetLatestBlock {
+        blocks(first: 1, orderBy: timestamp, orderDirection: desc) {
+            id
+            number
+            timestamp
+        }
+    }
+`;
+
+/**
+ * __useGetLatestBlockQuery__
+ *
+ * To run a query within a React component, call `useGetLatestBlockQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetLatestBlockQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetLatestBlockQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetLatestBlockQuery(
+    baseOptions?: Apollo.QueryHookOptions<GetLatestBlockQuery, GetLatestBlockQueryVariables>,
+) {
+    const options = { ...defaultOptions, ...baseOptions };
+    return Apollo.useQuery<GetLatestBlockQuery, GetLatestBlockQueryVariables>(GetLatestBlockDocument, options);
+}
+export function useGetLatestBlockLazyQuery(
+    baseOptions?: Apollo.LazyQueryHookOptions<GetLatestBlockQuery, GetLatestBlockQueryVariables>,
+) {
+    const options = { ...defaultOptions, ...baseOptions };
+    return Apollo.useLazyQuery<GetLatestBlockQuery, GetLatestBlockQueryVariables>(GetLatestBlockDocument, options);
+}
+export type GetLatestBlockQueryHookResult = ReturnType<typeof useGetLatestBlockQuery>;
+export type GetLatestBlockLazyQueryHookResult = ReturnType<typeof useGetLatestBlockLazyQuery>;
+export type GetLatestBlockQueryResult = Apollo.QueryResult<GetLatestBlockQuery, GetLatestBlockQueryVariables>;
