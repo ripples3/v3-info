@@ -1,5 +1,6 @@
 import React from 'react';
 import v3 from '../../assets/images/whitev3.svg';
+import lookingImage from '../../assets/images/looking-image.png';
 import styled, { keyframes, css } from 'styled-components';
 
 const rotate = keyframes`
@@ -79,7 +80,7 @@ const Wrapper = styled.div<{ fill: number; height?: string }>`
 const AnimatedImg = styled.div`
     animation: ${pulse} 800ms linear infinite;
     & > * {
-        width: 72px;
+        width: 180px;
     }
 `;
 
@@ -87,7 +88,7 @@ export const LocalLoader = ({ fill }: { fill: boolean }) => {
     return (
         <Wrapper fill={fill ? 1 : 0}>
             <AnimatedImg>
-                <img src={v3} alt="loading-icon" />
+                <img src={lookingImage} alt="loading-icon" />
             </AnimatedImg>
         </Wrapper>
     );
