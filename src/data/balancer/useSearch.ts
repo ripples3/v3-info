@@ -20,9 +20,16 @@ export function useFetchSearchResults(value: string): {
             const filteredTokens = allTokens.filter(
                 (token) => token.name.search(expression) || token.symbol.match(expression),
             );
-            const filteredPools = allPools.filter(
-                (pool) => pool.name.match(expression) || pool.symbol.match(expression),
-            );
+            const filteredPools = allPools.filter((pool) => {
+                if (pool.name.match(expression) || pool.symbol.match(expression)) {
+                    return true;
+                }
+
+                return (
+                    pool.tokens.filter((token) => token.name.search(expression) || token.symbol.match(expression))
+                        .length > 0
+                );
+            });
 
             setTokenData(filteredTokens);
             setPoolData(filteredPools);
