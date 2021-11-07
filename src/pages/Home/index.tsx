@@ -7,7 +7,7 @@ import LineChart from 'components/LineChart/alt';
 import useTheme from 'hooks/useTheme';
 import { useProtocolChartData, useProtocolTransactions } from 'state/protocol/hooks';
 import { DarkGreyCard } from 'components/Card';
-import { formatDollarAmount } from 'utils/numbers';
+import { formatAmount, formatDollarAmount } from 'utils/numbers';
 import Percent from 'components/Percent';
 import { HideMedium, HideSmall, StyledInternalLink } from '../../theme/components';
 import TokenTable from 'components/tokens/TokenTable';
@@ -22,6 +22,7 @@ import { useBalancerTokens } from '../../data/balancer/useTokens';
 import { useBalancerProtocolData } from '../../data/balancer/useProtocolData';
 import PoolTable from '../../components/pools/PoolTable';
 import { useBalancerPools } from '../../data/balancer/usePools';
+import numbro from 'numbro';
 
 const ChartWrapper = styled.div`
     width: 49%;
@@ -40,22 +41,21 @@ export default function Home() {
 
     const [activeNetwork] = useActiveNetworkVersion();
 
-    //const [protocolData] = useProtocolData();
-    const [chartData] = useProtocolChartData();
-    const [transactions] = useProtocolTransactions();
-
     const [volumeHover, setVolumeHover] = useState<number | undefined>();
     const [liquidityHover, setLiquidityHover] = useState<number | undefined>();
+    const [feesHover, setFeesHover] = useState<number | undefined>();
+    const [swapsHover, setSwapsHover] = useState<number | undefined>();
     const [leftLabel, setLeftLabel] = useState<string | undefined>();
     const [rightLabel, setRightLabel] = useState<string | undefined>();
+    const [swapsLabel, setSwapsLabel] = useState<string | undefined>();
+    const [feesLabel, setFeesLabel] = useState<string | undefined>();
 
     useEffect(() => {
         setLiquidityHover(undefined);
         setVolumeHover(undefined);
+        setFeesHover(undefined);
+        setSwapsHover(undefined);
     }, [activeNetwork]);
-
-    const weeklyVolumeData = useTransformedVolumeData(chartData, 'week');
-    const monthlyVolumeData = useTransformedVolumeData(chartData, 'month');
 
     const [volumeWindow, setVolumeWindow] = useState(VolumeWindow.daily);
 
@@ -74,6 +74,16 @@ export default function Home() {
             setLiquidityHover(protocolData.tvl);
         }
     }, [liquidityHover, protocolData]);
+    useEffect(() => {
+        if (!feesHover && protocolData) {
+            setFeesHover(protocolData.fees24);
+        }
+    }, [protocolData, feesHover]);
+    useEffect(() => {
+        if (!swapsHover && protocolData) {
+            setSwapsHover(protocolData.swaps24);
+        }
+    }, [protocolData, swapsHover]);
 
     return (
         <PageWrapper>
@@ -108,13 +118,7 @@ export default function Home() {
                         <BarChart
                             height={220}
                             minHeight={332}
-                            data={
-                                volumeWindow === VolumeWindow.monthly
-                                    ? monthlyVolumeData
-                                    : volumeWindow === VolumeWindow.weekly
-                                    ? weeklyVolumeData
-                                    : protocolData.volumeData
-                            }
+                            data={protocolData.volumeData}
                             color={theme.blue1}
                             setValue={setVolumeHover}
                             setLabel={setRightLabel}
@@ -153,6 +157,54 @@ export default function Home() {
                                     </TYPE.largeHeader>
                                     <TYPE.main fontSize="12px" height="14px">
                                         {rightLabel ? <MonoSpace>{rightLabel} (UTC)</MonoSpace> : null}
+                                    </TYPE.main>
+                                </AutoColumn>
+                            }
+                        />
+                    </ChartWrapper>
+                </ResponsiveRow>
+                <ResponsiveRow>
+                    <ChartWrapper>
+                        <LineChart
+                            data={protocolData.swapData}
+                            height={220}
+                            minHeight={332}
+                            color={activeNetwork.primaryColor}
+                            value={swapsHover}
+                            label={swapsLabel}
+                            setValue={setSwapsHover}
+                            setLabel={setSwapsLabel}
+                            topLeft={
+                                <AutoColumn gap="4px">
+                                    <TYPE.mediumHeader fontSize="16px">Swaps 24H</TYPE.mediumHeader>
+                                    <TYPE.largeHeader fontSize="32px">
+                                        <MonoSpace>{numbro(swapsHover).format({ thousandSeparated: true })} </MonoSpace>
+                                    </TYPE.largeHeader>
+                                    <TYPE.main fontSize="12px" height="14px">
+                                        {swapsLabel ? <MonoSpace>{swapsLabel} (UTC)</MonoSpace> : null}
+                                    </TYPE.main>
+                                </AutoColumn>
+                            }
+                        />
+                    </ChartWrapper>
+                    <ChartWrapper>
+                        <BarChart
+                            height={220}
+                            minHeight={332}
+                            data={protocolData.feeData}
+                            color={theme.blue1}
+                            setValue={setFeesHover}
+                            setLabel={setFeesLabel}
+                            value={feesHover}
+                            label={feesLabel}
+                            topLeft={
+                                <AutoColumn gap="4px">
+                                    <TYPE.mediumHeader fontSize="16px">Fees 24H</TYPE.mediumHeader>
+                                    <TYPE.largeHeader fontSize="32px">
+                                        <MonoSpace> {formatDollarAmount(feesHover, 2)}</MonoSpace>
+                                    </TYPE.largeHeader>
+                                    <TYPE.main fontSize="12px" height="14px">
+                                        {feesLabel ? <MonoSpace>{feesLabel} (UTC)</MonoSpace> : null}
                                     </TYPE.main>
                                 </AutoColumn>
                             }

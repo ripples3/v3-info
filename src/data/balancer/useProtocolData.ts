@@ -13,8 +13,11 @@ interface ProtocolData {
     feesChange?: number;
     tvl?: number;
     tvlChange?: number;
+    swaps24?: number;
     tvlData: BalancerChartDataItem[];
     volumeData: BalancerChartDataItem[];
+    swapData: BalancerChartDataItem[];
+    feeData: BalancerChartDataItem[];
 }
 
 export function useBalancerProtocolData(): ProtocolData {
@@ -36,7 +39,7 @@ export function useBalancerProtocolData(): ProtocolData {
     }, [block24]);
 
     if (!data) {
-        return { tvlData: [], volumeData: [] };
+        return { tvlData: [], volumeData: [], swapData: [], feeData: [] };
     }
 
     const snapshots = data.balancerSnapshots;
@@ -63,6 +66,26 @@ export function useBalancerProtocolData(): ProtocolData {
         };
     });
 
+    const swapData = snapshots.map((snapshot, idx) => {
+        const prevValue = idx === 0 ? 0 : parseFloat(snapshots[idx - 1].totalSwapCount);
+        const value = parseFloat(snapshot.totalSwapCount);
+
+        return {
+            value: value - prevValue > 0 ? value - prevValue : 0,
+            time: unixToDate(snapshot.timestamp),
+        };
+    });
+
+    const feeData = snapshots.map((snapshot, idx) => {
+        const prevValue = idx === 0 ? 0 : parseFloat(snapshots[idx - 1].totalSwapFee);
+        const value = parseFloat(snapshot.totalSwapFee);
+
+        return {
+            value: value - prevValue > 0 ? value - prevValue : 0,
+            time: unixToDate(snapshot.timestamp),
+        };
+    });
+
     const tvl = parseFloat(balancer.totalLiquidity);
     const tvl24 = parseFloat(balancer24.totalLiquidity);
     const volume = parseFloat(balancer.totalSwapVolume);
@@ -71,6 +94,8 @@ export function useBalancerProtocolData(): ProtocolData {
     const fees = parseFloat(balancer.totalSwapFee);
     const fees24 = parseFloat(balancer24.totalSwapFee);
     const fees48 = parseFloat(balancer48.totalSwapFee);
+    const swaps = parseFloat(balancer.totalSwapCount);
+    const swaps24 = parseFloat(balancer24.totalSwapCount);
 
     return {
         volume24: volume - volume24,
@@ -79,7 +104,10 @@ export function useBalancerProtocolData(): ProtocolData {
         tvlChange: (tvl - tvl24) / tvl24,
         fees24: fees - fees24,
         feesChange: (fees - fees24 - (fees24 - fees48)) / (fees24 - fees48),
+        swaps24: swaps - swaps24,
         tvlData,
         volumeData,
+        swapData,
+        feeData,
     };
 }
