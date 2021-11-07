@@ -165,11 +165,11 @@ export default function Home() {
                 </ResponsiveRow>
                 <ResponsiveRow>
                     <ChartWrapper>
-                        <LineChart
+                        <BarChart
                             data={protocolData.swapData}
                             height={220}
                             minHeight={332}
-                            color={activeNetwork.primaryColor}
+                            color={theme.blue1}
                             value={swapsHover}
                             label={swapsLabel}
                             setValue={setSwapsHover}
