@@ -24,6 +24,7 @@ import PoolTable from '../../components/pools/PoolTable';
 import { useBalancerPools } from '../../data/balancer/usePools';
 import numbro from 'numbro';
 import SwapsTable from '../../components/TransactionsTable/SwapsTable';
+import { LocalLoader } from '../../components/Loader';
 
 const ChartWrapper = styled.div`
     width: 49%;
@@ -249,10 +250,15 @@ export default function Home() {
                 </RowBetween>
                 <PoolTable poolDatas={poolData} />
                 <RowBetween>
-                    <TYPE.main>Whales</TYPE.main>
-                    <StyledInternalLink to="pools">Explore</StyledInternalLink>
+                    <TYPE.main>Large Swaps</TYPE.main>
                 </RowBetween>
-                <SwapsTable swaps={protocolData.whaleSwaps} />
+                <DarkGreyCard>
+                    {protocolData.whaleSwaps.length > 0 ? (
+                        <SwapsTable swaps={protocolData.whaleSwaps} />
+                    ) : (
+                        <LocalLoader fill={false} />
+                    )}
+                </DarkGreyCard>
                 {/*<RowBetween>
                     <TYPE.main>Transactions</TYPE.main>
                 </RowBetween>
