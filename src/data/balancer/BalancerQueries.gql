@@ -81,10 +81,10 @@ query GetTokenPageData($address: String!, $startTimestamp: Int!) {
 }
 
 query GetTransactionData($addresses: [Bytes!]!, $poolIds: [String!]!, $startTimestamp: Int!) {
-    swapsIn: swaps(first: 150, orderBy: timestamp, orderDirection: desc, where: {tokenIn_in: $addresses, poolId_in: $poolIds, timestamp_gte: $startTimestamp}) {
+    swapsIn: swaps(first: 1000, orderBy: timestamp, orderDirection: desc, where: {tokenIn_in: $addresses, poolId_in: $poolIds, timestamp_gte: $startTimestamp}) {
         ...BalancerSwap
     }
-    swapsOut: swaps(first: 150, orderBy: timestamp, orderDirection: desc, where: {tokenOut_in: $addresses, poolId_in: $poolIds, timestamp_gte: $startTimestamp}) {
+    swapsOut: swaps(first: 1000, orderBy: timestamp, orderDirection: desc, where: {tokenOut_in: $addresses, poolId_in: $poolIds, timestamp_gte: $startTimestamp}) {
         ...BalancerSwap
     }
     joinExits(first: 150, orderBy: timestamp, orderDirection: desc, where: {pool_in: $poolIds, timestamp_gte: $startTimestamp}) {
@@ -169,7 +169,7 @@ fragment LatestPrice on LatestPrice {
     asset
     pricingAsset
     price
-    priceUsd
+    priceUSD
     poolId {
         id
     }
@@ -267,7 +267,7 @@ fragment BalancerTokenPrice on TokenPrice {
     price
     block
     timestamp
-    priceUsd
+    priceUSD
 }
 
 fragment BalancerPool on Pool {
@@ -464,6 +464,7 @@ fragment BalancerJoinExit on JoinExit {
     timestamp
     tx
     type
+    value
     user {
         id
     }

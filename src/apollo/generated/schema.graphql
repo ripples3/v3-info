@@ -611,6 +611,7 @@ type JoinExit {
     tx: Bytes!
     type: InvestType!
     user: User!
+    value: BigDecimal!
 }
 
 input JoinExit_filter {
@@ -678,6 +679,14 @@ input JoinExit_filter {
     user_not_in: [String!]
     user_not_starts_with: String
     user_starts_with: String
+    value: BigDecimal
+    value_gt: BigDecimal
+    value_gte: BigDecimal
+    value_in: [BigDecimal!]
+    value_lt: BigDecimal
+    value_lte: BigDecimal
+    value_not: BigDecimal
+    value_not_in: [BigDecimal!]
 }
 
 enum JoinExit_orderBy {
@@ -689,6 +698,7 @@ enum JoinExit_orderBy {
     tx
     type
     user
+    value
 }
 
 type LatestPrice {
@@ -697,7 +707,7 @@ type LatestPrice {
     id: ID!
     poolId: Pool!
     price: BigDecimal!
-    priceUsd: BigDecimal!
+    priceUSD: BigDecimal!
     pricingAsset: Bytes!
 }
 
@@ -739,14 +749,14 @@ input LatestPrice_filter {
     poolId_not_starts_with: String
     poolId_starts_with: String
     price: BigDecimal
-    priceUsd: BigDecimal
-    priceUsd_gt: BigDecimal
-    priceUsd_gte: BigDecimal
-    priceUsd_in: [BigDecimal!]
-    priceUsd_lt: BigDecimal
-    priceUsd_lte: BigDecimal
-    priceUsd_not: BigDecimal
-    priceUsd_not_in: [BigDecimal!]
+    priceUSD: BigDecimal
+    priceUSD_gt: BigDecimal
+    priceUSD_gte: BigDecimal
+    priceUSD_in: [BigDecimal!]
+    priceUSD_lt: BigDecimal
+    priceUSD_lte: BigDecimal
+    priceUSD_not: BigDecimal
+    priceUSD_not_in: [BigDecimal!]
     price_gt: BigDecimal
     price_gte: BigDecimal
     price_in: [BigDecimal!]
@@ -768,7 +778,7 @@ enum LatestPrice_orderBy {
     id
     poolId
     price
-    priceUsd
+    priceUSD
     pricingAsset
 }
 
@@ -2641,7 +2651,7 @@ type TokenPrice {
     id: ID!
     poolId: Pool!
     price: BigDecimal!
-    priceUsd: BigDecimal!
+    priceUSD: BigDecimal!
     pricingAsset: Bytes!
     timestamp: Int!
 }
@@ -2692,14 +2702,14 @@ input TokenPrice_filter {
     poolId_not_starts_with: String
     poolId_starts_with: String
     price: BigDecimal
-    priceUsd: BigDecimal
-    priceUsd_gt: BigDecimal
-    priceUsd_gte: BigDecimal
-    priceUsd_in: [BigDecimal!]
-    priceUsd_lt: BigDecimal
-    priceUsd_lte: BigDecimal
-    priceUsd_not: BigDecimal
-    priceUsd_not_in: [BigDecimal!]
+    priceUSD: BigDecimal
+    priceUSD_gt: BigDecimal
+    priceUSD_gte: BigDecimal
+    priceUSD_in: [BigDecimal!]
+    priceUSD_lt: BigDecimal
+    priceUSD_lte: BigDecimal
+    priceUSD_not: BigDecimal
+    priceUSD_not_in: [BigDecimal!]
     price_gt: BigDecimal
     price_gte: BigDecimal
     price_in: [BigDecimal!]
@@ -2730,7 +2740,7 @@ enum TokenPrice_orderBy {
     id
     poolId
     price
-    priceUsd
+    priceUSD
     pricingAsset
     timestamp
 }

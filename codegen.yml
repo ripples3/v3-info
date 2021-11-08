@@ -1,5 +1,5 @@
 schema:
-  - 'https://graph-node.beets-ftm-node.com/subgraphs/name/beethovenx-v4'
+  - 'https://graph-node.beets-ftm-node.com/subgraphs/name/beethovenx'
   - 'https://graph-node.beets-ftm-node.com/subgraphs/name/fantom-blocks'
 documents:
   - 'src/**/*.gql'

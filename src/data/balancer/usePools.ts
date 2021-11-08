@@ -69,7 +69,7 @@ export function useBalancerPools(): PoolData[] {
             tokens: (pool.tokens || []).map((token) => {
                 const weight = token.weight ? parseFloat(token.weight) : 0;
                 const tokenPrice = prices.find((price) => price.asset === token.address);
-                const price = tokenPrice ? parseFloat(tokenPrice.priceUsd) : 0;
+                const price = tokenPrice ? parseFloat(tokenPrice.priceUSD) : 0;
 
                 return {
                     ...token,

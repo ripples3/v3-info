@@ -15,7 +15,7 @@ export const LatestPrice = gql`
         asset
         pricingAsset
         price
-        priceUsd
+        priceUSD
         poolId {
             id
         }
@@ -44,7 +44,7 @@ export const BalancerTokenPrice = gql`
         price
         block
         timestamp
-        priceUsd
+        priceUSD
     }
 `;
 export const BalancerPoolToken = gql`
@@ -109,12 +109,17 @@ export const BalancerJoinExit = gql`
         timestamp
         tx
         type
+        value
         user {
             id
         }
         pool {
             id
             tokensList
+            tokens {
+                address
+                symbol
+            }
         }
     }
 `;
@@ -263,7 +268,7 @@ export const GetTokenPageData = gql`
 export const GetTransactionData = gql`
     query GetTransactionData($addresses: [Bytes!]!, $poolIds: [String!]!, $startTimestamp: Int!) {
         swapsIn: swaps(
-            first: 150
+            first: 1000
             orderBy: timestamp
             orderDirection: desc
             where: { tokenIn_in: $addresses, poolId_in: $poolIds, timestamp_gte: $startTimestamp }
@@ -271,7 +276,7 @@ export const GetTransactionData = gql`
             ...BalancerSwap
         }
         swapsOut: swaps(
-            first: 150
+            first: 1000
             orderBy: timestamp
             orderDirection: desc
             where: { tokenOut_in: $addresses, poolId_in: $poolIds, timestamp_gte: $startTimestamp }

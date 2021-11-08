@@ -21,7 +21,7 @@ export const blockClient = new ApolloClient({
 });
 
 export const client = new ApolloClient({
-    uri: 'https://graph-node.beets-ftm-node.com/subgraphs/name/beethovenx-v4',
+    uri: 'https://graph-node.beets-ftm-node.com/subgraphs/name/beethovenx',
     cache: new InMemoryCache({
         typePolicies: {
             Token: {

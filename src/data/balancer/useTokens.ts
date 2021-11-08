@@ -35,7 +35,7 @@ function getTokenValues(
 
 function getTokenPriceValues(tokenAddress: string, prices: LatestPriceFragment[]): { price: number } {
     const price = prices.find((prices) => prices.asset === tokenAddress);
-    const priceUSD = price ? parseFloat(price.priceUsd) : 0;
+    const priceUSD = price ? parseFloat(price.priceUSD) : 0;
 
     return { price: priceUSD };
 }
@@ -48,7 +48,6 @@ export function useBalancerTokens(): TokenData[] {
 
     useEffect(() => {
         if (block24) {
-            //TODO: replace this once the graph has caught up
             getTokenData({
                 variables: {
                     block24: { number: parseInt(block24.number) },

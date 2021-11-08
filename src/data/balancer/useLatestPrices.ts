@@ -11,7 +11,7 @@ export function useLatestPrices(): { ftm?: number; beets?: number } {
     const beets = prices.find((price) => price.asset === BEETS_ADDRESS);
 
     return {
-        ftm: ftm ? parseFloat(ftm.priceUsd) : undefined,
-        beets: beets ? parseFloat(beets.priceUsd) : undefined,
+        ftm: ftm ? parseFloat(ftm.priceUSD) : undefined,
+        beets: beets ? parseFloat(beets.priceUSD) : undefined,
     };
 }

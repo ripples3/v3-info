@@ -5,12 +5,16 @@ import {
 } from '../../apollo/generated/graphql-codegen-generated';
 import { useEffect, useRef } from 'react';
 import { BALANCER_SUBGRAPH_START_TIMESTAMP } from './constants';
-import { orderBy } from 'lodash';
+import { orderBy, uniqBy, groupBy, mapValues, sumBy, map } from 'lodash';
 
 export function useBalancerTransactionData(
     addresses: string[],
     poolIds: string[],
-): { swaps: BalancerSwapFragment[]; joinExits: BalancerJoinExitFragment[] } {
+): {
+    swaps: BalancerSwapFragment[];
+    joinExits: BalancerJoinExitFragment[];
+    swapPairVolumes: { name: string; value: number }[];
+} {
     const [getTokenTransactionData, { data }] = useGetTransactionDataLazyQuery();
     const ref = useRef<{ poolIds: string[]; addresses: string[] }>({ poolIds: [], addresses: [] });
 
@@ -28,10 +32,22 @@ export function useBalancerTransactionData(
         }
     }, [poolIds, addresses]);
 
-    const swaps = orderBy([...(data?.swapsIn || []), ...(data?.swapsOut || [])], 'timestamp', 'desc');
+    const swaps = uniqBy(
+        orderBy([...(data?.swapsIn || []), ...(data?.swapsOut || [])], 'timestamp', 'desc'),
+        (swap) => swap.id,
+    );
+
+    const groupedByPair = groupBy(swaps, (swap) => `${swap.tokenInSym} -> ${swap.tokenOutSym}`);
+    const swapPairVolumes = map(groupedByPair, (swaps, key) => {
+        return {
+            name: key,
+            value: sumBy(swaps, (swap) => parseFloat(swap.value)),
+        };
+    });
 
     return {
         swaps,
         joinExits: data?.joinExits || [],
+        swapPairVolumes,
     };
 }

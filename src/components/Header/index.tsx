@@ -188,7 +188,8 @@ export default function Header() {
             <SmallContentGrouping>
                 <AutoColumn gap="sm">
                     <RowBetween>
-                        <NetworkDropdown />
+                        {/*<NetworkDropdown />*/}
+                        <div />
                         <Menu />
                     </RowBetween>
                     <SearchSmall />

@@ -15,8 +15,8 @@ import useTheme from 'hooks/useTheme';
 import HoverInlineText from 'components/HoverInlineText';
 import { useActiveNetworkVersion } from 'state/application/hooks';
 import { OptimismNetworkInfo } from 'constants/networks';
-import { BalancerSwapFragment } from '../../apollo/generated/graphql-codegen-generated';
-import WhaleImage from '../../assets/svg/whale.svg';
+import { BalancerJoinExitFragment, BalancerSwapFragment } from '../../apollo/generated/graphql-codegen-generated';
+import PoolCurrencyLogo from '../PoolCurrencyLogo';
 
 const Wrapper = styled(DarkGreyCard)`
     width: 100%;
@@ -27,42 +27,22 @@ const ResponsiveGrid = styled.div`
     grid-gap: 1em;
     align-items: center;
 
-    grid-template-columns: 1.5fr repeat(5, 1fr);
+    grid-template-columns: 1.5fr repeat(3, 1fr);
 
     @media screen and (max-width: 940px) {
-        grid-template-columns: 1.5fr repeat(4, 1fr);
-        & > *:nth-child(5) {
-            display: none;
-        }
+        grid-template-columns: 1.5fr repeat(3, 1fr);
     }
 
     @media screen and (max-width: 800px) {
         grid-template-columns: 1.5fr repeat(2, 1fr);
-        & > *:nth-child(5) {
-            display: none;
-        }
+
         & > *:nth-child(3) {
-            display: none;
-        }
-        & > *:nth-child(4) {
             display: none;
         }
     }
 
     @media screen and (max-width: 500px) {
-        grid-template-columns: 1.5fr repeat(1, 1fr);
-        & > *:nth-child(5) {
-            display: none;
-        }
-        & > *:nth-child(3) {
-            display: none;
-        }
-        & > *:nth-child(4) {
-            display: none;
-        }
-        & > *:nth-child(2) {
-            display: none;
-        }
+        grid-template-columns: 1.5fr repeat(2, 1fr);
     }
 `;
 
@@ -85,55 +65,55 @@ const SORT_FIELD = {
     amountUSD: 'amountUSD',
     timestamp: 'timestamp',
     sender: 'sender',
-    amountToken0: 'amountToken0',
-    amountToken1: 'amountToken1',
 };
 
-const DataRow = ({ swap, color }: { swap: BalancerSwapFragment; color?: string }) => {
-    const abs0 = Math.abs(parseFloat(swap.tokenAmountIn));
-    const abs1 = Math.abs(parseFloat(swap.tokenAmountOut));
+const DataRow = ({ transaction, color }: { transaction: BalancerJoinExitFragment; color?: string }) => {
     const [activeNetwork] = useActiveNetworkVersion();
     const theme = useTheme();
-    const value = parseFloat(swap.value);
+    const tokens: { address: string; amount: number }[] = [];
+
+    for (let i = 0; i < transaction.amounts.length; i++) {
+        const amount = parseFloat(transaction.amounts[i]);
+        if (amount > 0) {
+            tokens.push({ address: transaction.pool.tokensList[i], amount });
+        }
+    }
 
     return (
         <ResponsiveGrid>
-            <ExternalLink href={getEtherscanLink(1, swap.tx, 'transaction', activeNetwork)}>
+            <ExternalLink href={getEtherscanLink(1, transaction.tx, 'transaction', activeNetwork)}>
                 <Label color={color ?? theme.blue1} fontWeight={400}>
-                    {`Swap ${swap.tokenInSym} for ${swap.tokenOutSym}`}
-                    {value > 10000 ? <img src={WhaleImage} width={20} style={{ marginLeft: '4px' }} /> : null}
+                    {transaction.type === 'Join' ? `Invest ` : 'Withdraw'}
+                    <span style={{ marginLeft: '6px' }}>
+                        <PoolCurrencyLogo tokens={tokens} />
+                    </span>
                 </Label>
             </ExternalLink>
             <Label end={1} fontWeight={400}>
-                {formatDollarAmount(value)}
+                {formatDollarAmount(parseFloat(transaction.value))}
             </Label>
-            <Label end={1} fontWeight={400}>
-                <HoverInlineText text={`${formatAmount(abs0)}  ${swap.tokenInSym}`} maxCharacters={16} />
-            </Label>
-            <Label end={1} fontWeight={400}>
-                <HoverInlineText text={`${formatAmount(abs1)}  ${swap.tokenOutSym}`} maxCharacters={16} />
-            </Label>
+
             <Label end={1} fontWeight={400}>
                 <ExternalLink
-                    href={getEtherscanLink(1, swap.userAddress.id, 'address', activeNetwork)}
+                    href={getEtherscanLink(1, transaction.user.id, 'address', activeNetwork)}
                     style={{ color: color ?? theme.blue1 }}
                 >
-                    {shortenAddress(swap.userAddress.id)}
+                    {shortenAddress(transaction.user.id)}
                 </ExternalLink>
             </Label>
             <Label end={1} fontWeight={400}>
-                {formatTime(`${swap.timestamp}`)}
+                {formatTime(`${transaction.timestamp}`)}
             </Label>
         </ResponsiveGrid>
     );
 };
 
-export default function SwapsTable({
-    swaps,
+export default function JoinExitTable({
+    transactions,
     maxItems = 10,
     color,
 }: {
-    swaps: BalancerSwapFragment[];
+    transactions: BalancerJoinExitFragment[];
     maxItems?: number;
     color?: string;
 }) {
@@ -150,19 +130,20 @@ export default function SwapsTable({
 
     useEffect(() => {
         let extraPages = 1;
-        if (swaps.length % maxItems === 0) {
+        if (transactions.length % maxItems === 0) {
             extraPages = 0;
         }
-        setMaxPage(Math.floor(swaps.length / maxItems) + extraPages);
-    }, [maxItems, swaps]);
+        setMaxPage(Math.floor(transactions.length / maxItems) + extraPages);
+    }, [maxItems, transactions]);
 
     const sortedTransactions = useMemo(() => {
-        return swaps
-            ? swaps
+        return transactions
+            ? transactions
                   .slice()
                   .sort((a, b) => {
                       if (a && b) {
-                          return a[sortField as keyof BalancerSwapFragment] > b[sortField as keyof BalancerSwapFragment]
+                          return a[sortField as keyof BalancerJoinExitFragment] >
+                              b[sortField as keyof BalancerJoinExitFragment]
                               ? (sortDirection ? -1 : 1) * 1
                               : (sortDirection ? -1 : 1) * -1;
                       } else {
@@ -171,7 +152,7 @@ export default function SwapsTable({
                   })
                   .slice(maxItems * (page - 1), page * maxItems)
             : [];
-    }, [swaps, maxItems, page, sortField, sortDirection]);
+    }, [transactions, maxItems, page, sortField, sortDirection]);
 
     const handleSort = useCallback(
         (newField: string) => {
@@ -188,7 +169,7 @@ export default function SwapsTable({
         [sortDirection, sortField],
     );
 
-    if (!swaps) {
+    if (!transactions) {
         return <Loader />;
     }
 
@@ -200,12 +181,6 @@ export default function SwapsTable({
                     <ClickableText color={theme.text2} onClick={() => handleSort(SORT_FIELD.amountUSD)} end={1}>
                         Total Value {arrow(SORT_FIELD.amountUSD)}
                     </ClickableText>
-                    <ClickableText color={theme.text2} end={1} onClick={() => handleSort(SORT_FIELD.amountToken0)}>
-                        Token Amount {arrow(SORT_FIELD.amountToken0)}
-                    </ClickableText>
-                    <ClickableText color={theme.text2} end={1} onClick={() => handleSort(SORT_FIELD.amountToken1)}>
-                        Token Amount {arrow(SORT_FIELD.amountToken1)}
-                    </ClickableText>
                     <ClickableText color={theme.text2} end={1} onClick={() => handleSort(SORT_FIELD.sender)}>
                         Account {arrow(SORT_FIELD.sender)}
                     </ClickableText>
@@ -215,11 +190,11 @@ export default function SwapsTable({
                 </ResponsiveGrid>
                 <Break />
 
-                {sortedTransactions.map((swap, i) => {
-                    if (swap) {
+                {sortedTransactions.map((transaction, i) => {
+                    if (transaction) {
                         return (
                             <React.Fragment key={i}>
-                                <DataRow swap={swap} color={color} />
+                                <DataRow transaction={transaction} color={color} />
                                 <Break />
                             </React.Fragment>
                         );

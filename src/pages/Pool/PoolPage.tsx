@@ -30,6 +30,8 @@ import { Transaction } from '../../types';
 import { useBalancerPoolData, useBalancerPoolPageData } from '../../data/balancer/usePools';
 import { useBalancerTransactionData } from '../../data/balancer/useTransactions';
 import SwapsTable from 'components/TransactionsTable/SwapsTable';
+import { BalPieChart } from '../../components/PieChart/BalPieChart';
+import JoinExitTable from '../../components/TransactionsTable/JoinExitTable';
 
 const ContentLayout = styled.div`
     display: grid;
@@ -100,7 +102,7 @@ export default function PoolPage({
 
     const poolData = useBalancerPoolData(poolId);
     const { tvlData, volumeData, feesData } = useBalancerPoolPageData(poolId);
-    const { swaps, joinExits } = useBalancerTransactionData(
+    const { swaps, joinExits, swapPairVolumes } = useBalancerTransactionData(
         (poolData?.tokens || []).map((token) => token.address),
         poolData ? [poolData.id] : [],
     );
@@ -300,9 +302,30 @@ export default function PoolPage({
                             )}
                         </DarkGreyCard>
                     </ContentLayout>
+                    {/*<DarkGreyCard>
+                        <ToggleRow align="flex-start">
+                            <AutoColumn>
+                                <TYPE.label fontSize="24px" height="30px">
+                                    <MonoSpace>Swaps Breakdown</MonoSpace>
+                                </TYPE.label>
+                                <TYPE.main height="20px" fontSize="12px">
+                                    {valueLabel ? <MonoSpace>{valueLabel} (UTC)</MonoSpace> : ''}
+                                </TYPE.main>
+                            </AutoColumn>
+                        </ToggleRow>
+                        <BalPieChart data={swapPairVolumes} />
+                    </DarkGreyCard>*/}
                     <TYPE.main fontSize="24px">Swaps</TYPE.main>
                     <DarkGreyCard>
                         {swaps.length > 0 ? <SwapsTable swaps={swaps} /> : <LocalLoader fill={false} />}
+                    </DarkGreyCard>
+                    <TYPE.main fontSize="24px">Joins / Exits</TYPE.main>
+                    <DarkGreyCard>
+                        {joinExits.length > 0 ? (
+                            <JoinExitTable transactions={joinExits} />
+                        ) : (
+                            <LocalLoader fill={false} />
+                        )}
                     </DarkGreyCard>
                 </AutoColumn>
             ) : (

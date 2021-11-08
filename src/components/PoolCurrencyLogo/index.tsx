@@ -13,7 +13,7 @@ const Wrapper = styled.div<{ margin: boolean; sizeraw: number }>`
 interface PoolCurrencyLogoProps {
     margin?: boolean;
     size?: number;
-    tokens: PoolTokenData[];
+    tokens: { address: string }[];
 }
 
 const HigherLogo = styled(CurrencyLogo)`
