@@ -90,7 +90,7 @@ const DataRow = ({ transaction, color }: { transaction: BalancerJoinExitFragment
                 </Label>
             </ExternalLink>
             <Label end={1} fontWeight={400}>
-                {formatDollarAmount(parseFloat(transaction.value))}
+                {formatDollarAmount(parseFloat(transaction.valueUSD))}
             </Label>
 
             <Label end={1} fontWeight={400}>

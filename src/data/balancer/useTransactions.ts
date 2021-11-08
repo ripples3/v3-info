@@ -41,7 +41,7 @@ export function useBalancerTransactionData(
     const swapPairVolumes = map(groupedByPair, (swaps, key) => {
         return {
             name: key,
-            value: sumBy(swaps, (swap) => parseFloat(swap.value)),
+            value: sumBy(swaps, (swap) => parseFloat(swap.valueUSD)),
         };
     });
 

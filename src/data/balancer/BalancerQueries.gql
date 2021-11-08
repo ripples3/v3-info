@@ -29,7 +29,7 @@ query GetProtocolData($startTimestamp: Int!, $block24: Block_height!, $block48: 
     ) {
         ...BalancerSnapshot
     }
-    whaleSwaps: swaps(first: 100, orderBy: timestamp, orderDirection: desc, where: {value_gte: "10000"}) {
+    whaleSwaps: swaps(first: 100, orderBy: timestamp, orderDirection: desc, where: {valueUSD_gte: "10000"}) {
         ...BalancerSwap
     }
 }
@@ -467,7 +467,7 @@ fragment BalancerJoinExit on JoinExit {
     timestamp
     tx
     type
-    value
+    valueUSD
     user {
         id
     }
@@ -534,7 +534,7 @@ fragment BalancerSwap on Swap {
     }
     timestamp
     tx
-    value
+    valueUSD
 }
 
 

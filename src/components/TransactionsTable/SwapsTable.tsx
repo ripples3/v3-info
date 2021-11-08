@@ -94,7 +94,7 @@ const DataRow = ({ swap, color }: { swap: BalancerSwapFragment; color?: string }
     const abs1 = Math.abs(parseFloat(swap.tokenAmountOut));
     const [activeNetwork] = useActiveNetworkVersion();
     const theme = useTheme();
-    const value = parseFloat(swap.value);
+    const value = parseFloat(swap.valueUSD);
 
     return (
         <ResponsiveGrid>

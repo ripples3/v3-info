@@ -614,7 +614,7 @@ export interface JoinExit {
     tx: Scalars['Bytes'];
     type: InvestType;
     user: User;
-    value: Scalars['BigDecimal'];
+    valueUSD: Scalars['BigDecimal'];
 }
 
 export interface JoinExit_Filter {
@@ -682,17 +682,17 @@ export interface JoinExit_Filter {
     user_not_in?: Maybe<Array<Scalars['String']>>;
     user_not_starts_with?: Maybe<Scalars['String']>;
     user_starts_with?: Maybe<Scalars['String']>;
-    value?: Maybe<Scalars['BigDecimal']>;
-    value_gt?: Maybe<Scalars['BigDecimal']>;
-    value_gte?: Maybe<Scalars['BigDecimal']>;
-    value_in?: Maybe<Array<Scalars['BigDecimal']>>;
-    value_lt?: Maybe<Scalars['BigDecimal']>;
-    value_lte?: Maybe<Scalars['BigDecimal']>;
-    value_not?: Maybe<Scalars['BigDecimal']>;
-    value_not_in?: Maybe<Array<Scalars['BigDecimal']>>;
+    valueUSD?: Maybe<Scalars['BigDecimal']>;
+    valueUSD_gt?: Maybe<Scalars['BigDecimal']>;
+    valueUSD_gte?: Maybe<Scalars['BigDecimal']>;
+    valueUSD_in?: Maybe<Array<Scalars['BigDecimal']>>;
+    valueUSD_lt?: Maybe<Scalars['BigDecimal']>;
+    valueUSD_lte?: Maybe<Scalars['BigDecimal']>;
+    valueUSD_not?: Maybe<Scalars['BigDecimal']>;
+    valueUSD_not_in?: Maybe<Array<Scalars['BigDecimal']>>;
 }
 
-export type JoinExit_OrderBy = 'amounts' | 'id' | 'pool' | 'sender' | 'timestamp' | 'tx' | 'type' | 'user' | 'value';
+export type JoinExit_OrderBy = 'amounts' | 'id' | 'pool' | 'sender' | 'timestamp' | 'tx' | 'type' | 'user' | 'valueUSD';
 
 export interface LatestPrice {
     __typename: 'LatestPrice';
@@ -2400,7 +2400,7 @@ export interface Swap {
     tokenOutSym: Scalars['String'];
     tx: Scalars['Bytes'];
     userAddress: User;
-    value: Scalars['BigDecimal'];
+    valueUSD: Scalars['BigDecimal'];
 }
 
 export interface Swap_Filter {
@@ -2516,14 +2516,14 @@ export interface Swap_Filter {
     userAddress_not_in?: Maybe<Array<Scalars['String']>>;
     userAddress_not_starts_with?: Maybe<Scalars['String']>;
     userAddress_starts_with?: Maybe<Scalars['String']>;
-    value?: Maybe<Scalars['BigDecimal']>;
-    value_gt?: Maybe<Scalars['BigDecimal']>;
-    value_gte?: Maybe<Scalars['BigDecimal']>;
-    value_in?: Maybe<Array<Scalars['BigDecimal']>>;
-    value_lt?: Maybe<Scalars['BigDecimal']>;
-    value_lte?: Maybe<Scalars['BigDecimal']>;
-    value_not?: Maybe<Scalars['BigDecimal']>;
-    value_not_in?: Maybe<Array<Scalars['BigDecimal']>>;
+    valueUSD?: Maybe<Scalars['BigDecimal']>;
+    valueUSD_gt?: Maybe<Scalars['BigDecimal']>;
+    valueUSD_gte?: Maybe<Scalars['BigDecimal']>;
+    valueUSD_in?: Maybe<Array<Scalars['BigDecimal']>>;
+    valueUSD_lt?: Maybe<Scalars['BigDecimal']>;
+    valueUSD_lte?: Maybe<Scalars['BigDecimal']>;
+    valueUSD_not?: Maybe<Scalars['BigDecimal']>;
+    valueUSD_not_in?: Maybe<Array<Scalars['BigDecimal']>>;
 }
 
 export type Swap_OrderBy =
@@ -2539,7 +2539,7 @@ export type Swap_OrderBy =
     | 'tokenOutSym'
     | 'tx'
     | 'userAddress'
-    | 'value';
+    | 'valueUSD';
 
 export interface Token {
     __typename: 'Token';
@@ -3186,7 +3186,7 @@ export type GetProtocolDataQuery = {
         tokenAmountOut: string;
         timestamp: number;
         tx: string;
-        value: string;
+        valueUSD: string;
         poolId: { __typename: 'Pool'; id: string; name?: string | null | undefined; address: string; swapFee: string };
         userAddress: { __typename: 'User'; id: string };
     }>;
@@ -3333,7 +3333,7 @@ export type GetTransactionDataQuery = {
         tokenAmountOut: string;
         timestamp: number;
         tx: string;
-        value: string;
+        valueUSD: string;
         poolId: { __typename: 'Pool'; id: string; name?: string | null | undefined; address: string; swapFee: string };
         userAddress: { __typename: 'User'; id: string };
     }>;
@@ -3349,7 +3349,7 @@ export type GetTransactionDataQuery = {
         tokenAmountOut: string;
         timestamp: number;
         tx: string;
-        value: string;
+        valueUSD: string;
         poolId: { __typename: 'Pool'; id: string; name?: string | null | undefined; address: string; swapFee: string };
         userAddress: { __typename: 'User'; id: string };
     }>;
@@ -3361,7 +3361,7 @@ export type GetTransactionDataQuery = {
         timestamp: number;
         tx: string;
         type: InvestType;
-        value: string;
+        valueUSD: string;
         user: { __typename: 'User'; id: string };
         pool: { __typename: 'Pool'; id: string; tokensList: Array<string> };
     }>;
@@ -3952,7 +3952,7 @@ export type BalancerJoinExitsQuery = {
         timestamp: number;
         tx: string;
         type: InvestType;
-        value: string;
+        valueUSD: string;
         user: { __typename: 'User'; id: string };
         pool: { __typename: 'Pool'; id: string; tokensList: Array<string> };
     }>;
@@ -3966,7 +3966,7 @@ export type BalancerJoinExitFragment = {
     timestamp: number;
     tx: string;
     type: InvestType;
-    value: string;
+    valueUSD: string;
     user: { __typename: 'User'; id: string };
     pool: { __typename: 'Pool'; id: string; tokensList: Array<string> };
 };
@@ -4097,7 +4097,7 @@ export type BalancerSwapsQuery = {
         tokenAmountOut: string;
         timestamp: number;
         tx: string;
-        value: string;
+        valueUSD: string;
         poolId: { __typename: 'Pool'; id: string; name?: string | null | undefined; address: string; swapFee: string };
         userAddress: { __typename: 'User'; id: string };
     }>;
@@ -4115,7 +4115,7 @@ export type BalancerSwapFragment = {
     tokenAmountOut: string;
     timestamp: number;
     tx: string;
-    value: string;
+    valueUSD: string;
     poolId: { __typename: 'Pool'; id: string; name?: string | null | undefined; address: string; swapFee: string };
     userAddress: { __typename: 'User'; id: string };
 };
@@ -4470,7 +4470,7 @@ export const BalancerJoinExitFragmentDoc = gql`
         timestamp
         tx
         type
-        value
+        valueUSD
         user {
             id
         }
@@ -4501,7 +4501,7 @@ export const BalancerSwapFragmentDoc = gql`
         }
         timestamp
         tx
-        value
+        valueUSD
     }
 `;
 export const BalancerTokenFragmentDoc = gql`
@@ -4582,7 +4582,7 @@ export const GetProtocolDataDocument = gql`
         ) {
             ...BalancerSnapshot
         }
-        whaleSwaps: swaps(first: 100, orderBy: timestamp, orderDirection: desc, where: { value_gte: "10000" }) {
+        whaleSwaps: swaps(first: 100, orderBy: timestamp, orderDirection: desc, where: { valueUSD_gte: "10000" }) {
             ...BalancerSwap
         }
     }

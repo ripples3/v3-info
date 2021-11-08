@@ -611,7 +611,7 @@ type JoinExit {
     tx: Bytes!
     type: InvestType!
     user: User!
-    value: BigDecimal!
+    valueUSD: BigDecimal!
 }
 
 input JoinExit_filter {
@@ -679,14 +679,14 @@ input JoinExit_filter {
     user_not_in: [String!]
     user_not_starts_with: String
     user_starts_with: String
-    value: BigDecimal
-    value_gt: BigDecimal
-    value_gte: BigDecimal
-    value_in: [BigDecimal!]
-    value_lt: BigDecimal
-    value_lte: BigDecimal
-    value_not: BigDecimal
-    value_not_in: [BigDecimal!]
+    valueUSD: BigDecimal
+    valueUSD_gt: BigDecimal
+    valueUSD_gte: BigDecimal
+    valueUSD_in: [BigDecimal!]
+    valueUSD_lt: BigDecimal
+    valueUSD_lte: BigDecimal
+    valueUSD_not: BigDecimal
+    valueUSD_not_in: [BigDecimal!]
 }
 
 enum JoinExit_orderBy {
@@ -698,7 +698,7 @@ enum JoinExit_orderBy {
     tx
     type
     user
-    value
+    valueUSD
 }
 
 type LatestPrice {
@@ -2488,7 +2488,7 @@ type Swap {
     tokenOutSym: String!
     tx: Bytes!
     userAddress: User!
-    value: BigDecimal!
+    valueUSD: BigDecimal!
 }
 
 input Swap_filter {
@@ -2604,14 +2604,14 @@ input Swap_filter {
     userAddress_not_in: [String!]
     userAddress_not_starts_with: String
     userAddress_starts_with: String
-    value: BigDecimal
-    value_gt: BigDecimal
-    value_gte: BigDecimal
-    value_in: [BigDecimal!]
-    value_lt: BigDecimal
-    value_lte: BigDecimal
-    value_not: BigDecimal
-    value_not_in: [BigDecimal!]
+    valueUSD: BigDecimal
+    valueUSD_gt: BigDecimal
+    valueUSD_gte: BigDecimal
+    valueUSD_in: [BigDecimal!]
+    valueUSD_lt: BigDecimal
+    valueUSD_lte: BigDecimal
+    valueUSD_not: BigDecimal
+    valueUSD_not_in: [BigDecimal!]
 }
 
 enum Swap_orderBy {
@@ -2627,7 +2627,7 @@ enum Swap_orderBy {
     tokenOutSym
     tx
     userAddress
-    value
+    valueUSD
 }
 
 type Token {

@@ -6,7 +6,7 @@ export const healthClient = new ApolloClient({
 });
 
 export const blockClient = new ApolloClient({
-    uri: 'https://graph-node.beets-ftm-node.com/subgraphs/name/fantom-blocks',
+    uri: process.env.REACT_APP_FANTOM_BLOCKS,
     cache: new InMemoryCache(),
     queryDeduplication: true,
     defaultOptions: {
@@ -21,7 +21,7 @@ export const blockClient = new ApolloClient({
 });
 
 export const client = new ApolloClient({
-    uri: 'https://graph-node.beets-ftm-node.com/subgraphs/name/beethovenx',
+    uri: process.env.REACT_APP_SUBGRAPH_URL,
     cache: new InMemoryCache({
         typePolicies: {
             Token: {

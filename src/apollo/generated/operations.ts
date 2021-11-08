@@ -109,7 +109,7 @@ export const BalancerJoinExit = gql`
         timestamp
         tx
         type
-        value
+        valueUSD
         user {
             id
         }
@@ -140,7 +140,7 @@ export const BalancerSwap = gql`
         }
         timestamp
         tx
-        value
+        valueUSD
     }
 `;
 export const BalancerToken = gql`
@@ -221,7 +221,7 @@ export const GetProtocolData = gql`
         ) {
             ...BalancerSnapshot
         }
-        whaleSwaps: swaps(first: 100, orderBy: timestamp, orderDirection: desc, where: { value_gte: "10000" }) {
+        whaleSwaps: swaps(first: 100, orderBy: timestamp, orderDirection: desc, where: { valueUSD_gte: "10000" }) {
             ...BalancerSwap
         }
     }
