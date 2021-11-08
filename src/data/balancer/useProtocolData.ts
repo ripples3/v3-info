@@ -1,6 +1,6 @@
 import { useDeltaTimestamps } from '../../utils/queries';
 import { useBlocksFromTimestamps } from '../../hooks/useBlocksFromTimestamps';
-import { useGetProtocolDataLazyQuery } from '../../apollo/generated/graphql-codegen-generated';
+import { BalancerSwapFragment, useGetProtocolDataLazyQuery } from '../../apollo/generated/graphql-codegen-generated';
 import { useEffect } from 'react';
 import { unixToDate } from '../../utils/date';
 import { BalancerChartDataItem } from './balancerTypes';
@@ -18,6 +18,7 @@ interface ProtocolData {
     volumeData: BalancerChartDataItem[];
     swapData: BalancerChartDataItem[];
     feeData: BalancerChartDataItem[];
+    whaleSwaps: BalancerSwapFragment[];
 }
 
 export function useBalancerProtocolData(): ProtocolData {
@@ -39,7 +40,7 @@ export function useBalancerProtocolData(): ProtocolData {
     }, [block24]);
 
     if (!data) {
-        return { tvlData: [], volumeData: [], swapData: [], feeData: [] };
+        return { tvlData: [], volumeData: [], swapData: [], feeData: [], whaleSwaps: [] };
     }
 
     const snapshots = data.balancerSnapshots;
@@ -109,5 +110,6 @@ export function useBalancerProtocolData(): ProtocolData {
         volumeData,
         swapData,
         feeData,
+        whaleSwaps: data.whaleSwaps,
     };
 }

@@ -116,10 +116,6 @@ export const BalancerJoinExit = gql`
         pool {
             id
             tokensList
-            tokens {
-                address
-                symbol
-            }
         }
     }
 `;
@@ -225,8 +221,12 @@ export const GetProtocolData = gql`
         ) {
             ...BalancerSnapshot
         }
+        whaleSwaps: swaps(first: 100, orderBy: timestamp, orderDirection: desc, where: { value_gte: "10000" }) {
+            ...BalancerSwap
+        }
     }
     ${BalancerSnapshot}
+    ${BalancerSwap}
 `;
 export const GetTokenData = gql`
     query GetTokenData($block24: Block_height!, $blockWeek: Block_height!) {

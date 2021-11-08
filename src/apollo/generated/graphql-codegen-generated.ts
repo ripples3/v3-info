@@ -3174,6 +3174,22 @@ export type GetProtocolDataQuery = {
         totalSwapVolume: string;
         totalSwapFee: string;
     }>;
+    whaleSwaps: Array<{
+        __typename: 'Swap';
+        id: string;
+        caller: string;
+        tokenIn: string;
+        tokenInSym: string;
+        tokenOut: string;
+        tokenOutSym: string;
+        tokenAmountIn: string;
+        tokenAmountOut: string;
+        timestamp: number;
+        tx: string;
+        value: string;
+        poolId: { __typename: 'Pool'; id: string; name?: string | null | undefined; address: string; swapFee: string };
+        userAddress: { __typename: 'User'; id: string };
+    }>;
 };
 
 export type GetTokenDataQueryVariables = Exact<{
@@ -3347,12 +3363,7 @@ export type GetTransactionDataQuery = {
         type: InvestType;
         value: string;
         user: { __typename: 'User'; id: string };
-        pool: {
-            __typename: 'Pool';
-            id: string;
-            tokensList: Array<string>;
-            tokens?: Array<{ __typename: 'PoolToken'; address: string; symbol: string }> | null | undefined;
-        };
+        pool: { __typename: 'Pool'; id: string; tokensList: Array<string> };
     }>;
 };
 
@@ -3943,12 +3954,7 @@ export type BalancerJoinExitsQuery = {
         type: InvestType;
         value: string;
         user: { __typename: 'User'; id: string };
-        pool: {
-            __typename: 'Pool';
-            id: string;
-            tokensList: Array<string>;
-            tokens?: Array<{ __typename: 'PoolToken'; address: string; symbol: string }> | null | undefined;
-        };
+        pool: { __typename: 'Pool'; id: string; tokensList: Array<string> };
     }>;
 };
 
@@ -3962,12 +3968,7 @@ export type BalancerJoinExitFragment = {
     type: InvestType;
     value: string;
     user: { __typename: 'User'; id: string };
-    pool: {
-        __typename: 'Pool';
-        id: string;
-        tokensList: Array<string>;
-        tokens?: Array<{ __typename: 'PoolToken'; address: string; symbol: string }> | null | undefined;
-    };
+    pool: { __typename: 'Pool'; id: string; tokensList: Array<string> };
 };
 
 export type BalancePortfolioDataQueryVariables = Exact<{
@@ -4476,10 +4477,6 @@ export const BalancerJoinExitFragmentDoc = gql`
         pool {
             id
             tokensList
-            tokens {
-                address
-                symbol
-            }
         }
     }
 `;
@@ -4585,8 +4582,12 @@ export const GetProtocolDataDocument = gql`
         ) {
             ...BalancerSnapshot
         }
+        whaleSwaps: swaps(first: 100, orderBy: timestamp, orderDirection: desc, where: { value_gte: "10000" }) {
+            ...BalancerSwap
+        }
     }
     ${BalancerSnapshotFragmentDoc}
+    ${BalancerSwapFragmentDoc}
 `;
 
 /**
