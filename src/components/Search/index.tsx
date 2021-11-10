@@ -13,12 +13,12 @@ import { feeTierPercent, swapFeePercent } from 'utils';
 import { useSavedTokens, useSavedPools } from 'state/user/hooks';
 import { SavedIcon } from 'components/Button';
 import { useHistory } from 'react-router-dom';
-import { usePoolDatas } from 'state/pools/hooks';
 import HoverInlineText from 'components/HoverInlineText';
 import { TOKEN_HIDE, POOL_HIDE } from '../../constants/index';
 import { useActiveNetworkVersion } from 'state/application/hooks';
 import { networkPrefix } from 'utils/networkPrefix';
 import { useBalancerTokens } from '../../data/balancer/useTokens';
+import { useBalancerPools } from '../../data/balancer/usePools';
 
 const Container = styled.div`
     position: relative;
@@ -225,8 +225,9 @@ const Search = ({ ...rest }: React.HTMLAttributes<HTMLDivElement>) => {
 
     // get date for watchlist
     const allTokens = useBalancerTokens();
+    const allPools = useBalancerPools();
     const watchListTokenData = allTokens.filter((token) => savedTokens.includes(token.address));
-    const watchListPoolData = usePoolDatas(savedPools);
+    const watchListPoolData = allPools.filter((pool) => savedPools.includes(pool.id));
 
     // filter on view
     const [showWatchlist, setShowWatchlist] = useState(false);

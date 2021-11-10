@@ -9,7 +9,6 @@ import './i18n';
 import App from './pages/App';
 import store from './state';
 import UserUpdater from './state/user/updater';
-import PoolUpdater from './state/pools/updater';
 import ApplicationUpdater from './state/application/updater';
 import ListUpdater from './state/lists/updater';
 import ThemeProvider, { FixedGlobalStyle, ThemedGlobalStyle } from './theme';
@@ -42,7 +41,6 @@ function Updaters() {
         <>
             <ListUpdater />
             <UserUpdater />
-            <PoolUpdater />
             <ApplicationUpdater />
         </>
     );

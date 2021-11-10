@@ -7,11 +7,11 @@ import { RowFixed } from 'components/Row';
 import { TYPE, StyledInternalLink } from 'theme';
 import { formatDollarAmount } from 'utils/numbers';
 import Percent from 'components/Percent';
-import { useAllPoolData } from 'state/pools/hooks';
-import { PoolData } from 'state/pools/reducer';
 import PoolCurrencyLogo from 'components/PoolCurrencyLogo';
 import HoverInlineText from 'components/HoverInlineText';
 import { feeTierPercent } from 'utils';
+import { PoolData } from '../../data/balancer/balancerTypes';
+import { useBalancerPools } from '../../data/balancer/usePools';
 
 const Container = styled(StyledInternalLink)`
     min-width: 210px;
@@ -55,11 +55,11 @@ const DataCard = ({ poolData }: { poolData: PoolData }) => {
 };
 
 export default function TopPoolMovers() {
-    const allPools = useAllPoolData();
+    const allPools = useBalancerPools();
 
     const topVolume = useMemo(() => {
         return Object.values(allPools)
-            .sort(({ data: a }, { data: b }) => {
+            .sort((a, b) => {
                 return a && b ? (a?.volumeUSDChange > b?.volumeUSDChange ? -1 : 1) : -1;
             })
             .slice(0, Math.min(20, Object.values(allPools).length));
@@ -72,7 +72,7 @@ export default function TopPoolMovers() {
     return (
         <ScrollableX>
             {topVolume.map((entry) =>
-                entry.data ? <DataCard key={'top-card-pool-' + entry.data.address} poolData={entry.data} /> : null,
+                entry ? <DataCard key={'top-card-pool-' + entry.address} poolData={entry} /> : null,
             )}
         </ScrollableX>
     );

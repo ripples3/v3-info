@@ -6,9 +6,8 @@ import {
 import { useDeltaTimestamps } from '../../utils/queries';
 import { useBlocksFromTimestamps } from '../../hooks/useBlocksFromTimestamps';
 import { useEffect } from 'react';
-import { PoolData } from '../../state/pools/reducer';
 import { unixToDate } from '../../utils/date';
-import { BalancerChartDataItem } from './balancerTypes';
+import { BalancerChartDataItem, PoolData } from './balancerTypes';
 import { BALANCER_SUBGRAPH_START_TIMESTAMP } from './constants';
 
 function getPoolValues(

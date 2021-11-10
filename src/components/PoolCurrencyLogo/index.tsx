@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import CurrencyLogo from '../CurrencyLogo';
-import { PoolTokenData } from '../../state/pools/reducer';
+import { PoolTokenData } from '../../data/balancer/balancerTypes';
 
 const Wrapper = styled.div<{ margin: boolean; sizeraw: number }>`
     position: relative;

@@ -30,3 +30,42 @@ export type TokenData = {
     priceUSDChange: number;
     priceUSDChangeWeek: number;
 };
+
+export interface PoolTokenData {
+    name: string;
+    symbol: string;
+    address: string;
+    decimals: number;
+    derivedETH: number;
+    price: number;
+    tvl: number;
+    weight: number;
+}
+
+export interface PoolData {
+    id: string;
+    name: string;
+    symbol: string;
+    // basic token info
+    address: string;
+    feeTier: number;
+    swapFee: number;
+
+    tokens: PoolTokenData[];
+
+    // for tick math
+    liquidity: number;
+    sqrtPrice: number;
+    tick: number;
+
+    // volume
+    volumeUSD: number;
+    volumeUSDChange: number;
+    volumeUSDWeek: number;
+
+    // liquidity
+    tvlUSD: number;
+    tvlUSDChange: number;
+
+    feesUSD: number;
+}

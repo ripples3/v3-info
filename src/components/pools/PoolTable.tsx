@@ -7,7 +7,6 @@ import Loader, { LoadingRows } from 'components/Loader';
 import { AutoColumn } from 'components/Column';
 import { RowFixed } from 'components/Row';
 import { formatDollarAmount } from 'utils/numbers';
-import { PoolData } from 'state/pools/reducer';
 import PoolCurrencyLogo from 'components/PoolCurrencyLogo';
 import { feeTierPercent } from 'utils';
 import { Label, ClickableText } from 'components/Text';
@@ -16,6 +15,7 @@ import { POOL_HIDE } from '../../constants/index';
 import useTheme from 'hooks/useTheme';
 import { networkPrefix } from 'utils/networkPrefix';
 import { useActiveNetworkVersion } from 'state/application/hooks';
+import { PoolData } from '../../data/balancer/balancerTypes';
 
 const Wrapper = styled(DarkGreyCard)`
     width: 100%;
