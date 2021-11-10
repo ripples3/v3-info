@@ -35,6 +35,7 @@ import CMCLogo from '../../assets/images/cmc.png';
 import { useBalancerTokenData, useBalancerTokenPageData } from '../../data/balancer/useTokens';
 import { useBalancerPoolsForToken } from '../../data/balancer/usePools';
 import { useBalancerTransactionData } from '../../data/balancer/useTransactions';
+import { BALANCER_APP_LINK } from '../../data/balancer/constants';
 
 const PriceText = styled(TYPE.label)`
     font-size: 36px;
@@ -119,7 +120,7 @@ export default function TokenPage({
                 !tokenData.exists ? (
                     <LightGreyCard style={{ textAlign: 'center' }}>
                         No pool has been created with this token yet. Create one
-                        <StyledExternalLink style={{ marginLeft: '4px' }} href={`https://app.beets.fi/#/pool-create`}>
+                        <StyledExternalLink style={{ marginLeft: '4px' }} href={`${BALANCER_APP_LINK}#/pool-create`}>
                             here.
                         </StyledExternalLink>
                     </LightGreyCard>
@@ -193,7 +194,7 @@ export default function TokenPage({
                                 </AutoColumn>
                                 {activeNetwork !== EthereumNetworkInfo ? null : (
                                     <RowFixed>
-                                        <StyledExternalLink href={`https://app.beets.fi/#/trade/${address}`}>
+                                        <StyledExternalLink href={`${BALANCER_APP_LINK}#/trade/${address}`}>
                                             <ButtonPrimary
                                                 width="100px"
                                                 bgColor={backgroundColor}

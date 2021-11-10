@@ -5,6 +5,7 @@ import { ExternalLink, TYPE } from 'theme';
 import { formatDollarAmount } from 'utils/numbers';
 import Polling from './Polling';
 import { useLatestPrices } from '../../data/balancer/useLatestPrices';
+import { BALANCER_APP_LINK, BALANCER_DOCS_LINK } from '../../data/balancer/constants';
 
 const Wrapper = styled.div`
     width: 100%;
@@ -43,8 +44,8 @@ const TopBar = () => {
                     </RowFixed>
                 </AutoRow>
                 <AutoRow gap="6px" style={{ justifyContent: 'flex-end' }}>
-                    <StyledLink href="https://docs.beethovenx.io/">Docs</StyledLink>
-                    <StyledLink href="https://app.beets.fi/">App</StyledLink>
+                    <StyledLink href={BALANCER_DOCS_LINK}>Docs</StyledLink>
+                    <StyledLink href={BALANCER_APP_LINK}>App</StyledLink>
                 </AutoRow>
             </RowBetween>
         </Wrapper>

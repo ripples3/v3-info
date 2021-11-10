@@ -22,6 +22,7 @@ import { useBalancerPools } from '../../data/balancer/usePools';
 import numbro from 'numbro';
 import SwapsTable from '../../components/TransactionsTable/SwapsTable';
 import { LocalLoader } from '../../components/Loader';
+import { BALANCER_PROJECT_NAME } from '../../data/balancer/constants';
 
 const ChartWrapper = styled.div`
     width: 49%;
@@ -88,7 +89,7 @@ export default function Home() {
         <PageWrapper>
             <ThemedBackgroundGlobal backgroundColor={activeNetwork.bgColor} />
             <AutoColumn gap="16px">
-                <TYPE.main>Beethoven X</TYPE.main>
+                <TYPE.main>{BALANCER_PROJECT_NAME}</TYPE.main>
                 <ResponsiveRow>
                     <ChartWrapper>
                         <LineChart
