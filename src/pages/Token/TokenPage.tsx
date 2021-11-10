@@ -1,28 +1,27 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router-dom';
 import styled from 'styled-components';
 import { useColor } from 'hooks/useColor';
 import ReactGA from 'react-ga';
 import { PageWrapper, ThemedBackground } from 'pages/styled';
-import { currentTimestamp, getEtherscanLink, shortenAddress } from 'utils';
+import { getEtherscanLink, shortenAddress } from 'utils';
 import { AutoColumn } from 'components/Column';
 import { AutoRow, RowBetween, RowFixed, RowFlat } from 'components/Row';
 import { StyledInternalLink, TYPE } from 'theme';
 import Loader, { LocalLoader } from 'components/Loader';
-import { Download, ExternalLink } from 'react-feather';
+import { ExternalLink } from 'react-feather';
 import { ExternalLink as StyledExternalLink } from '../../theme/components';
 import useTheme from 'hooks/useTheme';
 import CurrencyLogo from 'components/CurrencyLogo';
 import { formatDollarAmount } from 'utils/numbers';
 import Percent from 'components/Percent';
-import { ButtonGray, ButtonPrimary, SavedIcon } from 'components/Button';
+import { ButtonPrimary, SavedIcon } from 'components/Button';
 import { DarkGreyCard, LightGreyCard } from 'components/Card';
 import PoolTable from 'components/pools/PoolTable';
 import LineChart from 'components/LineChart/alt';
 import { ToggleElementFree, ToggleWrapper } from 'components/Toggle/index';
 import BarChart from 'components/BarChart/alt';
-import CandleChart from 'components/CandleChart';
-import TransactionTable from 'components/TransactionsTable/SwapsTable';
+import SwapsTable from 'components/TransactionsTable/SwapsTable';
 import { useSavedTokens } from 'state/user/hooks';
 import { TimeWindow } from 'constants/intervals';
 import { MonoSpace } from 'components/shared';
@@ -31,14 +30,11 @@ import { useActiveNetworkVersion } from 'state/application/hooks';
 import { networkPrefix } from 'utils/networkPrefix';
 import { EthereumNetworkInfo } from 'constants/networks';
 import { GenericImageWrapper } from 'components/Logo';
-// import { SmallOptionButton } from '../../components/Button'
 import { useCMCLink } from 'hooks/useCMCLink';
 import CMCLogo from '../../assets/images/cmc.png';
 import { useBalancerTokenData, useBalancerTokenPageData } from '../../data/balancer/useTokens';
 import { useBalancerPoolsForToken } from '../../data/balancer/usePools';
-import { PriceChartEntry, Transaction } from '../../types';
 import { useBalancerTransactionData } from '../../data/balancer/useTransactions';
-import SwapsTable from 'components/TransactionsTable/SwapsTable';
 
 const PriceText = styled(TYPE.label)`
     font-size: 36px;

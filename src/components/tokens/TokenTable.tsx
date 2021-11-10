@@ -2,7 +2,6 @@ import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import styled from 'styled-components';
 import { ExtraSmallOnly, HideExtraSmall, TYPE } from 'theme';
 import { DarkGreyCard } from 'components/Card';
-import { TokenData } from '../../state/tokens/reducer';
 import Loader, { LoadingRows } from 'components/Loader';
 import { Link } from 'react-router-dom';
 import { AutoColumn } from 'components/Column';
@@ -16,6 +15,7 @@ import HoverInlineText from '../HoverInlineText';
 import useTheme from 'hooks/useTheme';
 import { TOKEN_HIDE } from '../../constants/index';
 import { TokenListToken } from '../../state/token-lists/token-lists';
+import { TokenData } from '../../data/balancer/balancerTypes';
 
 const Wrapper = styled(DarkGreyCard)`
     width: 100%;

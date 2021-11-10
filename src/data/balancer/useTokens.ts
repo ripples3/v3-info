@@ -5,15 +5,11 @@ import {
     LatestPriceFragment,
     useGetTokenDataLazyQuery,
     useGetTokenPageDataQuery,
-    useGetTransactionDataLazyQuery,
 } from '../../apollo/generated/graphql-codegen-generated';
 import { useEffect } from 'react';
-import { TokenData } from '../../state/tokens/reducer';
 import { unixToDate } from '../../utils/date';
 import { BALANCER_SUBGRAPH_START_TIMESTAMP } from './constants';
-import { orderBy } from 'lodash';
-import { BalancerChartDataItem } from './balancerTypes';
-import { BalancerTransaction, TransactionType } from '../../types';
+import { BalancerChartDataItem, TokenData } from './balancerTypes';
 
 function getTokenValues(
     tokenAddress: string,

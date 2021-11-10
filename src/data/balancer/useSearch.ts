@@ -1,8 +1,8 @@
-import { TokenData } from 'state/tokens/reducer';
 import { useEffect, useState } from 'react';
 import { PoolData } from 'state/pools/reducer';
 import { useBalancerTokens } from './useTokens';
 import { useBalancerPools } from './usePools';
+import { TokenData } from './balancerTypes';
 
 export function useFetchSearchResults(value: string): {
     tokens: TokenData[];

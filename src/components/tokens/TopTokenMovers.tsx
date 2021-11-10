@@ -1,8 +1,6 @@
 import React, { useMemo, useRef, useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { useAllTokenData } from 'state/tokens/hooks';
 import { GreyCard } from 'components/Card';
-import { TokenData } from 'state/tokens/reducer';
 import { AutoColumn } from 'components/Column';
 import { RowFixed, RowFlat } from 'components/Row';
 import CurrencyLogo from 'components/CurrencyLogo';
@@ -10,6 +8,7 @@ import { TYPE, StyledInternalLink } from 'theme';
 import { formatDollarAmount } from 'utils/numbers';
 import Percent from 'components/Percent';
 import HoverInlineText from 'components/HoverInlineText';
+import { TokenData } from '../../data/balancer/balancerTypes';
 
 const CardWrapper = styled(StyledInternalLink)`
     min-width: 190px;

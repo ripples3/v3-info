@@ -1,20 +1,18 @@
-import React, { useCallback, useState, useMemo, useEffect } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
 import { DarkGreyCard } from 'components/Card';
 import Loader from 'components/Loader';
 import { AutoColumn } from 'components/Column';
-import { formatDollarAmount, formatAmount } from 'utils/numbers';
-import { shortenAddress, getEtherscanLink } from 'utils';
-import { Label, ClickableText } from 'components/Text';
-import { Transaction, TransactionType } from 'types';
+import { formatAmount, formatDollarAmount } from 'utils/numbers';
+import { getEtherscanLink, shortenAddress } from 'utils';
+import { ClickableText, Label } from 'components/Text';
 import { formatTime } from 'utils/date';
 import { RowFixed } from 'components/Row';
 import { ExternalLink, TYPE } from 'theme';
-import { PageButtons, Arrow, Break } from 'components/shared';
+import { Arrow, Break, PageButtons } from 'components/shared';
 import useTheme from 'hooks/useTheme';
 import HoverInlineText from 'components/HoverInlineText';
 import { useActiveNetworkVersion } from 'state/application/hooks';
-import { OptimismNetworkInfo } from 'constants/networks';
 import { BalancerSwapFragment } from '../../apollo/generated/graphql-codegen-generated';
 import WhaleImage from '../../assets/svg/whale.svg';
 
