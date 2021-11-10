@@ -1,7 +1,6 @@
 import React from 'react';
-import v3 from '../../assets/images/whitev3.svg';
-import lookingImage from '../../assets/images/looking-image.png';
-import styled, { keyframes, css } from 'styled-components';
+import styled, { css, keyframes } from 'styled-components';
+import { BALANCER_LOADING_IMAGE } from '../../data/balancer/constants';
 
 const rotate = keyframes`
   from {
@@ -88,7 +87,7 @@ export const LocalLoader = ({ fill }: { fill: boolean }) => {
     return (
         <Wrapper fill={fill ? 1 : 0}>
             <AnimatedImg>
-                <img src={lookingImage} alt="loading-icon" />
+                <img src={BALANCER_LOADING_IMAGE} alt="loading-icon" />
             </AnimatedImg>
         </Wrapper>
     );

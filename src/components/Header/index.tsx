@@ -2,14 +2,13 @@ import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { darken } from 'polished';
 import styled from 'styled-components';
-import LogoDark from '../../assets/svg/beets-icon-large.svg';
 import Menu from '../Menu';
-import Row, { RowFixed, RowBetween } from '../Row';
+import Row, { RowBetween, RowFixed } from '../Row';
 import SearchSmall from 'components/Search';
-import NetworkDropdown from 'components/Menu/NetworkDropdown';
 import { useActiveNetworkVersion } from 'state/application/hooks';
 import { networkPrefix } from 'utils/networkPrefix';
 import { AutoColumn } from 'components/Column';
+import { BALANCER_APP_LOGO } from '../../data/balancer/constants';
 
 const HeaderFrame = styled.div`
     display: grid;
@@ -162,7 +161,7 @@ export default function Header() {
             <HeaderRow>
                 <Title to={networkPrefix(activeNewtork)}>
                     <UniIcon>
-                        <img width={'28px'} src={LogoDark} alt="logo" />
+                        <img width={'28px'} src={BALANCER_APP_LOGO} alt="logo" />
                     </UniIcon>
                 </Title>
                 <HeaderLinks>
