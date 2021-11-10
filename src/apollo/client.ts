@@ -6,7 +6,7 @@ export const healthClient = new ApolloClient({
 });
 
 export const blockClient = new ApolloClient({
-    uri: process.env.REACT_APP_FANTOM_BLOCKS,
+    uri: process.env.REACT_APP_BLOCKS_SUBGRAPH_URL,
     cache: new InMemoryCache(),
     queryDeduplication: true,
     defaultOptions: {
