@@ -97,11 +97,11 @@ export default function Menu() {
 
             {open && (
                 <MenuFlyout>
-                    <MenuItem id="link" href="https://beets.fi/">
+                    <MenuItem id="link" href="https://balancer.fi/">
                         <Info size={14} />
                         About
                     </MenuItem>
-                    <MenuItem id="link" href="https://docs.beethovenx.io/">
+                    <MenuItem id="link" href="https://docs.balancer.fi/">
                         <BookOpen size={14} />
                         Docs
                     </MenuItem>
@@ -109,7 +109,7 @@ export default function Menu() {
                         <Code size={14} />
                         Github
                     </MenuItem>
-                    <MenuItem id="link" href="https://discord.gg/jedS4zGk28">
+                    <MenuItem id="link" href="https://discord.balancer.fi">
                         <MessageCircle size={14} />
                         Discord
                     </MenuItem>

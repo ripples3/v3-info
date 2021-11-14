@@ -46,6 +46,7 @@ export interface PoolData {
     id: string;
     name: string;
     symbol: string;
+    
     // basic token info
     address: string;
     feeTier: number;

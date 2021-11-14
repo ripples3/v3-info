@@ -9,3 +9,4 @@ export const BALANCER_PRIMARY_COLOR = process.env.REACT_APP_PRIMARY_COLOR || '';
 export const BALANCER_SECONDARY_COLOR = process.env.REACT_APP_SECONDARY_COLOR || '';
 export const BALANCER_APP_LOGO = process.env.REACT_APP_APP_LOGO || '';
 export const BALANCER_LOADING_IMAGE = process.env.REACT_APP_LOADING_IMAGE || '';
+export const BALANCER_BACKGROUND_IMAGE = process.env.REACT_APP_BACKGROUND_IMAGE  || '';

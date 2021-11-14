@@ -145,6 +145,7 @@
         "apollo-client": "^2.6.10",
         "apollo-link-http": "^1.5.17",
         "dayjs": "^1.10.4",
+        "firebase": "^9.4.0",
         "graphql": "^15.5.0",
         "graphql-tag": "^2.11.0",
         "lightweight-charts": "^3.3.0",

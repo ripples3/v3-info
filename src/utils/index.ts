@@ -26,7 +26,7 @@ export function getEtherscanLink(
     type: 'transaction' | 'token' | 'address' | 'block',
     networkVersion: NetworkInfo,
 ): string {
-    const prefix = 'https://ftmscan.com';
+    const prefix = 'https://etherscan.io';
 
     if (networkVersion === OptimismNetworkInfo) {
         switch (type) {

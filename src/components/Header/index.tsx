@@ -172,6 +172,9 @@ export default function Header() {
                     >
                         Overview
                     </StyledNavLink>
+                    <StyledNavLink id={`stake-nav-link`} to={networkPrefix(activeNewtork) + 'incentives'}>
+                        Incentives
+                    </StyledNavLink>
                     <StyledNavLink id={`stake-nav-link`} to={networkPrefix(activeNewtork) + 'pools'}>
                         Pools
                     </StyledNavLink>
