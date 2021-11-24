@@ -62,11 +62,11 @@ export default function CurrencyLogo({
   }, [checkSummed, arbitrumList])
   const uriLocationsArbitrum = useHttpLocations(arbitrumURI)
 
-  //temp until token logo issue merged
+  //Secondary assets are loaded through Balancer
   const tempSources: { [address: string]: string } = useMemo(() => {
     return {
-      ['0x4dd28568d05f09b02220b09c2cb307bfd837cb95']:
-        'https://assets.coingecko.com/coins/images/18143/thumb/wCPb0b88_400x400.png?1630667954',
+      [`${address}`]:
+      `https://raw.githubusercontent.com/balancer-labs/assets/master/assets/${address}.png`,
     }
   }, [])
 

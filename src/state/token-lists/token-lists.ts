@@ -14,7 +14,7 @@ export const tokenListTokens = makeVar<TokenListToken[]>([]);
 export async function loadTokenListTokens() {
     try {
         const response = await fetch(
-            'https://beethoven-assets.s3.eu-central-1.amazonaws.com/beethoven-fantom.tokenlist.json',
+            'https://storageapi.fleek.co/balancer-team-bucket/assets/vetted.tokenlist.json',
         );
         const data = await response.json();
 
