@@ -1,21 +1,18 @@
-import React, { useCallback, useState, useMemo, useEffect } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
 import { DarkGreyCard } from 'components/Card';
 import Loader from 'components/Loader';
 import { AutoColumn } from 'components/Column';
-import { formatDollarAmount, formatAmount } from 'utils/numbers';
-import { shortenAddress, getEtherscanLink } from 'utils';
-import { Label, ClickableText } from 'components/Text';
-import { Transaction, TransactionType } from 'types';
+import { formatDollarAmount } from 'utils/numbers';
+import { getEtherscanLink, shortenAddress } from 'utils';
+import { ClickableText, Label } from 'components/Text';
 import { formatTime } from 'utils/date';
 import { RowFixed } from 'components/Row';
 import { ExternalLink, TYPE } from 'theme';
-import { PageButtons, Arrow, Break } from 'components/shared';
+import { Arrow, Break, PageButtons } from 'components/shared';
 import useTheme from 'hooks/useTheme';
-import HoverInlineText from 'components/HoverInlineText';
 import { useActiveNetworkVersion } from 'state/application/hooks';
-import { OptimismNetworkInfo } from 'constants/networks';
-import { BalancerJoinExitFragment, BalancerSwapFragment } from '../../apollo/generated/graphql-codegen-generated';
+import { BalancerJoinExitFragment } from '../../apollo/generated/graphql-codegen-generated';
 import PoolCurrencyLogo from '../PoolCurrencyLogo';
 
 const Wrapper = styled(DarkGreyCard)`
@@ -62,7 +59,7 @@ const SortText = styled.button<{ active: boolean }>`
 `;
 
 const SORT_FIELD = {
-    amountUSD: 'amountUSD',
+    valueUSD: 'valueUSD',
     timestamp: 'timestamp',
     sender: 'sender',
 };
@@ -142,6 +139,12 @@ export default function JoinExitTable({
                   .slice()
                   .sort((a, b) => {
                       if (a && b) {
+                          if (sortField === 'valueUSD') {
+                              return parseFloat(a.valueUSD) > parseFloat(b.valueUSD)
+                                  ? (sortDirection ? -1 : 1) * 1
+                                  : (sortDirection ? -1 : 1) * -1;
+                          }
+
                           return a[sortField as keyof BalancerJoinExitFragment] >
                               b[sortField as keyof BalancerJoinExitFragment]
                               ? (sortDirection ? -1 : 1) * 1
@@ -178,8 +181,8 @@ export default function JoinExitTable({
             <AutoColumn gap="16px">
                 <ResponsiveGrid>
                     <RowFixed></RowFixed>
-                    <ClickableText color={theme.text2} onClick={() => handleSort(SORT_FIELD.amountUSD)} end={1}>
-                        Total Value {arrow(SORT_FIELD.amountUSD)}
+                    <ClickableText color={theme.text2} onClick={() => handleSort(SORT_FIELD.valueUSD)} end={1}>
+                        Total Value {arrow(SORT_FIELD.valueUSD)}
                     </ClickableText>
                     <ClickableText color={theme.text2} end={1} onClick={() => handleSort(SORT_FIELD.sender)}>
                         Account {arrow(SORT_FIELD.sender)}

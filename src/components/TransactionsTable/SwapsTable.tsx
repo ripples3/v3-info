@@ -80,11 +80,11 @@ const SortText = styled.button<{ active: boolean }>`
 `;
 
 const SORT_FIELD = {
-    amountUSD: 'amountUSD',
+    valueUSD: 'valueUSD',
     timestamp: 'timestamp',
-    sender: 'sender',
-    amountToken0: 'amountToken0',
-    amountToken1: 'amountToken1',
+    caller: 'caller',
+    tokenAmountIn: 'tokenAmountIn',
+    tokenAmountOut: 'tokenAmountOut',
 };
 
 const DataRow = ({ swap, color }: { swap: BalancerSwapFragment; color?: string }) => {
@@ -160,6 +160,17 @@ export default function SwapsTable({
                   .slice()
                   .sort((a, b) => {
                       if (a && b) {
+                          if (
+                              [SORT_FIELD.tokenAmountIn, SORT_FIELD.tokenAmountOut, SORT_FIELD.valueUSD].includes(
+                                  sortField,
+                              )
+                          ) {
+                              return parseFloat(a[sortField as keyof BalancerSwapFragment] as string) >
+                                  parseFloat(b[sortField as keyof BalancerSwapFragment] as string)
+                                  ? (sortDirection ? -1 : 1) * 1
+                                  : (sortDirection ? -1 : 1) * -1;
+                          }
+
                           return a[sortField as keyof BalancerSwapFragment] > b[sortField as keyof BalancerSwapFragment]
                               ? (sortDirection ? -1 : 1) * 1
                               : (sortDirection ? -1 : 1) * -1;
@@ -195,17 +206,17 @@ export default function SwapsTable({
             <AutoColumn gap="16px">
                 <ResponsiveGrid>
                     <RowFixed></RowFixed>
-                    <ClickableText color={theme.text2} onClick={() => handleSort(SORT_FIELD.amountUSD)} end={1}>
-                        Total Value {arrow(SORT_FIELD.amountUSD)}
+                    <ClickableText color={theme.text2} onClick={() => handleSort(SORT_FIELD.valueUSD)} end={1}>
+                        Total Value {arrow(SORT_FIELD.valueUSD)}
                     </ClickableText>
-                    <ClickableText color={theme.text2} end={1} onClick={() => handleSort(SORT_FIELD.amountToken0)}>
-                        Token Amount {arrow(SORT_FIELD.amountToken0)}
+                    <ClickableText color={theme.text2} end={1} onClick={() => handleSort(SORT_FIELD.tokenAmountIn)}>
+                        Token Amount {arrow(SORT_FIELD.tokenAmountIn)}
                     </ClickableText>
-                    <ClickableText color={theme.text2} end={1} onClick={() => handleSort(SORT_FIELD.amountToken1)}>
-                        Token Amount {arrow(SORT_FIELD.amountToken1)}
+                    <ClickableText color={theme.text2} end={1} onClick={() => handleSort(SORT_FIELD.tokenAmountOut)}>
+                        Token Amount {arrow(SORT_FIELD.tokenAmountOut)}
                     </ClickableText>
-                    <ClickableText color={theme.text2} end={1} onClick={() => handleSort(SORT_FIELD.sender)}>
-                        Account {arrow(SORT_FIELD.sender)}
+                    <ClickableText color={theme.text2} end={1} onClick={() => handleSort(SORT_FIELD.caller)}>
+                        Account {arrow(SORT_FIELD.caller)}
                     </ClickableText>
                     <ClickableText color={theme.text2} end={1} onClick={() => handleSort(SORT_FIELD.timestamp)}>
                         Time {arrow(SORT_FIELD.timestamp)}
