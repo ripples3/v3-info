@@ -33,6 +33,7 @@ import SwapsTable from 'components/TransactionsTable/SwapsTable';
 import { BalPieChart } from '../../components/PieChart/BalPieChart';
 import JoinExitTable from '../../components/TransactionsTable/JoinExitTable';
 import { BALANCER_APP_LINK } from '../../data/balancer/constants';
+import { getShortPoolName } from 'utils/getShortPoolName';
 
 const ContentLayout = styled.div`
     display: grid;
@@ -102,7 +103,9 @@ export default function PoolPage({
     const theme = useTheme();
 
     const poolData = useBalancerPoolData(poolId);
+    
     const { tvlData, volumeData, feesData } = useBalancerPoolPageData(poolId);
+    //console.log("tvlData:", tvlData);
     const { swaps, joinExits, swapPairVolumes } = useBalancerTransactionData(
         (poolData?.tokens || []).map((token) => token.address),
         poolData ? [poolData.id] : [],
@@ -129,7 +132,7 @@ export default function PoolPage({
                                 <TYPE.label>{` Pools `}</TYPE.label>
                             </StyledInternalLink>
                             <TYPE.main>{` > `}</TYPE.main>
-                            <TYPE.label>{` ${poolData.name} ${swapFeePercent(poolData.swapFee)} `}</TYPE.label>
+                            <TYPE.label>{` ${getShortPoolName(poolData)} ${swapFeePercent(poolData.swapFee)} `}</TYPE.label>
                         </AutoRow>
                         <RowFixed gap="10px" align="center">
                             <SavedIcon fill={savedPools.includes(poolId)} onClick={() => addSavedPool(poolId)} />
@@ -142,7 +145,7 @@ export default function PoolPage({
                         <AutoColumn gap="lg">
                             <RowFixed>
                                 <PoolCurrencyLogo tokens={poolData.tokens} size={24} />
-                                <TYPE.label ml="8px" mr="8px" fontSize="24px">{`${poolData.name}`}</TYPE.label>
+                                <TYPE.label ml="8px" mr="8px" fontSize="24px">{`${getShortPoolName(poolData)}`}</TYPE.label>
                                 <GreyBadge>{swapFeePercent(poolData.swapFee)}</GreyBadge>
                             </RowFixed>
                             <TokenResponsiveRow>

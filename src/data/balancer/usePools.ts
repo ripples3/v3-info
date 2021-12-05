@@ -13,11 +13,11 @@ import { BALANCER_SUBGRAPH_START_TIMESTAMP } from './constants';
 function getPoolValues(
     poolId: string,
     pools: BalancerPoolFragment[],
-): { tvl: number; volume: number; swapCount: number; fees: number } {
+): { tvl: number; volume: number; swapCount: number; fees: number , poolType: string | null | undefined} {
     const pool = pools.find((pool) => poolId === pool.id);
 
     if (!pool) {
-        return { tvl: 0, volume: 0, swapCount: 0, fees: 0 };
+        return { tvl: 0, volume: 0, swapCount: 0, fees: 0 , poolType: ''};
     }
 
     return {
@@ -25,6 +25,7 @@ function getPoolValues(
         volume: parseFloat(pool.totalSwapVolume),
         fees: parseFloat(pool.totalSwapFee),
         swapCount: parseFloat(pool.swapsCount),
+       poolType: pool.poolType,
     };
 }
 
@@ -59,6 +60,8 @@ export function useBalancerPools(): PoolData[] {
         const poolData48 = getPoolValues(pool.id, pools48);
         const poolDataWeek = getPoolValues(pool.id, poolsWeek);
 
+        
+
         return {
             ...pool,
             name: pool.name || '',
@@ -90,6 +93,7 @@ export function useBalancerPools(): PoolData[] {
             feesUSD: poolData.fees - poolData24.fees,
             tvlUSD: poolData.tvl,
             tvlUSDChange: (poolData.tvl - poolData24.tvl) / poolData24.tvl,
+            poolType: poolData.poolType + "",
         };
     });
 }
@@ -115,12 +119,13 @@ export function useBalancerPoolPageData(poolId: string): {
     const { data } = useGetPoolChartDataQuery({
         variables: { poolId, startTimestamp: BALANCER_SUBGRAPH_START_TIMESTAMP },
     });
-
+    console.log("useBalancerPoolPageData, data object", data);
     if (!data) {
         return { tvlData: [], volumeData: [], feesData: [] };
     }
 
     const { poolSnapshots } = data;
+    
 
     const tvlData = poolSnapshots.map((snapshot) => ({
         value: parseFloat(snapshot.totalLiquidity),
