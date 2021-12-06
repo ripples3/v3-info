@@ -73,3 +73,17 @@ export interface PoolData {
     //Pool Type info
     poolType: string;
 }
+
+//Incentive Data Types
+export interface IncentiveTokenItem {
+    tokenAddress: string;
+    amount: number;
+}
+
+export interface IncentiveData {
+    chainId: number;
+    poolId: string;
+    tokens: IncentiveTokenItem[];
+}
+
+

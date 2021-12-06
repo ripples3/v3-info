@@ -70,7 +70,6 @@ const SORT_FIELD = {
 
 const DataRow = ({ poolData, index }: { poolData: PoolData; index: number }) => {
     const [activeNetwork] = useActiveNetworkVersion();
-    console.log("poolData", poolData);
 
     return (
         <LinkWrapper to={networkPrefix(activeNetwork) + 'pools/' + poolData.id}>
