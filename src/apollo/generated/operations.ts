@@ -348,11 +348,8 @@ export const GetPoolChartData = gql`
             swapVolume
             swapFees
             timestamp
-            totalSwapVolume
-            totalSwapFee
-            totalLiquidity
-            swapsCount
-            holdersCount
+            swapVolume
+            swapFees
             pool {
                 id
             }

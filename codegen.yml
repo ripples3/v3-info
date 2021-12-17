@@ -1,6 +1,6 @@
 schema:
-  - 'https://us-lb.beets-ftm-node.com/subgraphs/name/beethovenx-canary'
-  - 'https://graph-node.beets-ftm-node.com/subgraphs/name/fantom-blocks'
+  - 'https://api.thegraph.com/subgraphs/name/blocklytics/ethereum-blocks'
+  - 'https://api.thegraph.com/subgraphs/name/tomafrench/balancer-v2'
 documents:
   - 'src/**/*.gql'
 hooks:

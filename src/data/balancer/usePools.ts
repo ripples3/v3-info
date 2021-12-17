@@ -128,13 +128,13 @@ export function useBalancerPoolPageData(poolId: string): {
     
 
     const tvlData = poolSnapshots.map((snapshot) => ({
-        value: parseFloat(snapshot.totalLiquidity),
+        value: parseFloat(snapshot.totalShares),
         time: unixToDate(snapshot.timestamp),
     }));
 
     const volumeData = poolSnapshots.map((snapshot, idx) => {
-        const prevValue = idx === 0 ? 0 : parseFloat(poolSnapshots[idx - 1].totalSwapVolume);
-        const value = parseFloat(snapshot.totalSwapVolume);
+        const prevValue = idx === 0 ? 0 : parseFloat(poolSnapshots[idx - 1].swapVolume);
+        const value = parseFloat(snapshot.swapVolume);
 
         return {
             value: value - prevValue > 0 ? value - prevValue : 0,
@@ -143,8 +143,8 @@ export function useBalancerPoolPageData(poolId: string): {
     });
 
     const feesData = poolSnapshots.map((snapshot, idx) => {
-        const prevValue = idx === 0 ? 0 : parseFloat(poolSnapshots[idx - 1].totalSwapFee);
-        const value = parseFloat(snapshot.totalSwapFee);
+        const prevValue = idx === 0 ? 0 : parseFloat(poolSnapshots[idx - 1].swapFees);
+        const value = parseFloat(snapshot.swapFees);
 
         return {
             value: value - prevValue > 0 ? value - prevValue : 0,

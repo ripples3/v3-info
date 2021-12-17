@@ -157,11 +157,8 @@ query GetPoolChartData($poolId: String!, $startTimestamp: Int!) {
         swapVolume
         swapFees
         timestamp
-        totalSwapVolume
-        totalSwapFee
-        totalLiquidity
-        swapsCount
-        holdersCount
+        swapVolume
+        swapFees
         pool {
             id
         }

@@ -449,6 +449,7 @@ export interface Block_Filter {
 export interface Block_Height {
     hash?: Maybe<Scalars['Bytes']>;
     number?: Maybe<Scalars['Int']>;
+    number_gte?: Maybe<Scalars['Int']>;
 }
 
 export type Block_OrderBy =
@@ -783,7 +784,7 @@ export interface Pool {
     id: Scalars['ID'];
     managementFee?: Maybe<Scalars['BigDecimal']>;
     name?: Maybe<Scalars['String']>;
-    owner?: Maybe<Scalars['Bytes']>;
+    owner: Scalars['Bytes'];
     poolType?: Maybe<Scalars['String']>;
     priceRateProviders?: Maybe<Array<PriceRateProvider>>;
     principalToken?: Maybe<Scalars['Bytes']>;
@@ -861,11 +862,9 @@ export interface PoolHistoricalLiquidity {
     id: Scalars['ID'];
     poolId: Pool;
     poolLiquidity: Scalars['BigDecimal'];
-    poolLiquidityUSD: Scalars['BigDecimal'];
     poolShareValue: Scalars['BigDecimal'];
     poolTotalShares: Scalars['BigDecimal'];
     pricingAsset: Scalars['Bytes'];
-    timestamp: Scalars['Int'];
 }
 
 export interface PoolHistoricalLiquidity_Filter {
@@ -900,14 +899,6 @@ export interface PoolHistoricalLiquidity_Filter {
     poolId_not_starts_with?: Maybe<Scalars['String']>;
     poolId_starts_with?: Maybe<Scalars['String']>;
     poolLiquidity?: Maybe<Scalars['BigDecimal']>;
-    poolLiquidityUSD?: Maybe<Scalars['BigDecimal']>;
-    poolLiquidityUSD_gt?: Maybe<Scalars['BigDecimal']>;
-    poolLiquidityUSD_gte?: Maybe<Scalars['BigDecimal']>;
-    poolLiquidityUSD_in?: Maybe<Array<Scalars['BigDecimal']>>;
-    poolLiquidityUSD_lt?: Maybe<Scalars['BigDecimal']>;
-    poolLiquidityUSD_lte?: Maybe<Scalars['BigDecimal']>;
-    poolLiquidityUSD_not?: Maybe<Scalars['BigDecimal']>;
-    poolLiquidityUSD_not_in?: Maybe<Array<Scalars['BigDecimal']>>;
     poolLiquidity_gt?: Maybe<Scalars['BigDecimal']>;
     poolLiquidity_gte?: Maybe<Scalars['BigDecimal']>;
     poolLiquidity_in?: Maybe<Array<Scalars['BigDecimal']>>;
@@ -937,14 +928,6 @@ export interface PoolHistoricalLiquidity_Filter {
     pricingAsset_not?: Maybe<Scalars['Bytes']>;
     pricingAsset_not_contains?: Maybe<Scalars['Bytes']>;
     pricingAsset_not_in?: Maybe<Array<Scalars['Bytes']>>;
-    timestamp?: Maybe<Scalars['Int']>;
-    timestamp_gt?: Maybe<Scalars['Int']>;
-    timestamp_gte?: Maybe<Scalars['Int']>;
-    timestamp_in?: Maybe<Array<Scalars['Int']>>;
-    timestamp_lt?: Maybe<Scalars['Int']>;
-    timestamp_lte?: Maybe<Scalars['Int']>;
-    timestamp_not?: Maybe<Scalars['Int']>;
-    timestamp_not_in?: Maybe<Array<Scalars['Int']>>;
 }
 
 export type PoolHistoricalLiquidity_OrderBy =
@@ -952,11 +935,9 @@ export type PoolHistoricalLiquidity_OrderBy =
     | 'id'
     | 'poolId'
     | 'poolLiquidity'
-    | 'poolLiquidityUSD'
     | 'poolShareValue'
     | 'poolTotalShares'
-    | 'pricingAsset'
-    | 'timestamp';
+    | 'pricingAsset';
 
 export interface PoolShare {
     __typename: 'PoolShare';
@@ -1018,17 +999,12 @@ export type PoolShare_OrderBy = 'balance' | 'id' | 'poolId' | 'userAddress';
 export interface PoolSnapshot {
     __typename: 'PoolSnapshot';
     amounts: Array<Scalars['BigDecimal']>;
-    holdersCount: Scalars['BigInt'];
     id: Scalars['ID'];
     pool: Pool;
     swapFees: Scalars['BigDecimal'];
     swapVolume: Scalars['BigDecimal'];
-    swapsCount: Scalars['BigInt'];
     timestamp: Scalars['Int'];
-    totalLiquidity: Scalars['BigDecimal'];
     totalShares: Scalars['BigDecimal'];
-    totalSwapFee: Scalars['BigDecimal'];
-    totalSwapVolume: Scalars['BigDecimal'];
 }
 
 export interface PoolSnapshot_Filter {
@@ -1036,14 +1012,6 @@ export interface PoolSnapshot_Filter {
     amounts_contains?: Maybe<Array<Scalars['BigDecimal']>>;
     amounts_not?: Maybe<Array<Scalars['BigDecimal']>>;
     amounts_not_contains?: Maybe<Array<Scalars['BigDecimal']>>;
-    holdersCount?: Maybe<Scalars['BigInt']>;
-    holdersCount_gt?: Maybe<Scalars['BigInt']>;
-    holdersCount_gte?: Maybe<Scalars['BigInt']>;
-    holdersCount_in?: Maybe<Array<Scalars['BigInt']>>;
-    holdersCount_lt?: Maybe<Scalars['BigInt']>;
-    holdersCount_lte?: Maybe<Scalars['BigInt']>;
-    holdersCount_not?: Maybe<Scalars['BigInt']>;
-    holdersCount_not_in?: Maybe<Array<Scalars['BigInt']>>;
     id?: Maybe<Scalars['ID']>;
     id_gt?: Maybe<Scalars['ID']>;
     id_gte?: Maybe<Scalars['ID']>;
@@ -1082,14 +1050,6 @@ export interface PoolSnapshot_Filter {
     swapVolume_lte?: Maybe<Scalars['BigDecimal']>;
     swapVolume_not?: Maybe<Scalars['BigDecimal']>;
     swapVolume_not_in?: Maybe<Array<Scalars['BigDecimal']>>;
-    swapsCount?: Maybe<Scalars['BigInt']>;
-    swapsCount_gt?: Maybe<Scalars['BigInt']>;
-    swapsCount_gte?: Maybe<Scalars['BigInt']>;
-    swapsCount_in?: Maybe<Array<Scalars['BigInt']>>;
-    swapsCount_lt?: Maybe<Scalars['BigInt']>;
-    swapsCount_lte?: Maybe<Scalars['BigInt']>;
-    swapsCount_not?: Maybe<Scalars['BigInt']>;
-    swapsCount_not_in?: Maybe<Array<Scalars['BigInt']>>;
     timestamp?: Maybe<Scalars['Int']>;
     timestamp_gt?: Maybe<Scalars['Int']>;
     timestamp_gte?: Maybe<Scalars['Int']>;
@@ -1098,14 +1058,6 @@ export interface PoolSnapshot_Filter {
     timestamp_lte?: Maybe<Scalars['Int']>;
     timestamp_not?: Maybe<Scalars['Int']>;
     timestamp_not_in?: Maybe<Array<Scalars['Int']>>;
-    totalLiquidity?: Maybe<Scalars['BigDecimal']>;
-    totalLiquidity_gt?: Maybe<Scalars['BigDecimal']>;
-    totalLiquidity_gte?: Maybe<Scalars['BigDecimal']>;
-    totalLiquidity_in?: Maybe<Array<Scalars['BigDecimal']>>;
-    totalLiquidity_lt?: Maybe<Scalars['BigDecimal']>;
-    totalLiquidity_lte?: Maybe<Scalars['BigDecimal']>;
-    totalLiquidity_not?: Maybe<Scalars['BigDecimal']>;
-    totalLiquidity_not_in?: Maybe<Array<Scalars['BigDecimal']>>;
     totalShares?: Maybe<Scalars['BigDecimal']>;
     totalShares_gt?: Maybe<Scalars['BigDecimal']>;
     totalShares_gte?: Maybe<Scalars['BigDecimal']>;
@@ -1114,37 +1066,9 @@ export interface PoolSnapshot_Filter {
     totalShares_lte?: Maybe<Scalars['BigDecimal']>;
     totalShares_not?: Maybe<Scalars['BigDecimal']>;
     totalShares_not_in?: Maybe<Array<Scalars['BigDecimal']>>;
-    totalSwapFee?: Maybe<Scalars['BigDecimal']>;
-    totalSwapFee_gt?: Maybe<Scalars['BigDecimal']>;
-    totalSwapFee_gte?: Maybe<Scalars['BigDecimal']>;
-    totalSwapFee_in?: Maybe<Array<Scalars['BigDecimal']>>;
-    totalSwapFee_lt?: Maybe<Scalars['BigDecimal']>;
-    totalSwapFee_lte?: Maybe<Scalars['BigDecimal']>;
-    totalSwapFee_not?: Maybe<Scalars['BigDecimal']>;
-    totalSwapFee_not_in?: Maybe<Array<Scalars['BigDecimal']>>;
-    totalSwapVolume?: Maybe<Scalars['BigDecimal']>;
-    totalSwapVolume_gt?: Maybe<Scalars['BigDecimal']>;
-    totalSwapVolume_gte?: Maybe<Scalars['BigDecimal']>;
-    totalSwapVolume_in?: Maybe<Array<Scalars['BigDecimal']>>;
-    totalSwapVolume_lt?: Maybe<Scalars['BigDecimal']>;
-    totalSwapVolume_lte?: Maybe<Scalars['BigDecimal']>;
-    totalSwapVolume_not?: Maybe<Scalars['BigDecimal']>;
-    totalSwapVolume_not_in?: Maybe<Array<Scalars['BigDecimal']>>;
 }
 
-export type PoolSnapshot_OrderBy =
-    | 'amounts'
-    | 'holdersCount'
-    | 'id'
-    | 'pool'
-    | 'swapFees'
-    | 'swapVolume'
-    | 'swapsCount'
-    | 'timestamp'
-    | 'totalLiquidity'
-    | 'totalShares'
-    | 'totalSwapFee'
-    | 'totalSwapVolume';
+export type PoolSnapshot_OrderBy = 'amounts' | 'id' | 'pool' | 'swapFees' | 'swapVolume' | 'timestamp' | 'totalShares';
 
 export interface PoolToken {
     __typename: 'PoolToken';
@@ -1719,6 +1643,7 @@ export interface Query_MetaArgs {
 export interface QueryAmpUpdateArgs {
     block?: Maybe<Block_Height>;
     id: Scalars['ID'];
+    subgraphError?: _SubgraphErrorPolicy_;
 }
 
 export interface QueryAmpUpdatesArgs {
@@ -1727,17 +1652,20 @@ export interface QueryAmpUpdatesArgs {
     orderBy?: Maybe<AmpUpdate_OrderBy>;
     orderDirection?: Maybe<OrderDirection>;
     skip?: Maybe<Scalars['Int']>;
+    subgraphError?: _SubgraphErrorPolicy_;
     where?: Maybe<AmpUpdate_Filter>;
 }
 
 export interface QueryBalancerArgs {
     block?: Maybe<Block_Height>;
     id: Scalars['ID'];
+    subgraphError?: _SubgraphErrorPolicy_;
 }
 
 export interface QueryBalancerSnapshotArgs {
     block?: Maybe<Block_Height>;
     id: Scalars['ID'];
+    subgraphError?: _SubgraphErrorPolicy_;
 }
 
 export interface QueryBalancerSnapshotsArgs {
@@ -1746,6 +1674,7 @@ export interface QueryBalancerSnapshotsArgs {
     orderBy?: Maybe<BalancerSnapshot_OrderBy>;
     orderDirection?: Maybe<OrderDirection>;
     skip?: Maybe<Scalars['Int']>;
+    subgraphError?: _SubgraphErrorPolicy_;
     where?: Maybe<BalancerSnapshot_Filter>;
 }
 
@@ -1755,12 +1684,14 @@ export interface QueryBalancersArgs {
     orderBy?: Maybe<Balancer_OrderBy>;
     orderDirection?: Maybe<OrderDirection>;
     skip?: Maybe<Scalars['Int']>;
+    subgraphError?: _SubgraphErrorPolicy_;
     where?: Maybe<Balancer_Filter>;
 }
 
 export interface QueryBlockArgs {
     block?: Maybe<Block_Height>;
     id: Scalars['ID'];
+    subgraphError?: _SubgraphErrorPolicy_;
 }
 
 export interface QueryBlocksArgs {
@@ -1769,12 +1700,14 @@ export interface QueryBlocksArgs {
     orderBy?: Maybe<Block_OrderBy>;
     orderDirection?: Maybe<OrderDirection>;
     skip?: Maybe<Scalars['Int']>;
+    subgraphError?: _SubgraphErrorPolicy_;
     where?: Maybe<Block_Filter>;
 }
 
 export interface QueryGradualWeightUpdateArgs {
     block?: Maybe<Block_Height>;
     id: Scalars['ID'];
+    subgraphError?: _SubgraphErrorPolicy_;
 }
 
 export interface QueryGradualWeightUpdatesArgs {
@@ -1783,12 +1716,14 @@ export interface QueryGradualWeightUpdatesArgs {
     orderBy?: Maybe<GradualWeightUpdate_OrderBy>;
     orderDirection?: Maybe<OrderDirection>;
     skip?: Maybe<Scalars['Int']>;
+    subgraphError?: _SubgraphErrorPolicy_;
     where?: Maybe<GradualWeightUpdate_Filter>;
 }
 
 export interface QueryInvestmentArgs {
     block?: Maybe<Block_Height>;
     id: Scalars['ID'];
+    subgraphError?: _SubgraphErrorPolicy_;
 }
 
 export interface QueryInvestmentsArgs {
@@ -1797,12 +1732,14 @@ export interface QueryInvestmentsArgs {
     orderBy?: Maybe<Investment_OrderBy>;
     orderDirection?: Maybe<OrderDirection>;
     skip?: Maybe<Scalars['Int']>;
+    subgraphError?: _SubgraphErrorPolicy_;
     where?: Maybe<Investment_Filter>;
 }
 
 export interface QueryJoinExitArgs {
     block?: Maybe<Block_Height>;
     id: Scalars['ID'];
+    subgraphError?: _SubgraphErrorPolicy_;
 }
 
 export interface QueryJoinExitsArgs {
@@ -1811,12 +1748,14 @@ export interface QueryJoinExitsArgs {
     orderBy?: Maybe<JoinExit_OrderBy>;
     orderDirection?: Maybe<OrderDirection>;
     skip?: Maybe<Scalars['Int']>;
+    subgraphError?: _SubgraphErrorPolicy_;
     where?: Maybe<JoinExit_Filter>;
 }
 
 export interface QueryLatestPriceArgs {
     block?: Maybe<Block_Height>;
     id: Scalars['ID'];
+    subgraphError?: _SubgraphErrorPolicy_;
 }
 
 export interface QueryLatestPricesArgs {
@@ -1825,12 +1764,14 @@ export interface QueryLatestPricesArgs {
     orderBy?: Maybe<LatestPrice_OrderBy>;
     orderDirection?: Maybe<OrderDirection>;
     skip?: Maybe<Scalars['Int']>;
+    subgraphError?: _SubgraphErrorPolicy_;
     where?: Maybe<LatestPrice_Filter>;
 }
 
 export interface QueryPoolArgs {
     block?: Maybe<Block_Height>;
     id: Scalars['ID'];
+    subgraphError?: _SubgraphErrorPolicy_;
 }
 
 export interface QueryPoolHistoricalLiquiditiesArgs {
@@ -1839,17 +1780,20 @@ export interface QueryPoolHistoricalLiquiditiesArgs {
     orderBy?: Maybe<PoolHistoricalLiquidity_OrderBy>;
     orderDirection?: Maybe<OrderDirection>;
     skip?: Maybe<Scalars['Int']>;
+    subgraphError?: _SubgraphErrorPolicy_;
     where?: Maybe<PoolHistoricalLiquidity_Filter>;
 }
 
 export interface QueryPoolHistoricalLiquidityArgs {
     block?: Maybe<Block_Height>;
     id: Scalars['ID'];
+    subgraphError?: _SubgraphErrorPolicy_;
 }
 
 export interface QueryPoolShareArgs {
     block?: Maybe<Block_Height>;
     id: Scalars['ID'];
+    subgraphError?: _SubgraphErrorPolicy_;
 }
 
 export interface QueryPoolSharesArgs {
@@ -1858,12 +1802,14 @@ export interface QueryPoolSharesArgs {
     orderBy?: Maybe<PoolShare_OrderBy>;
     orderDirection?: Maybe<OrderDirection>;
     skip?: Maybe<Scalars['Int']>;
+    subgraphError?: _SubgraphErrorPolicy_;
     where?: Maybe<PoolShare_Filter>;
 }
 
 export interface QueryPoolSnapshotArgs {
     block?: Maybe<Block_Height>;
     id: Scalars['ID'];
+    subgraphError?: _SubgraphErrorPolicy_;
 }
 
 export interface QueryPoolSnapshotsArgs {
@@ -1872,12 +1818,14 @@ export interface QueryPoolSnapshotsArgs {
     orderBy?: Maybe<PoolSnapshot_OrderBy>;
     orderDirection?: Maybe<OrderDirection>;
     skip?: Maybe<Scalars['Int']>;
+    subgraphError?: _SubgraphErrorPolicy_;
     where?: Maybe<PoolSnapshot_Filter>;
 }
 
 export interface QueryPoolTokenArgs {
     block?: Maybe<Block_Height>;
     id: Scalars['ID'];
+    subgraphError?: _SubgraphErrorPolicy_;
 }
 
 export interface QueryPoolTokensArgs {
@@ -1886,6 +1834,7 @@ export interface QueryPoolTokensArgs {
     orderBy?: Maybe<PoolToken_OrderBy>;
     orderDirection?: Maybe<OrderDirection>;
     skip?: Maybe<Scalars['Int']>;
+    subgraphError?: _SubgraphErrorPolicy_;
     where?: Maybe<PoolToken_Filter>;
 }
 
@@ -1895,12 +1844,14 @@ export interface QueryPoolsArgs {
     orderBy?: Maybe<Pool_OrderBy>;
     orderDirection?: Maybe<OrderDirection>;
     skip?: Maybe<Scalars['Int']>;
+    subgraphError?: _SubgraphErrorPolicy_;
     where?: Maybe<Pool_Filter>;
 }
 
 export interface QueryPriceRateProviderArgs {
     block?: Maybe<Block_Height>;
     id: Scalars['ID'];
+    subgraphError?: _SubgraphErrorPolicy_;
 }
 
 export interface QueryPriceRateProvidersArgs {
@@ -1909,12 +1860,14 @@ export interface QueryPriceRateProvidersArgs {
     orderBy?: Maybe<PriceRateProvider_OrderBy>;
     orderDirection?: Maybe<OrderDirection>;
     skip?: Maybe<Scalars['Int']>;
+    subgraphError?: _SubgraphErrorPolicy_;
     where?: Maybe<PriceRateProvider_Filter>;
 }
 
 export interface QuerySwapArgs {
     block?: Maybe<Block_Height>;
     id: Scalars['ID'];
+    subgraphError?: _SubgraphErrorPolicy_;
 }
 
 export interface QuerySwapsArgs {
@@ -1923,17 +1876,20 @@ export interface QuerySwapsArgs {
     orderBy?: Maybe<Swap_OrderBy>;
     orderDirection?: Maybe<OrderDirection>;
     skip?: Maybe<Scalars['Int']>;
+    subgraphError?: _SubgraphErrorPolicy_;
     where?: Maybe<Swap_Filter>;
 }
 
 export interface QueryTokenArgs {
     block?: Maybe<Block_Height>;
     id: Scalars['ID'];
+    subgraphError?: _SubgraphErrorPolicy_;
 }
 
 export interface QueryTokenPriceArgs {
     block?: Maybe<Block_Height>;
     id: Scalars['ID'];
+    subgraphError?: _SubgraphErrorPolicy_;
 }
 
 export interface QueryTokenPricesArgs {
@@ -1942,12 +1898,14 @@ export interface QueryTokenPricesArgs {
     orderBy?: Maybe<TokenPrice_OrderBy>;
     orderDirection?: Maybe<OrderDirection>;
     skip?: Maybe<Scalars['Int']>;
+    subgraphError?: _SubgraphErrorPolicy_;
     where?: Maybe<TokenPrice_Filter>;
 }
 
 export interface QueryTokenSnapshotArgs {
     block?: Maybe<Block_Height>;
     id: Scalars['ID'];
+    subgraphError?: _SubgraphErrorPolicy_;
 }
 
 export interface QueryTokenSnapshotsArgs {
@@ -1956,6 +1914,7 @@ export interface QueryTokenSnapshotsArgs {
     orderBy?: Maybe<TokenSnapshot_OrderBy>;
     orderDirection?: Maybe<OrderDirection>;
     skip?: Maybe<Scalars['Int']>;
+    subgraphError?: _SubgraphErrorPolicy_;
     where?: Maybe<TokenSnapshot_Filter>;
 }
 
@@ -1965,17 +1924,20 @@ export interface QueryTokensArgs {
     orderBy?: Maybe<Token_OrderBy>;
     orderDirection?: Maybe<OrderDirection>;
     skip?: Maybe<Scalars['Int']>;
+    subgraphError?: _SubgraphErrorPolicy_;
     where?: Maybe<Token_Filter>;
 }
 
 export interface QueryTradePairArgs {
     block?: Maybe<Block_Height>;
     id: Scalars['ID'];
+    subgraphError?: _SubgraphErrorPolicy_;
 }
 
 export interface QueryTradePairSnapshotArgs {
     block?: Maybe<Block_Height>;
     id: Scalars['ID'];
+    subgraphError?: _SubgraphErrorPolicy_;
 }
 
 export interface QueryTradePairSnapshotsArgs {
@@ -1984,6 +1946,7 @@ export interface QueryTradePairSnapshotsArgs {
     orderBy?: Maybe<TradePairSnapshot_OrderBy>;
     orderDirection?: Maybe<OrderDirection>;
     skip?: Maybe<Scalars['Int']>;
+    subgraphError?: _SubgraphErrorPolicy_;
     where?: Maybe<TradePairSnapshot_Filter>;
 }
 
@@ -1993,17 +1956,20 @@ export interface QueryTradePairsArgs {
     orderBy?: Maybe<TradePair_OrderBy>;
     orderDirection?: Maybe<OrderDirection>;
     skip?: Maybe<Scalars['Int']>;
+    subgraphError?: _SubgraphErrorPolicy_;
     where?: Maybe<TradePair_Filter>;
 }
 
 export interface QueryUserArgs {
     block?: Maybe<Block_Height>;
     id: Scalars['ID'];
+    subgraphError?: _SubgraphErrorPolicy_;
 }
 
 export interface QueryUserInternalBalanceArgs {
     block?: Maybe<Block_Height>;
     id: Scalars['ID'];
+    subgraphError?: _SubgraphErrorPolicy_;
 }
 
 export interface QueryUserInternalBalancesArgs {
@@ -2012,6 +1978,7 @@ export interface QueryUserInternalBalancesArgs {
     orderBy?: Maybe<UserInternalBalance_OrderBy>;
     orderDirection?: Maybe<OrderDirection>;
     skip?: Maybe<Scalars['Int']>;
+    subgraphError?: _SubgraphErrorPolicy_;
     where?: Maybe<UserInternalBalance_Filter>;
 }
 
@@ -2021,6 +1988,7 @@ export interface QueryUsersArgs {
     orderBy?: Maybe<User_OrderBy>;
     orderDirection?: Maybe<OrderDirection>;
     skip?: Maybe<Scalars['Int']>;
+    subgraphError?: _SubgraphErrorPolicy_;
     where?: Maybe<User_Filter>;
 }
 
@@ -2081,6 +2049,7 @@ export interface Subscription_MetaArgs {
 export interface SubscriptionAmpUpdateArgs {
     block?: Maybe<Block_Height>;
     id: Scalars['ID'];
+    subgraphError?: _SubgraphErrorPolicy_;
 }
 
 export interface SubscriptionAmpUpdatesArgs {
@@ -2089,17 +2058,20 @@ export interface SubscriptionAmpUpdatesArgs {
     orderBy?: Maybe<AmpUpdate_OrderBy>;
     orderDirection?: Maybe<OrderDirection>;
     skip?: Maybe<Scalars['Int']>;
+    subgraphError?: _SubgraphErrorPolicy_;
     where?: Maybe<AmpUpdate_Filter>;
 }
 
 export interface SubscriptionBalancerArgs {
     block?: Maybe<Block_Height>;
     id: Scalars['ID'];
+    subgraphError?: _SubgraphErrorPolicy_;
 }
 
 export interface SubscriptionBalancerSnapshotArgs {
     block?: Maybe<Block_Height>;
     id: Scalars['ID'];
+    subgraphError?: _SubgraphErrorPolicy_;
 }
 
 export interface SubscriptionBalancerSnapshotsArgs {
@@ -2108,6 +2080,7 @@ export interface SubscriptionBalancerSnapshotsArgs {
     orderBy?: Maybe<BalancerSnapshot_OrderBy>;
     orderDirection?: Maybe<OrderDirection>;
     skip?: Maybe<Scalars['Int']>;
+    subgraphError?: _SubgraphErrorPolicy_;
     where?: Maybe<BalancerSnapshot_Filter>;
 }
 
@@ -2117,12 +2090,14 @@ export interface SubscriptionBalancersArgs {
     orderBy?: Maybe<Balancer_OrderBy>;
     orderDirection?: Maybe<OrderDirection>;
     skip?: Maybe<Scalars['Int']>;
+    subgraphError?: _SubgraphErrorPolicy_;
     where?: Maybe<Balancer_Filter>;
 }
 
 export interface SubscriptionBlockArgs {
     block?: Maybe<Block_Height>;
     id: Scalars['ID'];
+    subgraphError?: _SubgraphErrorPolicy_;
 }
 
 export interface SubscriptionBlocksArgs {
@@ -2131,12 +2106,14 @@ export interface SubscriptionBlocksArgs {
     orderBy?: Maybe<Block_OrderBy>;
     orderDirection?: Maybe<OrderDirection>;
     skip?: Maybe<Scalars['Int']>;
+    subgraphError?: _SubgraphErrorPolicy_;
     where?: Maybe<Block_Filter>;
 }
 
 export interface SubscriptionGradualWeightUpdateArgs {
     block?: Maybe<Block_Height>;
     id: Scalars['ID'];
+    subgraphError?: _SubgraphErrorPolicy_;
 }
 
 export interface SubscriptionGradualWeightUpdatesArgs {
@@ -2145,12 +2122,14 @@ export interface SubscriptionGradualWeightUpdatesArgs {
     orderBy?: Maybe<GradualWeightUpdate_OrderBy>;
     orderDirection?: Maybe<OrderDirection>;
     skip?: Maybe<Scalars['Int']>;
+    subgraphError?: _SubgraphErrorPolicy_;
     where?: Maybe<GradualWeightUpdate_Filter>;
 }
 
 export interface SubscriptionInvestmentArgs {
     block?: Maybe<Block_Height>;
     id: Scalars['ID'];
+    subgraphError?: _SubgraphErrorPolicy_;
 }
 
 export interface SubscriptionInvestmentsArgs {
@@ -2159,12 +2138,14 @@ export interface SubscriptionInvestmentsArgs {
     orderBy?: Maybe<Investment_OrderBy>;
     orderDirection?: Maybe<OrderDirection>;
     skip?: Maybe<Scalars['Int']>;
+    subgraphError?: _SubgraphErrorPolicy_;
     where?: Maybe<Investment_Filter>;
 }
 
 export interface SubscriptionJoinExitArgs {
     block?: Maybe<Block_Height>;
     id: Scalars['ID'];
+    subgraphError?: _SubgraphErrorPolicy_;
 }
 
 export interface SubscriptionJoinExitsArgs {
@@ -2173,12 +2154,14 @@ export interface SubscriptionJoinExitsArgs {
     orderBy?: Maybe<JoinExit_OrderBy>;
     orderDirection?: Maybe<OrderDirection>;
     skip?: Maybe<Scalars['Int']>;
+    subgraphError?: _SubgraphErrorPolicy_;
     where?: Maybe<JoinExit_Filter>;
 }
 
 export interface SubscriptionLatestPriceArgs {
     block?: Maybe<Block_Height>;
     id: Scalars['ID'];
+    subgraphError?: _SubgraphErrorPolicy_;
 }
 
 export interface SubscriptionLatestPricesArgs {
@@ -2187,12 +2170,14 @@ export interface SubscriptionLatestPricesArgs {
     orderBy?: Maybe<LatestPrice_OrderBy>;
     orderDirection?: Maybe<OrderDirection>;
     skip?: Maybe<Scalars['Int']>;
+    subgraphError?: _SubgraphErrorPolicy_;
     where?: Maybe<LatestPrice_Filter>;
 }
 
 export interface SubscriptionPoolArgs {
     block?: Maybe<Block_Height>;
     id: Scalars['ID'];
+    subgraphError?: _SubgraphErrorPolicy_;
 }
 
 export interface SubscriptionPoolHistoricalLiquiditiesArgs {
@@ -2201,17 +2186,20 @@ export interface SubscriptionPoolHistoricalLiquiditiesArgs {
     orderBy?: Maybe<PoolHistoricalLiquidity_OrderBy>;
     orderDirection?: Maybe<OrderDirection>;
     skip?: Maybe<Scalars['Int']>;
+    subgraphError?: _SubgraphErrorPolicy_;
     where?: Maybe<PoolHistoricalLiquidity_Filter>;
 }
 
 export interface SubscriptionPoolHistoricalLiquidityArgs {
     block?: Maybe<Block_Height>;
     id: Scalars['ID'];
+    subgraphError?: _SubgraphErrorPolicy_;
 }
 
 export interface SubscriptionPoolShareArgs {
     block?: Maybe<Block_Height>;
     id: Scalars['ID'];
+    subgraphError?: _SubgraphErrorPolicy_;
 }
 
 export interface SubscriptionPoolSharesArgs {
@@ -2220,12 +2208,14 @@ export interface SubscriptionPoolSharesArgs {
     orderBy?: Maybe<PoolShare_OrderBy>;
     orderDirection?: Maybe<OrderDirection>;
     skip?: Maybe<Scalars['Int']>;
+    subgraphError?: _SubgraphErrorPolicy_;
     where?: Maybe<PoolShare_Filter>;
 }
 
 export interface SubscriptionPoolSnapshotArgs {
     block?: Maybe<Block_Height>;
     id: Scalars['ID'];
+    subgraphError?: _SubgraphErrorPolicy_;
 }
 
 export interface SubscriptionPoolSnapshotsArgs {
@@ -2234,12 +2224,14 @@ export interface SubscriptionPoolSnapshotsArgs {
     orderBy?: Maybe<PoolSnapshot_OrderBy>;
     orderDirection?: Maybe<OrderDirection>;
     skip?: Maybe<Scalars['Int']>;
+    subgraphError?: _SubgraphErrorPolicy_;
     where?: Maybe<PoolSnapshot_Filter>;
 }
 
 export interface SubscriptionPoolTokenArgs {
     block?: Maybe<Block_Height>;
     id: Scalars['ID'];
+    subgraphError?: _SubgraphErrorPolicy_;
 }
 
 export interface SubscriptionPoolTokensArgs {
@@ -2248,6 +2240,7 @@ export interface SubscriptionPoolTokensArgs {
     orderBy?: Maybe<PoolToken_OrderBy>;
     orderDirection?: Maybe<OrderDirection>;
     skip?: Maybe<Scalars['Int']>;
+    subgraphError?: _SubgraphErrorPolicy_;
     where?: Maybe<PoolToken_Filter>;
 }
 
@@ -2257,12 +2250,14 @@ export interface SubscriptionPoolsArgs {
     orderBy?: Maybe<Pool_OrderBy>;
     orderDirection?: Maybe<OrderDirection>;
     skip?: Maybe<Scalars['Int']>;
+    subgraphError?: _SubgraphErrorPolicy_;
     where?: Maybe<Pool_Filter>;
 }
 
 export interface SubscriptionPriceRateProviderArgs {
     block?: Maybe<Block_Height>;
     id: Scalars['ID'];
+    subgraphError?: _SubgraphErrorPolicy_;
 }
 
 export interface SubscriptionPriceRateProvidersArgs {
@@ -2271,12 +2266,14 @@ export interface SubscriptionPriceRateProvidersArgs {
     orderBy?: Maybe<PriceRateProvider_OrderBy>;
     orderDirection?: Maybe<OrderDirection>;
     skip?: Maybe<Scalars['Int']>;
+    subgraphError?: _SubgraphErrorPolicy_;
     where?: Maybe<PriceRateProvider_Filter>;
 }
 
 export interface SubscriptionSwapArgs {
     block?: Maybe<Block_Height>;
     id: Scalars['ID'];
+    subgraphError?: _SubgraphErrorPolicy_;
 }
 
 export interface SubscriptionSwapsArgs {
@@ -2285,17 +2282,20 @@ export interface SubscriptionSwapsArgs {
     orderBy?: Maybe<Swap_OrderBy>;
     orderDirection?: Maybe<OrderDirection>;
     skip?: Maybe<Scalars['Int']>;
+    subgraphError?: _SubgraphErrorPolicy_;
     where?: Maybe<Swap_Filter>;
 }
 
 export interface SubscriptionTokenArgs {
     block?: Maybe<Block_Height>;
     id: Scalars['ID'];
+    subgraphError?: _SubgraphErrorPolicy_;
 }
 
 export interface SubscriptionTokenPriceArgs {
     block?: Maybe<Block_Height>;
     id: Scalars['ID'];
+    subgraphError?: _SubgraphErrorPolicy_;
 }
 
 export interface SubscriptionTokenPricesArgs {
@@ -2304,12 +2304,14 @@ export interface SubscriptionTokenPricesArgs {
     orderBy?: Maybe<TokenPrice_OrderBy>;
     orderDirection?: Maybe<OrderDirection>;
     skip?: Maybe<Scalars['Int']>;
+    subgraphError?: _SubgraphErrorPolicy_;
     where?: Maybe<TokenPrice_Filter>;
 }
 
 export interface SubscriptionTokenSnapshotArgs {
     block?: Maybe<Block_Height>;
     id: Scalars['ID'];
+    subgraphError?: _SubgraphErrorPolicy_;
 }
 
 export interface SubscriptionTokenSnapshotsArgs {
@@ -2318,6 +2320,7 @@ export interface SubscriptionTokenSnapshotsArgs {
     orderBy?: Maybe<TokenSnapshot_OrderBy>;
     orderDirection?: Maybe<OrderDirection>;
     skip?: Maybe<Scalars['Int']>;
+    subgraphError?: _SubgraphErrorPolicy_;
     where?: Maybe<TokenSnapshot_Filter>;
 }
 
@@ -2327,17 +2330,20 @@ export interface SubscriptionTokensArgs {
     orderBy?: Maybe<Token_OrderBy>;
     orderDirection?: Maybe<OrderDirection>;
     skip?: Maybe<Scalars['Int']>;
+    subgraphError?: _SubgraphErrorPolicy_;
     where?: Maybe<Token_Filter>;
 }
 
 export interface SubscriptionTradePairArgs {
     block?: Maybe<Block_Height>;
     id: Scalars['ID'];
+    subgraphError?: _SubgraphErrorPolicy_;
 }
 
 export interface SubscriptionTradePairSnapshotArgs {
     block?: Maybe<Block_Height>;
     id: Scalars['ID'];
+    subgraphError?: _SubgraphErrorPolicy_;
 }
 
 export interface SubscriptionTradePairSnapshotsArgs {
@@ -2346,6 +2352,7 @@ export interface SubscriptionTradePairSnapshotsArgs {
     orderBy?: Maybe<TradePairSnapshot_OrderBy>;
     orderDirection?: Maybe<OrderDirection>;
     skip?: Maybe<Scalars['Int']>;
+    subgraphError?: _SubgraphErrorPolicy_;
     where?: Maybe<TradePairSnapshot_Filter>;
 }
 
@@ -2355,17 +2362,20 @@ export interface SubscriptionTradePairsArgs {
     orderBy?: Maybe<TradePair_OrderBy>;
     orderDirection?: Maybe<OrderDirection>;
     skip?: Maybe<Scalars['Int']>;
+    subgraphError?: _SubgraphErrorPolicy_;
     where?: Maybe<TradePair_Filter>;
 }
 
 export interface SubscriptionUserArgs {
     block?: Maybe<Block_Height>;
     id: Scalars['ID'];
+    subgraphError?: _SubgraphErrorPolicy_;
 }
 
 export interface SubscriptionUserInternalBalanceArgs {
     block?: Maybe<Block_Height>;
     id: Scalars['ID'];
+    subgraphError?: _SubgraphErrorPolicy_;
 }
 
 export interface SubscriptionUserInternalBalancesArgs {
@@ -2374,6 +2384,7 @@ export interface SubscriptionUserInternalBalancesArgs {
     orderBy?: Maybe<UserInternalBalance_OrderBy>;
     orderDirection?: Maybe<OrderDirection>;
     skip?: Maybe<Scalars['Int']>;
+    subgraphError?: _SubgraphErrorPolicy_;
     where?: Maybe<UserInternalBalance_Filter>;
 }
 
@@ -2383,6 +2394,7 @@ export interface SubscriptionUsersArgs {
     orderBy?: Maybe<User_OrderBy>;
     orderDirection?: Maybe<OrderDirection>;
     skip?: Maybe<Scalars['Int']>;
+    subgraphError?: _SubgraphErrorPolicy_;
     where?: Maybe<User_Filter>;
 }
 
@@ -3402,7 +3414,7 @@ export type GetPoolDataQuery = {
         swapsCount: string;
         holdersCount: string;
         createTime: number;
-        owner?: string | null | undefined;
+        owner: string;
         strategyType: number;
         swapEnabled: boolean;
         tokens?:
@@ -3438,7 +3450,7 @@ export type GetPoolDataQuery = {
         swapsCount: string;
         holdersCount: string;
         createTime: number;
-        owner?: string | null | undefined;
+        owner: string;
         strategyType: number;
         swapEnabled: boolean;
         tokens?:
@@ -3474,7 +3486,7 @@ export type GetPoolDataQuery = {
         swapsCount: string;
         holdersCount: string;
         createTime: number;
-        owner?: string | null | undefined;
+        owner: string;
         strategyType: number;
         swapEnabled: boolean;
         tokens?:
@@ -3510,7 +3522,7 @@ export type GetPoolDataQuery = {
         swapsCount: string;
         holdersCount: string;
         createTime: number;
-        owner?: string | null | undefined;
+        owner: string;
         strategyType: number;
         swapEnabled: boolean;
         tokens?:
@@ -3555,11 +3567,6 @@ export type GetPoolChartDataQuery = {
         swapVolume: string;
         swapFees: string;
         timestamp: number;
-        totalSwapVolume: string;
-        totalSwapFee: string;
-        totalLiquidity: string;
-        swapsCount: string;
-        holdersCount: string;
         pool: { __typename: 'Pool'; id: string };
     }>;
 };
@@ -3699,7 +3706,7 @@ export type BalancerPoolFragment = {
     swapsCount: string;
     holdersCount: string;
     createTime: number;
-    owner?: string | null | undefined;
+    owner: string;
     strategyType: number;
     swapEnabled: boolean;
     tokens?:
@@ -3761,7 +3768,7 @@ export type GetBalancerPoolsQuery = {
         swapsCount: string;
         holdersCount: string;
         createTime: number;
-        owner?: string | null | undefined;
+        owner: string;
         strategyType: number;
         swapEnabled: boolean;
         tokens?:
@@ -3807,7 +3814,7 @@ export type GetBalancerPoolQuery = {
               swapsCount: string;
               holdersCount: string;
               createTime: number;
-              owner?: string | null | undefined;
+              owner: string;
               strategyType: number;
               swapEnabled: boolean;
               tokens?:
@@ -4005,7 +4012,7 @@ export type BalancePortfolioDataQuery = {
         swapsCount: string;
         holdersCount: string;
         createTime: number;
-        owner?: string | null | undefined;
+        owner: string;
         strategyType: number;
         swapEnabled: boolean;
         tokens?:
@@ -4052,7 +4059,7 @@ export type BalancePortfolioDataQuery = {
         swapsCount: string;
         holdersCount: string;
         createTime: number;
-        owner?: string | null | undefined;
+        owner: string;
         strategyType: number;
         swapEnabled: boolean;
         tokens?:
@@ -4887,11 +4894,8 @@ export const GetPoolChartDataDocument = gql`
             swapVolume
             swapFees
             timestamp
-            totalSwapVolume
-            totalSwapFee
-            totalLiquidity
-            swapsCount
-            holdersCount
+            swapVolume
+            swapFees
             pool {
                 id
             }
