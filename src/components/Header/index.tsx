@@ -8,6 +8,7 @@ import SearchSmall from 'components/Search';
 import { useActiveNetworkVersion } from 'state/application/hooks';
 import { networkPrefix } from 'utils/networkPrefix';
 import { AutoColumn } from 'components/Column';
+import NetworkDropdown from 'components/Menu/NetworkDropdown';
 import { BALANCER_APP_LOGO } from '../../data/balancer/constants';
 
 const HeaderFrame = styled.div`
@@ -172,9 +173,9 @@ export default function Header() {
                     >
                         Overview
                     </StyledNavLink>
-                    <StyledNavLink id={`stake-nav-link`} to={networkPrefix(activeNewtork) + 'incentives'}>
+                    {/*<StyledNavLink id={`stake-nav-link`} to={networkPrefix(activeNewtork) + 'incentives'}>
                         Incentives
-                    </StyledNavLink>
+    </StyledNavLink>*/}
                     <StyledNavLink id={`stake-nav-link`} to={networkPrefix(activeNewtork) + 'pools'}>
                         Pools
                     </StyledNavLink>
@@ -190,7 +191,7 @@ export default function Header() {
             <SmallContentGrouping>
                 <AutoColumn gap="sm">
                     <RowBetween>
-                        {/*<NetworkDropdown />*/}
+                        <NetworkDropdown />
                         <div />
                         <Menu />
                     </RowBetween>
