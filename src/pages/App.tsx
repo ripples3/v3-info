@@ -16,7 +16,7 @@ import PoolPage from './Pool/PoolPage';
 import { ExternalLink, TYPE } from 'theme';
 import { useActiveNetworkVersion, useSubgraphStatus } from 'state/application/hooks';
 import { DarkGreyCard } from 'components/Card';
-import { SUPPORTED_NETWORK_VERSIONS, EthereumNetworkInfo, OptimismNetworkInfo } from 'constants/networks';
+import { SUPPORTED_NETWORK_VERSIONS, EthereumNetworkInfo } from 'constants/networks';
 import { loadTokenListTokens } from '../state/token-lists/token-lists';
 import IncentivePage from './Incentives/IncentivePage';
 
@@ -114,7 +114,7 @@ export default function App() {
     const [subgraphStatus] = useSubgraphStatus();
 
     const showNotSyncedWarning =
-        subgraphStatus.headBlock && subgraphStatus.syncedBlock && activeNetwork === OptimismNetworkInfo
+        subgraphStatus.headBlock && subgraphStatus.syncedBlock
             ? subgraphStatus.headBlock - subgraphStatus.syncedBlock > BLOCK_DIFFERENCE_THRESHOLD
             : false;
 

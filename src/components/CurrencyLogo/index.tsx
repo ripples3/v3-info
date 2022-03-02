@@ -5,7 +5,6 @@ import Logo from '../Logo'
 import { useCombinedActiveList } from 'state/lists/hooks'
 import useHttpLocations from 'hooks/useHttpLocations'
 import { useActiveNetworkVersion } from 'state/application/hooks'
-import { OptimismNetworkInfo } from 'constants/networks'
 import EthereumLogo from '../../assets/images/ethereum-logo.png'
 
 export const getTokenLogoURL = (address: string) => {
@@ -80,9 +79,6 @@ export default function CurrencyLogo({
     return []
   }, [address, tempSources, uriLocationsArbitrum, uriLocationsOptimism])
 
-  if (activeNetwork === OptimismNetworkInfo && address === '0x4200000000000000000000000000000000000006') {
-    return <StyledEthereumLogo src={EthereumLogo} size={size} style={style} {...rest} />
-  }
 
   return <StyledLogo size={size} srcs={srcs} alt={'token logo'} style={style} {...rest} />
 }

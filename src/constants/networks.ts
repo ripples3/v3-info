@@ -1,4 +1,4 @@
-import OPTIMISM_LOGO_URL from '../assets/images/optimism.svg'
+
 import ARBITRUM_LOGO_URL from '../assets/images/arbitrum.svg'
 import ETHEREUM_LOGO_URL from '../assets/images/ethereum-logo.png'
 import POLYGON_LOGO_URL from '../assets/images/polygon-logo.png'
@@ -7,7 +7,6 @@ import { BALANCER_PRIMARY_COLOR, BALANCER_SECONDARY_COLOR } from '../data/balanc
 export enum SupportedNetwork {
   ETHEREUM,
   ARBITRUM,
-  OPTIMISM,
   POLYGON,
 }
 
@@ -40,18 +39,7 @@ export const ArbitrumNetworkInfo: NetworkInfo = {
   bgColor: '#0A294B',
   primaryColor: '#0490ED',
   secondaryColor: '#96BEDC',
-  blurb: 'Beta',
-}
-
-export const OptimismNetworkInfo: NetworkInfo = {
-  id: SupportedNetwork.OPTIMISM,
-  route: 'optimism',
-  name: 'Optimism',
-  bgColor: '#F01B36',
-  primaryColor: '#F01B36',
-  secondaryColor: '#FB7876',
-  imageURL: OPTIMISM_LOGO_URL,
-  blurb: 'Beta',
+  blurb: '',
 }
 
 export const PolygonNetworkInfo: NetworkInfo = {
@@ -68,6 +56,5 @@ export const PolygonNetworkInfo: NetworkInfo = {
 export const SUPPORTED_NETWORK_VERSIONS: NetworkInfo[] = [
   EthereumNetworkInfo,
   PolygonNetworkInfo,
-  OptimismNetworkInfo,
   ArbitrumNetworkInfo,
 ]

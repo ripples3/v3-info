@@ -9,7 +9,6 @@ import { ArbitrumNetworkInfo, NetworkInfo } from 'constants/networks';
 import JSBI from 'jsbi';
 import { ROUTER_ADDRESS } from '../constants';
 import { TokenAddressMap } from '../state/lists/hooks';
-import { OptimismNetworkInfo } from './../constants/networks';
 
 // returns the checksummed address if the address is valid, otherwise returns false
 export function isAddress(value: any): string | false {
@@ -27,24 +26,6 @@ export function getEtherscanLink(
     networkVersion: NetworkInfo,
 ): string {
     const prefix = 'https://etherscan.io';
-
-    if (networkVersion === OptimismNetworkInfo) {
-        switch (type) {
-            case 'transaction': {
-                return `${prefix}/tx/${data}`;
-            }
-            case 'token': {
-                return `${prefix}/address/${data}`;
-            }
-            case 'block': {
-                return `https://optimistic.etherscan.io`;
-            }
-            case 'address':
-            default: {
-                return `${prefix}/address/${data}`;
-            }
-        }
-    }
 
     if (networkVersion === ArbitrumNetworkInfo) {
         switch (type) {

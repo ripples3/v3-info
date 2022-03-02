@@ -14,7 +14,6 @@ import { PageButtons, Arrow, Break } from 'components/shared';
 import useTheme from 'hooks/useTheme';
 import HoverInlineText from 'components/HoverInlineText';
 import { useActiveNetworkVersion } from 'state/application/hooks';
-import { OptimismNetworkInfo } from 'constants/networks';
 import { BalancerJoinExitFragment, BalancerSwapFragment } from '../../apollo/generated/graphql-codegen-generated';
 import PoolCurrencyLogo from '../PoolCurrencyLogo';
 

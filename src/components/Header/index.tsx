@@ -185,6 +185,7 @@ export default function Header() {
                 </HeaderLinks>
             </HeaderRow>
             <HeaderControls>
+            <NetworkDropdown />
                 <SearchSmall />
                 <Menu />
             </HeaderControls>
@@ -195,7 +196,6 @@ export default function Header() {
                         <div />
                         <Menu />
                     </RowBetween>
-                    <SearchSmall />
                 </AutoColumn>
             </SmallContentGrouping>
         </HeaderFrame>
