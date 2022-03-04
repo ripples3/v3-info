@@ -46,6 +46,8 @@ function Updaters() {
     );
 }
 
+console.log("client", client);
+
 ReactDOM.render(
     <StrictMode>
         <FixedGlobalStyle />

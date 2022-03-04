@@ -4,7 +4,7 @@ import { BalancerSwapFragment, useGetProtocolDataLazyQuery } from '../../apollo/
 import { useEffect } from 'react';
 import { unixToDate } from '../../utils/date';
 import { BalancerChartDataItem } from './balancerTypes';
-import { BALANCER_SUBGRAPH_START_TIMESTAMP } from './constants';
+import { useActiveNetworkVersion } from 'state/application/hooks';
 
 interface ProtocolData {
     volume24?: number;
@@ -22,6 +22,7 @@ interface ProtocolData {
 }
 
 export function useBalancerProtocolData(): ProtocolData {
+    const [activeNetwork] = useActiveNetworkVersion();
     const [t24, t48, tWeek] = useDeltaTimestamps();
     const { blocks, error: blockError } = useBlocksFromTimestamps([t24, t48, tWeek]);
     const [block24, block48, blockWeek] = blocks ?? [];
@@ -31,13 +32,18 @@ export function useBalancerProtocolData(): ProtocolData {
         if (block24) {
             getProcotolData({
                 variables: {
-                    startTimestamp: BALANCER_SUBGRAPH_START_TIMESTAMP,
+                    startTimestamp: activeNetwork.startTimeStamp,
                     block24: { number: parseInt(block24.number) },
                     block48: { number: parseInt(block48.number) },
+                },
+                context: {
+                    uri: activeNetwork.clientUri,
                 },
             });
         }
     }, [block24]);
+
+    
 
     if (!data) {
         return { tvlData: [], volumeData: [], swapData: [], feeData: [], whaleSwaps: [] };

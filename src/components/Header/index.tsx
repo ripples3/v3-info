@@ -157,6 +157,8 @@ const SmallContentGrouping = styled.div`
 export default function Header() {
     const [activeNewtork] = useActiveNetworkVersion();
 
+    console.log("activeNetwork: ", [activeNewtork]);
+
     return (
         <HeaderFrame>
             <HeaderRow>

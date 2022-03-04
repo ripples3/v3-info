@@ -1,13 +1,22 @@
 import { LatestPrice, useGetLatestPricesQuery } from '../../apollo/generated/graphql-codegen-generated';
+import { useActiveNetworkVersion } from 'state/application/hooks';
 
+//TODO: Network dependent address fetching!
 const WETH_ADDRESS = '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2';
 const BAL_ADDRESS = '0xba100000625a3754423978a60c9317c58a424e3d';
+
 
 const reducer = (previousValue: number, currentValue: number) => previousValue + currentValue;
 
 export function useLatestPrices(): { eth?: number; bal?: number } {
     // eslint-disable-next-line
-    const { data } = useGetLatestPricesQuery({ variables: { where: { asset_in: [WETH_ADDRESS, BAL_ADDRESS] } } });
+    const [activeNetwork] = useActiveNetworkVersion();
+    const { data } = useGetLatestPricesQuery({ 
+        variables: { where: { asset_in: [WETH_ADDRESS, BAL_ADDRESS] } },
+        context: {
+            uri: activeNetwork.clientUri,
+        },
+    });
     const prices = data?.latestPrices || [];
 
     //Calculate average price from multi-pool Info explicitly (as we have complex type otherwise for reduce function)
