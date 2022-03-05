@@ -124,7 +124,7 @@ export function useBalancerPoolPageData(poolId: string): {
 } {
     const [activeNetwork] = useActiveNetworkVersion();
     const { data } = useGetPoolChartDataQuery({
-        variables: { poolId, startTimestamp: BALANCER_SUBGRAPH_START_TIMESTAMP },
+        variables: { poolId, startTimestamp: activeNetwork.startTimeStamp },
         context: {
             uri: activeNetwork.clientUri,
         },

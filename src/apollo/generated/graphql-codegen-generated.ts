@@ -5,8 +5,7 @@ export type Maybe<T> = T | null;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
-const defaultOptions = {
-};
+const defaultOptions = {};
 /** All built-in and custom scalars, mapped to their actual values */
 export interface Scalars {
     ID: string;
@@ -3395,7 +3394,6 @@ export type GetPoolDataQueryVariables = Exact<{
     block24: Block_Height;
     block48: Block_Height;
     blockWeek: Block_Height;
-
 }>;
 
 export type GetPoolDataQuery = {
@@ -4958,11 +4956,11 @@ export const BalancerProtocolDataDocument = gql`
             block: $block
         ) {
             id
-            totalLiquidity
-            totalSwapVolume
-            totalSwapFee
+            liquidity
+            swapVolume
+            swapFee
             poolCount
-            totalSwapCount
+            swapCount
         }
     }
 `;

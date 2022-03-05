@@ -28,7 +28,7 @@ export function useBalancerTransactionData(
                 variables: {
                     addresses,
                     poolIds,
-                    startTimestamp: BALANCER_SUBGRAPH_START_TIMESTAMP,
+                    startTimestamp: activeNetwork.startTimeStamp,
                 },
                 context: {
                     uri: activeNetwork.clientUri,

@@ -5,10 +5,21 @@ import Logo from '../Logo'
 import { useCombinedActiveList } from 'state/lists/hooks'
 import useHttpLocations from 'hooks/useHttpLocations'
 import { useActiveNetworkVersion } from 'state/application/hooks'
-import EthereumLogo from '../../assets/images/ethereum-logo.png'
+import { SupportedNetwork } from 'constants/networks'
 
-export const getTokenLogoURL = (address: string) => {
-  return `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${address}/logo.png`
+//TODO: BAL default token for all chains
+//Backup if png cannot be found?
+export const getTokenLogoURL = (address: string, networkId: SupportedNetwork) => {
+  switch (networkId) {
+    case SupportedNetwork.ETHEREUM:
+      return `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${address}/logo.png`
+    case SupportedNetwork.ARBITRUM:
+      return `https://raw.githubusercontent.com/sushiswap/assets/master/blockchains/arbitrum/assets/${address}/logo.png`
+    case SupportedNetwork.POLYGON:
+      return `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${address}/logo.png`
+    default:
+      return `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${address}/logo.png`
+  } 
 }
 
 const StyledLogo = styled(Logo)<{ size: string }>`
@@ -71,10 +82,11 @@ export default function CurrencyLogo({
 
   const srcs: string[] = useMemo(() => {
     const checkSummed = isAddress(address)
+    
 
     if (checkSummed && address) {
       const override = tempSources[address]
-      return [getTokenLogoURL(checkSummed), ...uriLocationsOptimism, ...uriLocationsArbitrum, override]
+      return [getTokenLogoURL(checkSummed, activeNetwork.id), ...uriLocationsOptimism, ...uriLocationsArbitrum, override]
     }
     return []
   }, [address, tempSources, uriLocationsArbitrum, uriLocationsOptimism])
