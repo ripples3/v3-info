@@ -446,9 +446,19 @@ export interface Block_Filter {
     unclesHash_starts_with?: Maybe<Scalars['String']>;
 }
 
+/** The block at which the query should be executed. */
 export interface Block_Height {
+    /** Value containing a block hash */
     hash?: Maybe<Scalars['Bytes']>;
+    /** Value containing a block number */
     number?: Maybe<Scalars['Int']>;
+    /**
+     * Value containing the minimum block number.
+     * In the case of `number_gte`, the query will be executed on the latest block only if
+     * the subgraph has progressed to or past the minimum block number.
+     * Defaults to the latest block when omitted.
+     *
+     */
     number_gte?: Maybe<Scalars['Int']>;
 }
 
@@ -769,6 +779,7 @@ export interface LatestPrice_Filter {
 
 export type LatestPrice_OrderBy = 'asset' | 'block' | 'id' | 'poolId' | 'price' | 'priceUSD' | 'pricingAsset';
 
+/** Defines the order direction, either ascending or descending */
 export type OrderDirection = 'asc' | 'desc';
 
 export interface Pool {
@@ -4956,11 +4967,11 @@ export const BalancerProtocolDataDocument = gql`
             block: $block
         ) {
             id
-            liquidity
-            swapVolume
-            swapFee
+            totalLiquidity
+            totalSwapVolume
+            totalSwapFee
             poolCount
-            swapCount
+            totalSwapCount
         }
     }
 `;

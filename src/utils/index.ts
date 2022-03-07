@@ -5,7 +5,7 @@ import { Contract } from '@ethersproject/contracts';
 import { JsonRpcSigner, Web3Provider } from '@ethersproject/providers';
 import { ChainId, Currency, CurrencyAmount, Fraction, Percent, Token } from '@uniswap/sdk-core';
 import { abi as IUniswapV2Router02ABI } from '@uniswap/v2-periphery/build/IUniswapV2Router02.json';
-import { ArbitrumNetworkInfo, NetworkInfo } from 'constants/networks';
+import { ArbitrumNetworkInfo, NetworkInfo, PolygonNetworkInfo } from 'constants/networks';
 import JSBI from 'jsbi';
 import { ROUTER_ADDRESS } from '../constants';
 import { TokenAddressMap } from '../state/lists/hooks';
@@ -37,6 +37,24 @@ export function getEtherscanLink(
             }
             case 'block': {
                 return 'https://arbiscan.io/';
+            }
+            case 'address':
+            default: {
+                return `${prefix}/address/${data}`;
+            }
+        }
+    }
+
+    if (networkVersion === PolygonNetworkInfo) {
+        switch (type) {
+            case 'transaction': {
+                return `${prefix}/tx/${data}`;
+            }
+            case 'token': {
+                return `${prefix}/address/${data}`;
+            }
+            case 'block': {
+                return 'https://polygonscan.com/';
             }
             case 'address':
             default: {

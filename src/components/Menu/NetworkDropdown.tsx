@@ -20,6 +20,7 @@ const Wrapper = styled.div`
   background-color: ${({ theme }) => theme.bg1};
   padding: 6px 8px;
   margin-right: 12px;
+
   :hover {
     cursor: pointer;
     opacity: 0.7;

@@ -51,10 +51,10 @@ export function useFetchedSubgraphStatus(): {
         variables: {
             name:
                 activeNetwork === EthereumNetworkInfo
-                    ? 'uniswap/uniswap-v3'
+                    ? 'blocklytics/ethereum-blocks'
                     : activeNetwork === ArbitrumNetworkInfo
                     ? 'ianlapham/uniswap-arbitrum-one'
-                    : 'ianlapham/uniswap-optimism',
+                    : 'ianlapham/polygon-blocks',
         },
     });
 

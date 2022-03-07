@@ -16,7 +16,7 @@ import PoolPage from './Pool/PoolPage';
 import { ExternalLink, TYPE } from 'theme';
 import { useActiveNetworkVersion, useSubgraphStatus } from 'state/application/hooks';
 import { DarkGreyCard } from 'components/Card';
-import { SUPPORTED_NETWORK_VERSIONS, EthereumNetworkInfo } from 'constants/networks';
+import { SUPPORTED_NETWORK_VERSIONS, EthereumNetworkInfo, SupportedNetwork } from 'constants/networks';
 import { loadTokenListTokens } from '../state/token-lists/token-lists';
 import IncentivePage from './Incentives/IncentivePage';
 
@@ -77,7 +77,7 @@ const WarningWrapper = styled.div`
 const WarningBanner = styled.div`
     background-color: ${({ theme }) => theme.bg3};
     padding: 1rem;
-    color: white;
+    color: red;
     font-size: 14px;
     width: 100%;
     text-align: center;
@@ -128,11 +128,11 @@ export default function App() {
                 <AppWrapper>
                     <URLWarning />
                     <HeaderWrapper>
-                        {showNotSyncedWarning && (
+                        {activeNetwork.id !== SupportedNetwork.ETHEREUM && (
                             <WarningWrapper>
                                 <WarningBanner>
                                     {`Warning: 
-                  Data has only synced to Optimism block ${subgraphStatus.syncedBlock} (out of ${subgraphStatus.headBlock}). Please check back soon.`}
+                  Data for this chain is still experimental - Some GraphQL dependencies are missing.`}
                                 </WarningBanner>
                             </WarningWrapper>
                         )}

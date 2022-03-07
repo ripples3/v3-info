@@ -16,7 +16,7 @@ export const getTokenLogoURL = (address: string, networkId: SupportedNetwork) =>
     case SupportedNetwork.ARBITRUM:
       return `https://raw.githubusercontent.com/sushiswap/assets/master/blockchains/arbitrum/assets/${address}/logo.png`
     case SupportedNetwork.POLYGON:
-      return `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${address}/logo.png`
+      return `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/polygon/assets/${address}/logo.png`
     default:
       return `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${address}/logo.png`
   } 
@@ -76,7 +76,7 @@ export default function CurrencyLogo({
   const tempSources: { [address: string]: string } = useMemo(() => {
     return {
       [`${address}`]:
-      `https://raw.githubusercontent.com/balancer-labs/assets/master/assets/${address}.png`,
+      `https://raw.githubusercontent.com/balancer-labs/assets/master/assets/assets/${address}.png`,
     }
   }, [])
 
