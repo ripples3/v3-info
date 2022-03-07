@@ -106,6 +106,7 @@ function combineMaps(map1: TokenAddressMap, map2: TokenAddressMap): TokenAddress
         [ChainId.KOVAN]: { ...map1[ChainId.KOVAN], ...map2[ChainId.KOVAN] },
         [ChainId.GÖRLI]: { ...map1[ChainId.GÖRLI], ...map2[ChainId.GÖRLI] },
         [10]: { ...map1[10], ...map2[10] },
+        [137]: { ...map1[137], ...map2[137] },
         [42161]: { ...map1[42161], ...map2[42161] },
         [250]: { ...map1[250], ...map2[250] },
     };
