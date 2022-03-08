@@ -156,7 +156,7 @@ export default function App() {
                             </BodyWrapper>
                         </AppWrapper>
                     ) : (
-                        <BodyWrapper warningActive={showNotSyncedWarning}>
+                        <BodyWrapper warningActive={activeNetwork.id !== SupportedNetwork.ETHEREUM}>
                             <Popups />
                             <Switch>
                                 <Route exact strict path="/:networkID?/pools/:poolId" component={PoolPage} />

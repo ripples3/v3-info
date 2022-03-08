@@ -85,11 +85,13 @@ export default function Home() {
         }
     }, [protocolData, swapsHover]);
 
+    console.log("protocolData", protocolData);
     return (
         <PageWrapper>
             <ThemedBackgroundGlobal backgroundColor={activeNetwork.bgColor} />
             <AutoColumn gap="16px">
                 <TYPE.main>{BALANCER_PROJECT_NAME}</TYPE.main>
+                {protocolData.volumeData.length > 0 ?
                 <ResponsiveRow>
                     <ChartWrapper>
                         <LineChart
@@ -162,7 +164,8 @@ export default function Home() {
                             }
                         />
                     </ChartWrapper>
-                </ResponsiveRow>
+                </ResponsiveRow> : null }
+                {protocolData?.swapData?.length?
                 <ResponsiveRow>
                     <ChartWrapper>
                         <BarChart
@@ -210,7 +213,8 @@ export default function Home() {
                             }
                         />
                     </ChartWrapper>
-                </ResponsiveRow>
+                </ResponsiveRow> : null }
+                {protocolData?.volumeChange?
                 <HideSmall>
                     <DarkGreyCard>
                         <RowBetween>
@@ -236,7 +240,7 @@ export default function Home() {
                             </RowFixed>
                         </RowBetween>
                     </DarkGreyCard>
-                </HideSmall>
+                </HideSmall> : null }
                 <RowBetween>
                     <TYPE.main>Top Tokens</TYPE.main>
                     <StyledInternalLink to="tokens">Explore</StyledInternalLink>

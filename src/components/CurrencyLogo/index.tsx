@@ -7,22 +7,29 @@ import useHttpLocations from 'hooks/useHttpLocations'
 import { useActiveNetworkVersion } from 'state/application/hooks'
 import { SupportedNetwork } from 'constants/networks'
 
-//TODO: BAL default token for all chains
-//Backup if png cannot be found?
+//TODO: Refactor with uni-v3 tokenlist nesting methods
 export const getTokenLogoURL = (address: string, networkId: SupportedNetwork) => {
-  switch (networkId) {
-    case SupportedNetwork.ETHEREUM:
-      return `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${address}/logo.png`
-    case SupportedNetwork.ARBITRUM:
-      return `https://raw.githubusercontent.com/sushiswap/assets/master/blockchains/arbitrum/assets/${address}/logo.png`
-    case SupportedNetwork.POLYGON:
-      return `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/polygon/assets/${address}/logo.png`
-    default:
-      return `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${address}/logo.png`
-  } 
-}
+    switch (networkId) {
+      case SupportedNetwork.ETHEREUM:
+        return `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${address}/logo.png`
+      case SupportedNetwork.ARBITRUM:
+        if (address === '0x040d1EdC9569d4Bab2D15287Dc5A4F10F56a56B8') {
+          return `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xba100000625a3754423978a60c9317c58a424e3D/logo.png`
+        } else {
+        return `https://raw.githubusercontent.com/sushiswap/assets/master/blockchains/arbitrum/assets/${address}/logo.png`
+        }
+      case SupportedNetwork.POLYGON:
+        if (address === '0x9a71012B13CA4d3D0Cdc72A177DF3ef03b0E76A3') {
+          return `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xba100000625a3754423978a60c9317c58a424e3D/logo.png`
+        } else {
+        return `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/polygon/assets/${address}/logo.png`
+        }
+      default:
+        return `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${address}/logo.png`
+    }
+  }
 
-const StyledLogo = styled(Logo)<{ size: string }>`
+const StyledLogo = styled(Logo) <{ size: string }>`
   width: ${({ size }) => size};
   height: ${({ size }) => size};
   border-radius: ${({ size }) => size};
@@ -49,20 +56,20 @@ export default function CurrencyLogo({
   style?: React.CSSProperties
 }) {
   // useOptimismList()
-  const optimismList = useCombinedActiveList()?.[10]
   const arbitrumList = useCombinedActiveList()?.[42161]
+  const polygonList = useCombinedActiveList()?.[137]
 
   const [activeNetwork] = useActiveNetworkVersion()
 
   const checkSummed = isAddress(address)
 
-  const optimismURI = useMemo(() => {
-    if (checkSummed && optimismList?.[checkSummed]) {
-      return optimismList?.[checkSummed].token.logoURI
+  const polygonURI = useMemo(() => {
+    if (checkSummed && polygonList?.[checkSummed]) {
+      return polygonList?.[checkSummed].token.logoURI
     }
     return undefined
-  }, [checkSummed, optimismList])
-  const uriLocationsOptimism = useHttpLocations(optimismURI)
+  }, [checkSummed, polygonList])
+  const uriLocationsPolygon = useHttpLocations(polygonURI)
 
   const arbitrumURI = useMemo(() => {
     if (checkSummed && arbitrumList?.[checkSummed]) {
@@ -76,20 +83,20 @@ export default function CurrencyLogo({
   const tempSources: { [address: string]: string } = useMemo(() => {
     return {
       [`${address}`]:
-      `https://raw.githubusercontent.com/balancer-labs/assets/master/assets/assets/${address}.png`,
+        `https://raw.githubusercontent.com/balancer-labs/assets/refactor-for-multichain/assets/${address}.png`,
     }
   }, [])
 
   const srcs: string[] = useMemo(() => {
     const checkSummed = isAddress(address)
-    
+
 
     if (checkSummed && address) {
       const override = tempSources[address]
-      return [getTokenLogoURL(checkSummed, activeNetwork.id), ...uriLocationsOptimism, ...uriLocationsArbitrum, override]
+      return [getTokenLogoURL(checkSummed, activeNetwork.id), ...uriLocationsPolygon, ...uriLocationsArbitrum, override]
     }
     return []
-  }, [address, tempSources, uriLocationsArbitrum, uriLocationsOptimism])
+  }, [address, tempSources, uriLocationsArbitrum, uriLocationsPolygon])
 
 
   return <StyledLogo size={size} srcs={srcs} alt={'token logo'} style={style} {...rest} />

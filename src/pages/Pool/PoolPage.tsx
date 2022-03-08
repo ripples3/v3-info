@@ -105,7 +105,7 @@ export default function PoolPage({
     const poolData = useBalancerPoolData(poolId);
     
     const { tvlData, volumeData, feesData } = useBalancerPoolPageData(poolId);
-    //console.log("tvlData:", tvlData);
+    console.log("tvlData:", tvlData);
     const { swaps, joinExits, swapPairVolumes } = useBalancerTransactionData(
         (poolData?.tokens || []).map((token) => token.address),
         poolData ? [poolData.id] : [],
@@ -175,7 +175,7 @@ export default function PoolPage({
                             </TokenResponsiveRow>
                         </AutoColumn>
                         <RowFixed>
-                            <StyledExternalLink href={`${BALANCER_APP_LINK}#/pool/${poolId}`}>
+                            <StyledExternalLink href={`${activeNetwork.appUri}#/pool/${poolId}`}>
                                 <ButtonGray width="128px" mr="12px" style={{ height: '44px' }}>
                                     <RowBetween>
                                         <Download size={24} />
@@ -183,7 +183,7 @@ export default function PoolPage({
                                     </RowBetween>
                                 </ButtonGray>
                             </StyledExternalLink>
-                            <StyledExternalLink href={`${BALANCER_APP_LINK}#/trade`}>
+                            <StyledExternalLink href={`${activeNetwork.appUri}#/trade`}>
                                 <ButtonPrimary width="100px" style={{ height: '44px' }}>
                                     Trade
                                 </ButtonPrimary>
@@ -231,12 +231,12 @@ export default function PoolPage({
                                     <TYPE.label fontSize="24px" height="30px">
                                         <MonoSpace>
                                             {latestValue
-                                                ? formatDollarAmount(latestValue)
-                                                : view === ChartView.VOL
-                                                ? formatDollarAmount(volumeData[volumeData.length - 1]?.value)
-                                                : view === ChartView.DENSITY
-                                                ? ''
-                                                : formatDollarAmount(tvlData[tvlData.length - 1]?.value)}{' '}
+                                                 ? formatDollarAmount(latestValue, 2)
+                                                 : view === ChartView.VOL
+                                                 ? formatDollarAmount(volumeData[volumeData.length - 1]?.value)
+                                                 : view === ChartView.TVL
+                                                 ? formatDollarAmount(tvlData[tvlData.length - 1]?.value)
+                                                 : formatDollarAmount(feesData[feesData.length- 1 ]?.value)}{' '}
                                         </MonoSpace>
                                     </TYPE.label>
                                     <TYPE.main height="20px" fontSize="12px">
@@ -257,7 +257,7 @@ export default function PoolPage({
                                         isActive={view === ChartView.TVL}
                                         fontSize="12px"
                                         onClick={() =>
-                                            view === ChartView.TVL ? setView(ChartView.DENSITY) : setView(ChartView.TVL)
+                                            view === ChartView.TVL ? setView(ChartView.TVL) : setView(ChartView.TVL)
                                         }
                                     >
                                         TVL
@@ -333,7 +333,12 @@ export default function PoolPage({
                     </DarkGreyCard>
                 </AutoColumn>
             ) : (
-                <Loader />
+                <AutoColumn gap="lg">
+                <DarkGreyCard>
+                    <TYPE.main fontSize="24px">Loading pool data...</TYPE.main>
+                <LocalLoader fill={false} />
+                </DarkGreyCard>
+                </ AutoColumn>
             )}
         </PageWrapper>
     );

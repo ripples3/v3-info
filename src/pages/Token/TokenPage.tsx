@@ -194,7 +194,7 @@ export default function TokenPage({
                                 </AutoColumn>
                                 {activeNetwork !== EthereumNetworkInfo ? null : (
                                     <RowFixed>
-                                        <StyledExternalLink href={`${BALANCER_APP_LINK}#/trade/${address}`}>
+                                        <StyledExternalLink href={`${activeNetwork.appUri}#/trade/${address}`}>
                                             <ButtonPrimary
                                                 width="100px"
                                                 bgColor={backgroundColor}
@@ -279,13 +279,13 @@ export default function TokenPage({
                                         >
                                             TVL
                                         </ToggleElementFree>
-                                        {/*<ToggleElementFree
+                                        {<ToggleElementFree
                                             isActive={view === ChartView.PRICE}
                                             fontSize="12px"
                                             onClick={() => setView(ChartView.PRICE)}
                                         >
                                             Price
-                                        </ToggleElementFree>*/}
+                                        </ToggleElementFree>}
                                     </ToggleWrapper>
                                 </RowBetween>
                                 {view === ChartView.TVL ? (
@@ -369,7 +369,12 @@ export default function TokenPage({
                     </AutoColumn>
                 )
             ) : (
-                <Loader />
+                <AutoColumn gap="lg">
+                <DarkGreyCard>
+                    <TYPE.main fontSize="24px">Loading token data...</TYPE.main>
+                <LocalLoader fill={false} />
+                </DarkGreyCard>
+                </ AutoColumn>
             )}
         </PageWrapper>
     );
