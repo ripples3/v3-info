@@ -137,7 +137,7 @@ export function useBalancerPoolPageData(poolId: string): {
     
 
     const tvlData = poolSnapshots.map((snapshot) => ({
-        value: parseFloat(snapshot.totalShares),
+        value: parseFloat(snapshot.totalLiquidity),
         time: unixToDate(snapshot.timestamp),
     }));
 

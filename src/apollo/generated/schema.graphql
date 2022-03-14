@@ -456,12 +456,7 @@ input Block_height {
     """
     number: Int
 
-    """
-    Value containing the minimum block number.
-    In the case of `number_gte`, the query will be executed on the latest block only if
-    the subgraph has progressed to or past the minimum block number.
-    Defaults to the latest block when omitted.
-    """
+    "Value containing the minimum block number. \nIn the case of `number_gte`, the query will be executed on the latest block only if\nthe subgraph has progressed to or past the minimum block number.\nDefaults to the latest block when omitted.\n"
     number_gte: Int
 }
 
@@ -833,9 +828,11 @@ type Pool {
     ): [PoolHistoricalLiquidity!]
     holdersCount: BigInt!
     id: ID!
+    lowerTarget: BigDecimal
+    mainIndex: Int
     managementFee: BigDecimal
     name: String
-    owner: Bytes!
+    owner: Bytes
     poolType: String
     priceRateProviders(
         first: Int = 100
@@ -879,6 +876,7 @@ type Pool {
     totalWeight: BigDecimal
     tx: Bytes
     unitSeconds: BigInt
+    upperTarget: BigDecimal
     vaultID: Balancer!
     weightUpdates(
         first: Int = 100
@@ -887,6 +885,7 @@ type Pool {
         skip: Int = 0
         where: GradualWeightUpdate_filter
     ): [GradualWeightUpdate!]
+    wrappedIndex: Int
 }
 
 type PoolHistoricalLiquidity {
@@ -894,9 +893,11 @@ type PoolHistoricalLiquidity {
     id: ID!
     poolId: Pool!
     poolLiquidity: BigDecimal!
+    poolLiquidityUSD: BigDecimal!
     poolShareValue: BigDecimal!
     poolTotalShares: BigDecimal!
     pricingAsset: Bytes!
+    timestamp: Int!
 }
 
 input PoolHistoricalLiquidity_filter {
@@ -931,6 +932,14 @@ input PoolHistoricalLiquidity_filter {
     poolId_not_starts_with: String
     poolId_starts_with: String
     poolLiquidity: BigDecimal
+    poolLiquidityUSD: BigDecimal
+    poolLiquidityUSD_gt: BigDecimal
+    poolLiquidityUSD_gte: BigDecimal
+    poolLiquidityUSD_in: [BigDecimal!]
+    poolLiquidityUSD_lt: BigDecimal
+    poolLiquidityUSD_lte: BigDecimal
+    poolLiquidityUSD_not: BigDecimal
+    poolLiquidityUSD_not_in: [BigDecimal!]
     poolLiquidity_gt: BigDecimal
     poolLiquidity_gte: BigDecimal
     poolLiquidity_in: [BigDecimal!]
@@ -960,6 +969,14 @@ input PoolHistoricalLiquidity_filter {
     pricingAsset_not: Bytes
     pricingAsset_not_contains: Bytes
     pricingAsset_not_in: [Bytes!]
+    timestamp: Int
+    timestamp_gt: Int
+    timestamp_gte: Int
+    timestamp_in: [Int!]
+    timestamp_lt: Int
+    timestamp_lte: Int
+    timestamp_not: Int
+    timestamp_not_in: [Int!]
 }
 
 enum PoolHistoricalLiquidity_orderBy {
@@ -967,9 +984,11 @@ enum PoolHistoricalLiquidity_orderBy {
     id
     poolId
     poolLiquidity
+    poolLiquidityUSD
     poolShareValue
     poolTotalShares
     pricingAsset
+    timestamp
 }
 
 type PoolShare {
@@ -1035,12 +1054,17 @@ enum PoolShare_orderBy {
 
 type PoolSnapshot {
     amounts: [BigDecimal!]!
+    holdersCount: BigInt!
     id: ID!
     pool: Pool!
     swapFees: BigDecimal!
     swapVolume: BigDecimal!
+    swapsCount: BigInt!
     timestamp: Int!
+    totalLiquidity: BigDecimal!
     totalShares: BigDecimal!
+    totalSwapFee: BigDecimal!
+    totalSwapVolume: BigDecimal!
 }
 
 input PoolSnapshot_filter {
@@ -1048,6 +1072,14 @@ input PoolSnapshot_filter {
     amounts_contains: [BigDecimal!]
     amounts_not: [BigDecimal!]
     amounts_not_contains: [BigDecimal!]
+    holdersCount: BigInt
+    holdersCount_gt: BigInt
+    holdersCount_gte: BigInt
+    holdersCount_in: [BigInt!]
+    holdersCount_lt: BigInt
+    holdersCount_lte: BigInt
+    holdersCount_not: BigInt
+    holdersCount_not_in: [BigInt!]
     id: ID
     id_gt: ID
     id_gte: ID
@@ -1086,6 +1118,14 @@ input PoolSnapshot_filter {
     swapVolume_lte: BigDecimal
     swapVolume_not: BigDecimal
     swapVolume_not_in: [BigDecimal!]
+    swapsCount: BigInt
+    swapsCount_gt: BigInt
+    swapsCount_gte: BigInt
+    swapsCount_in: [BigInt!]
+    swapsCount_lt: BigInt
+    swapsCount_lte: BigInt
+    swapsCount_not: BigInt
+    swapsCount_not_in: [BigInt!]
     timestamp: Int
     timestamp_gt: Int
     timestamp_gte: Int
@@ -1094,6 +1134,14 @@ input PoolSnapshot_filter {
     timestamp_lte: Int
     timestamp_not: Int
     timestamp_not_in: [Int!]
+    totalLiquidity: BigDecimal
+    totalLiquidity_gt: BigDecimal
+    totalLiquidity_gte: BigDecimal
+    totalLiquidity_in: [BigDecimal!]
+    totalLiquidity_lt: BigDecimal
+    totalLiquidity_lte: BigDecimal
+    totalLiquidity_not: BigDecimal
+    totalLiquidity_not_in: [BigDecimal!]
     totalShares: BigDecimal
     totalShares_gt: BigDecimal
     totalShares_gte: BigDecimal
@@ -1102,16 +1150,37 @@ input PoolSnapshot_filter {
     totalShares_lte: BigDecimal
     totalShares_not: BigDecimal
     totalShares_not_in: [BigDecimal!]
+    totalSwapFee: BigDecimal
+    totalSwapFee_gt: BigDecimal
+    totalSwapFee_gte: BigDecimal
+    totalSwapFee_in: [BigDecimal!]
+    totalSwapFee_lt: BigDecimal
+    totalSwapFee_lte: BigDecimal
+    totalSwapFee_not: BigDecimal
+    totalSwapFee_not_in: [BigDecimal!]
+    totalSwapVolume: BigDecimal
+    totalSwapVolume_gt: BigDecimal
+    totalSwapVolume_gte: BigDecimal
+    totalSwapVolume_in: [BigDecimal!]
+    totalSwapVolume_lt: BigDecimal
+    totalSwapVolume_lte: BigDecimal
+    totalSwapVolume_not: BigDecimal
+    totalSwapVolume_not_in: [BigDecimal!]
 }
 
 enum PoolSnapshot_orderBy {
     amounts
+    holdersCount
     id
     pool
     swapFees
     swapVolume
+    swapsCount
     timestamp
+    totalLiquidity
     totalShares
+    totalSwapFee
+    totalSwapVolume
 }
 
 type PoolToken {
@@ -1330,6 +1399,22 @@ input Pool_filter {
     id_lte: ID
     id_not: ID
     id_not_in: [ID!]
+    lowerTarget: BigDecimal
+    lowerTarget_gt: BigDecimal
+    lowerTarget_gte: BigDecimal
+    lowerTarget_in: [BigDecimal!]
+    lowerTarget_lt: BigDecimal
+    lowerTarget_lte: BigDecimal
+    lowerTarget_not: BigDecimal
+    lowerTarget_not_in: [BigDecimal!]
+    mainIndex: Int
+    mainIndex_gt: Int
+    mainIndex_gte: Int
+    mainIndex_in: [Int!]
+    mainIndex_lt: Int
+    mainIndex_lte: Int
+    mainIndex_not: Int
+    mainIndex_not_in: [Int!]
     managementFee: BigDecimal
     managementFee_gt: BigDecimal
     managementFee_gte: BigDecimal
@@ -1478,6 +1563,14 @@ input Pool_filter {
     unitSeconds_lte: BigInt
     unitSeconds_not: BigInt
     unitSeconds_not_in: [BigInt!]
+    upperTarget: BigDecimal
+    upperTarget_gt: BigDecimal
+    upperTarget_gte: BigDecimal
+    upperTarget_in: [BigDecimal!]
+    upperTarget_lt: BigDecimal
+    upperTarget_lte: BigDecimal
+    upperTarget_not: BigDecimal
+    upperTarget_not_in: [BigDecimal!]
     vaultID: String
     vaultID_contains: String
     vaultID_ends_with: String
@@ -1492,6 +1585,14 @@ input Pool_filter {
     vaultID_not_in: [String!]
     vaultID_not_starts_with: String
     vaultID_starts_with: String
+    wrappedIndex: Int
+    wrappedIndex_gt: Int
+    wrappedIndex_gte: Int
+    wrappedIndex_in: [Int!]
+    wrappedIndex_lt: Int
+    wrappedIndex_lte: Int
+    wrappedIndex_not: Int
+    wrappedIndex_not_in: [Int!]
 }
 
 enum Pool_orderBy {
@@ -1504,6 +1605,8 @@ enum Pool_orderBy {
     historicalValues
     holdersCount
     id
+    lowerTarget
+    mainIndex
     managementFee
     name
     owner
@@ -1526,8 +1629,10 @@ enum Pool_orderBy {
     totalWeight
     tx
     unitSeconds
+    upperTarget
     vaultID
     weightUpdates
+    wrappedIndex
 }
 
 type PriceRateProvider {
@@ -3620,12 +3725,7 @@ type _Block_ {
 The type for the top-level _meta field
 """
 type _Meta_ {
-    """
-    Information about a specific subgraph block. The hash of the block
-    will be null if the _meta field has a block constraint that asks for
-    a block number. It will be filled if the _meta field has no block constraint
-    and therefore asks for the latest  block
-    """
+    "Information about a specific subgraph block. The hash of the block\nwill be null if the _meta field has a block constraint that asks for\na block number. It will be filled if the _meta field has no block constraint\nand therefore asks for the latest  block\n"
     block: _Block_!
 
     """

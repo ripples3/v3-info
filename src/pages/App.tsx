@@ -128,7 +128,7 @@ export default function App() {
                 <AppWrapper>
                     <URLWarning />
                     <HeaderWrapper>
-                        {activeNetwork.id !== SupportedNetwork.ETHEREUM && (
+                        {activeNetwork.id === SupportedNetwork.POLYGON && (
                             <WarningWrapper>
                                 <WarningBanner>
                                     {`Warning: 
@@ -156,7 +156,7 @@ export default function App() {
                             </BodyWrapper>
                         </AppWrapper>
                     ) : (
-                        <BodyWrapper warningActive={activeNetwork.id !== SupportedNetwork.ETHEREUM}>
+                        <BodyWrapper warningActive={activeNetwork.id === SupportedNetwork.POLYGON}>
                             <Popups />
                             <Switch>
                                 <Route exact strict path="/:networkID?/pools/:poolId" component={PoolPage} />

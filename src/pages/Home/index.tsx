@@ -41,6 +41,10 @@ export default function Home() {
 
     const [activeNetwork] = useActiveNetworkVersion();
 
+    const formattedTokens = useBalancerTokens();
+    const protocolData = useBalancerProtocolData();
+    const poolData = useBalancerPools();
+
     const [volumeHover, setVolumeHover] = useState<number | undefined>();
     const [liquidityHover, setLiquidityHover] = useState<number | undefined>();
     const [feesHover, setFeesHover] = useState<number | undefined>();
@@ -49,7 +53,7 @@ export default function Home() {
     const [rightLabel, setRightLabel] = useState<string | undefined>();
     const [swapsLabel, setSwapsLabel] = useState<string | undefined>();
     const [feesLabel, setFeesLabel] = useState<string | undefined>();
-
+    
     useEffect(() => {
         setLiquidityHover(undefined);
         setVolumeHover(undefined);
@@ -59,9 +63,7 @@ export default function Home() {
 
     const [volumeWindow, setVolumeWindow] = useState(VolumeWindow.daily);
 
-    const formattedTokens = useBalancerTokens();
-    const protocolData = useBalancerProtocolData();
-    const poolData = useBalancerPools();
+
 
     // if hover value undefined, reset to current day value
     useEffect(() => {
@@ -69,23 +71,25 @@ export default function Home() {
             setVolumeHover(protocolData.volume24);
         }
     }, [protocolData, volumeHover]);
+
     useEffect(() => {
-        if (!liquidityHover && protocolData) {
-            setLiquidityHover(protocolData.tvl);
+        if (liquidityHover === undefined && protocolData) {
+          setLiquidityHover(protocolData.tvl)
         }
-    }, [liquidityHover, protocolData]);
+      }, [liquidityHover, protocolData])
+
     useEffect(() => {
         if (!feesHover && protocolData) {
             setFeesHover(protocolData.fees24);
         }
     }, [protocolData, feesHover]);
+
     useEffect(() => {
         if (!swapsHover && protocolData) {
             setSwapsHover(protocolData.swaps24);
         }
     }, [protocolData, swapsHover]);
 
-    console.log("protocolData", protocolData);
     return (
         <PageWrapper>
             <ThemedBackgroundGlobal backgroundColor={activeNetwork.bgColor} />
