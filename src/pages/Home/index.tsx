@@ -70,25 +70,25 @@ export default function Home() {
         if (!volumeHover && protocolData) {
             setVolumeHover(protocolData.volume24);
         }
-    }, [protocolData, volumeHover]);
+    }, [protocolData, volumeHover, activeNetwork]);
 
     useEffect(() => {
         if (liquidityHover === undefined && protocolData) {
           setLiquidityHover(protocolData.tvl)
         }
-      }, [liquidityHover, protocolData])
+      }, [liquidityHover, protocolData, activeNetwork])
 
     useEffect(() => {
         if (!feesHover && protocolData) {
             setFeesHover(protocolData.fees24);
         }
-    }, [protocolData, feesHover]);
+    }, [protocolData, feesHover, activeNetwork]);
 
     useEffect(() => {
         if (!swapsHover && protocolData) {
             setSwapsHover(protocolData.swaps24);
         }
-    }, [protocolData, swapsHover]);
+    }, [protocolData, swapsHover, activeNetwork]);
 
     return (
         <PageWrapper>

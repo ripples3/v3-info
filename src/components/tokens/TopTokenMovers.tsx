@@ -9,6 +9,7 @@ import { formatDollarAmount } from 'utils/numbers';
 import Percent from 'components/Percent';
 import HoverInlineText from 'components/HoverInlineText';
 import { TokenData } from '../../data/balancer/balancerTypes';
+import getCuratedTokenName from 'utils/getCuratedTokenName';
 
 const CardWrapper = styled(StyledInternalLink)`
     min-width: 190px;

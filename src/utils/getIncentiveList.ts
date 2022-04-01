@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Incentives } from "data/balancer/balancerTypes";
+import { ChainIncentives } from "data/balancer/balancerTypes";
 
 const url = "https://raw.githubusercontent.com/balancer-labs/frontend-v2/master/src/lib/utils/liquidityMining/MultiTokenLiquidityMining.json";
 
@@ -20,6 +21,10 @@ export function GetIncentiveList () {
             };
     
             fetchData();
-        }, [jsonData]);
+        }, []);
+
+        //Map jsonData to new Interface cain -> pool -> [...weeks] ... [tokenAddress, amount]
+        //let incentiveArray = <ChainIncentives>
+
     return jsonData;
 }
