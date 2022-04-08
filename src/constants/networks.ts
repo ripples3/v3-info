@@ -49,24 +49,25 @@ export const ArbitrumNetworkInfo: NetworkInfo = {
   bgColor: '#0A294B',
   primaryColor: '#0490ED',
   secondaryColor: '#96BEDC',
-  blurb: '',
+  blurb: 'L2',
 }
 
 export const PolygonNetworkInfo: NetworkInfo = {
   id: SupportedNetwork.POLYGON,
   route: 'polygon',
   name: 'Polygon',
-  startTimeStamp: 1619874000,
+  startTimeStamp: 1644935196,
   appUri: 'https://polygon.balancer.fi/',
   clientUri: 'https://api.thegraph.com/subgraphs/name/xeonus/balancer-polygon-v2',
   bgColor: '#8247e5',
   primaryColor: '#8247e5',
   secondaryColor: '#FB7876',
   imageURL: POLYGON_LOGO_URL,
-  blurb: '',
+  blurb: 'Beta',
 }
 
 export const SUPPORTED_NETWORK_VERSIONS: NetworkInfo[] = [
   EthereumNetworkInfo,
   ArbitrumNetworkInfo,
+  PolygonNetworkInfo,
 ]

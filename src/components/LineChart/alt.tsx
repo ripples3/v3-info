@@ -88,7 +88,7 @@ const Chart = ({
                         dataKey="time"
                         axisLine={false}
                         tickLine={false}
-                        tickFormatter={(time) => dayjs(time).format('DD')}
+                        tickFormatter={(time) => dayjs(time).format('DD.MM.YY')}
                         minTickGap={10}
                     />
                     <Tooltip
