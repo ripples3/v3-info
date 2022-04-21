@@ -80,7 +80,7 @@ const MenuItem = styled(ExternalLink)`
     }
 `;
 
-const CODE_LINK = 'https://github.com/Uniswap/uniswap-v3-info';
+const CODE_LINK = 'https://github.com/Xeonus/v3-info';
 
 export default function Menu() {
     const node = useRef<HTMLDivElement>();

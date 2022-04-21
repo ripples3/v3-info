@@ -132,7 +132,7 @@ export default function App() {
                             <WarningWrapper>
                                 <WarningBanner>
                                     {`Warning: 
-                  Data for this chain is still experimental - Metrics such as TVL might show incorrect values.`}
+                  Data fetching for this chain requires long loading times - Please be patient.`}
                                 </WarningBanner>
                             </WarningWrapper>
                         )}

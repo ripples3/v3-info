@@ -12,6 +12,7 @@ import { HideMedium, HideSmall, StyledInternalLink } from '../../theme';
 import TokenTable from 'components/tokens/TokenTable';
 import { PageWrapper, ThemedBackgroundGlobal } from 'pages/styled';
 import BarChart from 'components/BarChart/alt';
+import { SmallOptionButton } from 'components/Button';
 import { MonoSpace } from 'components/shared';
 import { useActiveNetworkVersion } from 'state/application/hooks';
 import { VolumeWindow } from 'types';
@@ -23,6 +24,7 @@ import numbro from 'numbro';
 import SwapsTable from '../../components/TransactionsTable/SwapsTable';
 import { LocalLoader } from '../../components/Loader';
 import { BALANCER_PROJECT_NAME } from '../../data/balancer/constants';
+import { useTransformedVolumeData } from 'hooks/chart';
 
 const ChartWrapper = styled.div`
     width: 49%;
@@ -90,6 +92,9 @@ export default function Home() {
         }
     }, [protocolData, swapsHover, activeNetwork]);
 
+    const weeklyVolumeData = useTransformedVolumeData(protocolData.volumeData, 'week');
+    const monthlyVolumeData = useTransformedVolumeData(protocolData.volumeData, 'month');
+
     return (
         <PageWrapper>
             <ThemedBackgroundGlobal backgroundColor={activeNetwork.bgColor} />
@@ -124,7 +129,13 @@ export default function Home() {
                         <BarChart
                             height={220}
                             minHeight={332}
-                            data={protocolData.volumeData}
+                            data={
+                                volumeWindow === VolumeWindow.monthly
+                                  ? monthlyVolumeData
+                                  : volumeWindow === VolumeWindow.weekly
+                                  ? weeklyVolumeData
+                                  : protocolData.volumeData
+                              }
                             color={theme.blue1}
                             setValue={setVolumeHover}
                             setLabel={setRightLabel}
@@ -133,7 +144,7 @@ export default function Home() {
                             activeWindow={volumeWindow}
                             topRight={
                                 <RowFixed style={{ marginLeft: '-40px', marginTop: '8px' }}>
-                                    {/*<SmallOptionButton
+                                    <SmallOptionButton
                                         active={volumeWindow === VolumeWindow.daily}
                                         onClick={() => setVolumeWindow(VolumeWindow.daily)}
                                     >
@@ -152,7 +163,7 @@ export default function Home() {
                                         onClick={() => setVolumeWindow(VolumeWindow.monthly)}
                                     >
                                         M
-                                    </SmallOptionButton>*/}
+                                    </SmallOptionButton>
                                 </RowFixed>
                             }
                             topLeft={
