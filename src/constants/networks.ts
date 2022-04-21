@@ -56,7 +56,7 @@ export const PolygonNetworkInfo: NetworkInfo = {
   id: SupportedNetwork.POLYGON,
   route: 'polygon',
   name: 'Polygon',
-  startTimeStamp: 1644935196,
+  startTimeStamp: 1619874000,
   appUri: 'https://polygon.balancer.fi/',
   clientUri: 'https://api.thegraph.com/subgraphs/name/xeonus/balancer-polygon-v2',
   bgColor: '#8247e5',

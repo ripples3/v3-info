@@ -14,7 +14,7 @@ export const tokenListTokens = makeVar<TokenListToken[]>([]);
 export async function loadTokenListTokens() {
     try {
         const response = await fetch(
-            'hhttps://raw.githubusercontent.com/balancer-labs/assets/master/generated/listed.tokenlist.json',
+            'https://raw.githubusercontent.com/balancer-labs/assets/master/generated/listed.tokenlist.json',
         );
         const data = await response.json();
 
