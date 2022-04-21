@@ -49,7 +49,7 @@ export const ArbitrumNetworkInfo: NetworkInfo = {
   bgColor: '#0A294B',
   primaryColor: '#0490ED',
   secondaryColor: '#96BEDC',
-  blurb: '',
+  blurb: 'L2',
 }
 
 export const PolygonNetworkInfo: NetworkInfo = {
@@ -63,7 +63,7 @@ export const PolygonNetworkInfo: NetworkInfo = {
   primaryColor: '#8247e5',
   secondaryColor: '#FB7876',
   imageURL: POLYGON_LOGO_URL,
-  blurb: '',
+  blurb: 'Beta',
 }
 
 export const SUPPORTED_NETWORK_VERSIONS: NetworkInfo[] = [

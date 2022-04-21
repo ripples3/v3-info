@@ -186,7 +186,7 @@ export default function Header() {
             </HeaderRow>
             <HeaderControls>
             <NetworkDropdown />
-                <SearchSmall />
+                {/*<SearchSmall />*/}
                 <Menu />
             </HeaderControls>
             <SmallContentGrouping>
