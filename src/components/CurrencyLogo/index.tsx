@@ -57,6 +57,7 @@ export default function CurrencyLogo({
 }) {
   // useOptimismList()
   const arbitrumList = useCombinedActiveList()?.[42161]
+  
   const polygonList = useCombinedActiveList()?.[137]
 
   const [activeNetwork] = useActiveNetworkVersion()

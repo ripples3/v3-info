@@ -16,7 +16,7 @@ import useTheme from 'hooks/useTheme';
 import { TOKEN_HIDE } from '../../constants/index';
 import { TokenListToken } from '../../state/token-lists/token-lists';
 import { TokenData } from '../../data/balancer/balancerTypes';
-
+import getCuratedTokenName from 'utils/getCuratedTokenName';
 const Wrapper = styled(DarkGreyCard)`
     width: 100%;
 `;
@@ -79,13 +79,13 @@ const DataRow = ({ tokenData, index }: { tokenData: TokenData; index: number }) 
                         <ResponsiveLogo address={tokenData.address} />
                     </RowFixed>
                     <ExtraSmallOnly style={{ marginLeft: '6px' }}>
-                        <Label ml="8px">{tokenData.symbol}</Label>
+                        <Label ml="8px">{getCuratedTokenName(tokenData)}</Label>
                     </ExtraSmallOnly>
                     <HideExtraSmall style={{ marginLeft: '10px' }}>
                         <RowFixed>
                             <HoverInlineText text={tokenData.name} />
                             <Label ml="8px" color={theme.text3}>
-                                ({tokenData.symbol})
+                                ({getCuratedTokenName(tokenData)})
                             </Label>
                         </RowFixed>
                     </HideExtraSmall>

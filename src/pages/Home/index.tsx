@@ -12,6 +12,7 @@ import { HideMedium, HideSmall, StyledInternalLink } from '../../theme';
 import TokenTable from 'components/tokens/TokenTable';
 import { PageWrapper, ThemedBackgroundGlobal } from 'pages/styled';
 import BarChart from 'components/BarChart/alt';
+import { SmallOptionButton } from 'components/Button';
 import { MonoSpace } from 'components/shared';
 import { useActiveNetworkVersion } from 'state/application/hooks';
 import { VolumeWindow } from 'types';
@@ -23,6 +24,7 @@ import numbro from 'numbro';
 import SwapsTable from '../../components/TransactionsTable/SwapsTable';
 import { LocalLoader } from '../../components/Loader';
 import { BALANCER_PROJECT_NAME } from '../../data/balancer/constants';
+import { useTransformedVolumeData } from 'hooks/chart';
 
 const ChartWrapper = styled.div`
     width: 49%;
@@ -70,25 +72,28 @@ export default function Home() {
         if (!volumeHover && protocolData) {
             setVolumeHover(protocolData.volume24);
         }
-    }, [protocolData, volumeHover]);
+    }, [protocolData, volumeHover, activeNetwork]);
 
     useEffect(() => {
         if (liquidityHover === undefined && protocolData) {
           setLiquidityHover(protocolData.tvl)
         }
-      }, [liquidityHover, protocolData])
+      }, [liquidityHover, protocolData, activeNetwork])
 
     useEffect(() => {
         if (!feesHover && protocolData) {
             setFeesHover(protocolData.fees24);
         }
-    }, [protocolData, feesHover]);
+    }, [protocolData, feesHover, activeNetwork]);
 
     useEffect(() => {
         if (!swapsHover && protocolData) {
             setSwapsHover(protocolData.swaps24);
         }
-    }, [protocolData, swapsHover]);
+    }, [protocolData, swapsHover, activeNetwork]);
+
+    const weeklyVolumeData = useTransformedVolumeData(protocolData.volumeData, 'week');
+    const monthlyVolumeData = useTransformedVolumeData(protocolData.volumeData, 'month');
 
     return (
         <PageWrapper>
@@ -124,7 +129,13 @@ export default function Home() {
                         <BarChart
                             height={220}
                             minHeight={332}
-                            data={protocolData.volumeData}
+                            data={
+                                volumeWindow === VolumeWindow.monthly
+                                  ? monthlyVolumeData
+                                  : volumeWindow === VolumeWindow.weekly
+                                  ? weeklyVolumeData
+                                  : protocolData.volumeData
+                              }
                             color={theme.blue1}
                             setValue={setVolumeHover}
                             setLabel={setRightLabel}
@@ -133,7 +144,7 @@ export default function Home() {
                             activeWindow={volumeWindow}
                             topRight={
                                 <RowFixed style={{ marginLeft: '-40px', marginTop: '8px' }}>
-                                    {/*<SmallOptionButton
+                                    <SmallOptionButton
                                         active={volumeWindow === VolumeWindow.daily}
                                         onClick={() => setVolumeWindow(VolumeWindow.daily)}
                                     >
@@ -152,7 +163,7 @@ export default function Home() {
                                         onClick={() => setVolumeWindow(VolumeWindow.monthly)}
                                     >
                                         M
-                                    </SmallOptionButton>*/}
+                                    </SmallOptionButton>
                                 </RowFixed>
                             }
                             topLeft={

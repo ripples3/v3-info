@@ -11,6 +11,7 @@ import { unixToDate } from '../../utils/date';
 import { BalancerChartDataItem, PoolData } from './balancerTypes';
 import { BALANCER_SUBGRAPH_START_TIMESTAMP } from './constants';
 import { options } from 'numeral';
+import { GetIncentiveList } from 'utils/getIncentiveList';
 
 function getPoolValues(
     poolId: string,
@@ -37,6 +38,9 @@ export function useBalancerPools(): PoolData[] {
     const { blocks, error: blockError } = useBlocksFromTimestamps([t24, t48, tWeek]);
     const [block24, block48, blockWeek] = blocks ?? [];
     const [getPoolData, { data }] = useGetPoolDataLazyQuery();
+    const incentives = GetIncentiveList();
+
+    //console.log("incentives", incentives['week_52']);
 
     useEffect(() => {
         if (block24) {

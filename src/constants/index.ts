@@ -33,6 +33,7 @@ export const USDC = new Token(ChainId.MAINNET, '0xA0b86991c6218b36c1d19D4a2e9Eb0
 export const USDT = new Token(ChainId.MAINNET, '0xdAC17F958D2ee523a2206206994597C13D831ec7', 6, 'USDT', 'Tether USD');
 export const COMP = new Token(ChainId.MAINNET, '0xc00e94Cb662C3520282E6f5717214004A7f26888', 18, 'COMP', 'Compound');
 export const MKR = new Token(ChainId.MAINNET, '0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2', 18, 'MKR', 'Maker');
+export const SWAPR = new Token(ChainId.ARBITRUM, '0x2e9a6Df78E42a30712c10a9Dc4b1C8656f8F2879', 18, 'SWAPR', 'Swapr');
 export const AMPL = new Token(ChainId.MAINNET, '0xD46bA6D942050d489DBd938a2C909A5d5039A161', 9, 'AMPL', 'Ampleforth');
 export const WBTC = new Token(ChainId.MAINNET, '0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599', 8, 'WBTC', 'Wrapped BTC');
 
@@ -52,6 +53,8 @@ export const UNI: { [chainId in ChainId]: Token } = {
     [ChainId.ROPSTEN]: new Token(ChainId.ROPSTEN, UNI_ADDRESS, 18, 'UNI', 'Uniswap'),
     [ChainId.GÖRLI]: new Token(ChainId.GÖRLI, UNI_ADDRESS, 18, 'UNI', 'Uniswap'),
     [ChainId.KOVAN]: new Token(ChainId.KOVAN, UNI_ADDRESS, 18, 'UNI', 'Uniswap'),
+    [ChainId.ARBITRUM]: new Token(ChainId.ROPSTEN, UNI_ADDRESS, 18, 'UNI', 'Uniswap'),
+    [ChainId.POLYGON]: new Token(ChainId.ROPSTEN, UNI_ADDRESS, 18, 'UNI', 'Uniswap'),
 };
 
 export const COMMON_CONTRACT_NAMES: { [address: string]: string } = {
@@ -71,6 +74,8 @@ const WETH_ONLY: ChainTokenList = {
     [ChainId.RINKEBY]: [WETH9[ChainId.RINKEBY]],
     [ChainId.GÖRLI]: [WETH9[ChainId.GÖRLI]],
     [ChainId.KOVAN]: [WETH9[ChainId.KOVAN]],
+    [ChainId.ARBITRUM]: [WETH9[ChainId.ARBITRUM]],
+    [ChainId.POLYGON]: [WETH9[ChainId.POLYGON]],
 };
 
 // used to construct intermediary pairs for trading

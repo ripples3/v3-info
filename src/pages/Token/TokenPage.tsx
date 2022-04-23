@@ -35,7 +35,7 @@ import CMCLogo from '../../assets/images/cmc.png';
 import { useBalancerTokenData, useBalancerTokenPageData } from '../../data/balancer/useTokens';
 import { useBalancerPoolsForToken } from '../../data/balancer/usePools';
 import { useBalancerTransactionData } from '../../data/balancer/useTransactions';
-import { BALANCER_APP_LINK } from '../../data/balancer/constants';
+import { useBalancerToken } from 'data/balancer/useToken';
 
 const PriceText = styled(TYPE.label)`
     font-size: 36px;
@@ -113,6 +113,11 @@ export default function TokenPage({
     // watchlist
     const [savedTokens, addSavedToken] = useSavedTokens();
 
+    //CandleChart Data
+    //const { chartData } = useBalancerToken(address);
+
+    //console.log("chartData", chartData)
+
     return (
         <PageWrapper>
             <ThemedBackground backgroundColor={backgroundColor} />
@@ -120,7 +125,7 @@ export default function TokenPage({
                 !tokenData.exists ? (
                     <LightGreyCard style={{ textAlign: 'center' }}>
                         No pool has been created with this token yet. Create one
-                        <StyledExternalLink style={{ marginLeft: '4px' }} href={`${BALANCER_APP_LINK}#/pool-create`}>
+                        <StyledExternalLink style={{ marginLeft: '4px' }} href={`${activeNetwork.appUri}#/pool-create`}>
                             here.
                         </StyledExternalLink>
                     </LightGreyCard>
