@@ -38,7 +38,7 @@ export function useBalancerPools(): PoolData[] {
     const { blocks, error: blockError } = useBlocksFromTimestamps([t24, t48, tWeek]);
     const [block24, block48, blockWeek] = blocks ?? [];
     const [getPoolData, { data }] = useGetPoolDataLazyQuery();
-    const incentives = GetIncentiveList();
+    //const incentives = GetIncentiveList();
 
     //console.log("incentives", incentives['week_52']);
 

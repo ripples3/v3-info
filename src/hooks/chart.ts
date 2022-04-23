@@ -32,12 +32,12 @@ export function useTransformedVolumeData(
       const data: Record<string, GenericChartEntry> = {}
 
       chartData.forEach(({ time, value }: { time: string; value: number }) => {
-        const group = unixToType(value, type)
+        const group = unixToType(Math.floor(new Date(time).getTime() / 1000), type)
         if (data[group]) {
           data[group].value += value
         } else {
           data[group] = {
-            time: unixToDate(Math.floor(new Date(time).getTime() / 1000)),
+            time: time,
             value: value,
           }
         }

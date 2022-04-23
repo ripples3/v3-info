@@ -4838,14 +4838,13 @@ export type GetTransactionDataQueryResult = Apollo.QueryResult<
 >;
 export const GetPoolDataDocument = gql`
     query GetPoolData($block24: Block_height!, $block48: Block_height!, $blockWeek: Block_height!) {
-        pools(first: 1000, orderBy: totalLiquidity, orderDirection: desc, where: { totalLiquidity_gt: "0.01" }) {
+        pools(first: 1000, orderBy: totalLiquidity, orderDirection: desc) {
             ...BalancerPool
         }
         pools24: pools(
             first: 1000
             orderBy: totalLiquidity
             orderDirection: desc
-            where: { totalLiquidity_gt: "0.01" }
             block: $block24
         ) {
             ...BalancerPool
@@ -4854,7 +4853,6 @@ export const GetPoolDataDocument = gql`
             first: 1000
             orderBy: totalLiquidity
             orderDirection: desc
-            where: { totalLiquidity_gt: "0.01" }
             block: $block48
         ) {
             ...BalancerPool
@@ -4863,7 +4861,6 @@ export const GetPoolDataDocument = gql`
             first: 1000
             orderBy: totalLiquidity
             orderDirection: desc
-            where: { totalLiquidity_gt: "0.01" }
             block: $blockWeek
         ) {
             ...BalancerPool

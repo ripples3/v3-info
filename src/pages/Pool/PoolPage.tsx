@@ -105,11 +105,12 @@ export default function PoolPage({
     const poolData = useBalancerPoolData(poolId);
     
     const { tvlData, volumeData, feesData } = useBalancerPoolPageData(poolId);
-    console.log("tvlData:", tvlData);
+
     const { swaps, joinExits, swapPairVolumes } = useBalancerTransactionData(
         (poolData?.tokens || []).map((token) => token.address),
         poolData ? [poolData.id] : [],
     );
+    console.log("swaps:", poolData);
 
     const [view, setView] = useState(ChartView.VOL);
     const [latestValue, setLatestValue] = useState<number | undefined>();
