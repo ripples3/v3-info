@@ -114,7 +114,8 @@ export default function Home() {
                             setLabel={setLeftLabel}
                             topLeft={
                                 <AutoColumn gap="4px">
-                                    <TYPE.mediumHeader fontSize="16px">TVL</TYPE.mediumHeader>
+                                    <TYPE.mediumHeader fontSize="16px">TVL*</TYPE.mediumHeader>
+                                    <TYPE.small fontSize="10px">* excluding boosted pools</TYPE.small>
                                     <TYPE.largeHeader fontSize="32px">
                                         <MonoSpace>{formatDollarAmount(liquidityHover, 2, true)} </MonoSpace>
                                     </TYPE.largeHeader>
