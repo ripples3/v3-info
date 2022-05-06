@@ -182,6 +182,9 @@ export default function Header() {
                     <StyledNavLink id={`stake-nav-link`} to={networkPrefix(activeNewtork) + 'tokens'}>
                         Tokens
                     </StyledNavLink>
+                    <StyledNavLink id={`stake-nav-link`} to={networkPrefix(activeNewtork) + 'protocolFees'}>
+                        Protocol Fees
+    </StyledNavLink>
                 </HeaderLinks>
             </HeaderRow>
             <HeaderControls>

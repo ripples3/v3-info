@@ -18,11 +18,12 @@ import { useActiveNetworkVersion } from 'state/application/hooks';
 import { VolumeWindow } from 'types';
 import { useBalancerTokens } from '../../data/balancer/useTokens';
 import { useBalancerProtocolData } from '../../data/balancer/useProtocolData';
+import { useProtocolData, useProtocolChartData } from 'state/protocol/hooks'
 import PoolTable from '../../components/pools/PoolTable';
 import { useBalancerPools } from '../../data/balancer/usePools';
 import numbro from 'numbro';
 import SwapsTable from '../../components/TransactionsTable/SwapsTable';
-import { LocalLoader } from '../../components/Loader';
+import Loader, { LocalLoader } from '../../components/Loader';
 import { BALANCER_PROJECT_NAME } from '../../data/balancer/constants';
 import { useTransformedVolumeData } from 'hooks/chart';
 
@@ -57,10 +58,14 @@ export default function Home() {
     const [feesLabel, setFeesLabel] = useState<string | undefined>();
     
     useEffect(() => {
+        if (!protocolData) {
         setLiquidityHover(undefined);
         setVolumeHover(undefined);
         setFeesHover(undefined);
         setSwapsHover(undefined);
+        } else {
+            setVolumeHover(protocolData.volume24);
+        }
     }, [activeNetwork]);
 
     const [volumeWindow, setVolumeWindow] = useState(VolumeWindow.daily);
@@ -69,42 +74,43 @@ export default function Home() {
 
     // if hover value undefined, reset to current day value
     useEffect(() => {
-        if (!volumeHover && protocolData) {
+        if (protocolData) {
             setVolumeHover(protocolData.volume24);
         }
     }, [protocolData, volumeHover, activeNetwork]);
 
     useEffect(() => {
-        if (liquidityHover === undefined && protocolData) {
+        if (protocolData) {
           setLiquidityHover(protocolData.tvl)
         }
-      }, [liquidityHover, protocolData, activeNetwork])
+      }, [liquidityHover, protocolData])
 
     useEffect(() => {
-        if (!feesHover && protocolData) {
+        if (protocolData) {
             setFeesHover(protocolData.fees24);
         }
-    }, [protocolData, feesHover, activeNetwork]);
+    }, [feesHover, protocolData]);
 
     useEffect(() => {
-        if (!swapsHover && protocolData) {
+        if (protocolData?.swaps24) {
             setSwapsHover(protocolData.swaps24);
         }
-    }, [protocolData, swapsHover, activeNetwork]);
+    }, [swapsHover, activeNetwork, protocolData]);
 
-    const weeklyVolumeData = useTransformedVolumeData(protocolData.volumeData, 'week');
-    const monthlyVolumeData = useTransformedVolumeData(protocolData.volumeData, 'month');
+
+    const weeklyVolumeData = useTransformedVolumeData(protocolData?.volumeData, 'week');
+    const monthlyVolumeData = useTransformedVolumeData(protocolData?.volumeData, 'month');
 
     return (
         <PageWrapper>
             <ThemedBackgroundGlobal backgroundColor={activeNetwork.bgColor} />
             <AutoColumn gap="16px">
-                <TYPE.main>{BALANCER_PROJECT_NAME}</TYPE.main>
-                {protocolData.volumeData.length > 0 ?
+                <TYPE.main>Chain Overview</TYPE.main>
+                {protocolData?.volumeData.length > 0 ?
                 <ResponsiveRow>
                     <ChartWrapper>
                         <LineChart
-                            data={protocolData.tvlData}
+                            data={protocolData?.tvlData}
                             height={220}
                             minHeight={332}
                             color={activeNetwork.primaryColor}
@@ -135,7 +141,7 @@ export default function Home() {
                                   ? monthlyVolumeData
                                   : volumeWindow === VolumeWindow.weekly
                                   ? weeklyVolumeData
-                                  : protocolData.volumeData
+                                  : protocolData?.volumeData
                               }
                             color={theme.blue1}
                             setValue={setVolumeHover}
@@ -229,7 +235,7 @@ export default function Home() {
                             }
                         />
                     </ChartWrapper>
-                </ResponsiveRow> : null }
+                </ResponsiveRow> : <Loader/> }
                 {protocolData?.volumeChange?
                 <HideSmall>
                     <DarkGreyCard>
@@ -271,7 +277,7 @@ export default function Home() {
                     <TYPE.main>Large Swaps</TYPE.main>
                 </RowBetween>
                 <DarkGreyCard>
-                    {protocolData.whaleSwaps.length > 0 ? (
+                    {protocolData?.whaleSwaps.length > 0 ? (
                         <SwapsTable swaps={protocolData.whaleSwaps} />
                     ) : (
                         <LocalLoader fill={false} />
