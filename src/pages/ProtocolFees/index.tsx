@@ -8,6 +8,7 @@ import { useSavedTokens } from 'state/user/hooks';
 import { DarkGreyCard } from 'components/Card';
 import { useBalancerTokens } from '../../data/balancer/useTokens';
 import { GetProtocolFeeTokenSet } from 'utils/getProtocolFeeCollectorTokens';
+import { GetAddressTokenBalances } from 'utils/getAddressTokenBalances';
 
 export default function ProtocolFees() {
     useEffect(() => {
@@ -16,15 +17,13 @@ export default function ProtocolFees() {
 
     const formattedTokens = useBalancerTokens();
 
-    if (formattedTokens) {
-        GetProtocolFeeTokenSet(formattedTokens);
-    }
+    const walletTokenData = GetAddressTokenBalances()
 
     return (
         <PageWrapper>
             <AutoColumn gap="lg">
                 <TYPE.main>Protocol Fee Collector Tokens</TYPE.main>
-                <ProtocolFeeTokenTable tokenDatas={formattedTokens} />
+                <ProtocolFeeTokenTable tokenDatas={formattedTokens} walletTokenDatas={walletTokenData} />
             </AutoColumn>
         </PageWrapper>
     );

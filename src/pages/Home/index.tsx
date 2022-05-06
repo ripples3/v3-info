@@ -133,7 +133,7 @@ export default function Home() {
                         />
                     </ChartWrapper>
                     <ChartWrapper>
-                        <BarChart
+                    <LineChart
                             height={220}
                             minHeight={332}
                             data={
@@ -143,12 +143,11 @@ export default function Home() {
                                   ? weeklyVolumeData
                                   : protocolData?.volumeData
                               }
-                            color={theme.blue1}
+                            color={activeNetwork.primaryColor}
                             setValue={setVolumeHover}
                             setLabel={setRightLabel}
                             value={volumeHover}
                             label={rightLabel}
-                            activeWindow={volumeWindow}
                             topRight={
                                 <RowFixed style={{ marginLeft: '-40px', marginTop: '8px' }}>
                                     <SmallOptionButton
@@ -190,11 +189,11 @@ export default function Home() {
                 {protocolData?.swapData?.length?
                 <ResponsiveRow>
                     <ChartWrapper>
-                        <BarChart
+                        <LineChart
                             data={protocolData.swapData}
                             height={220}
                             minHeight={332}
-                            color={theme.blue1}
+                            color={activeNetwork.primaryColor}
                             value={swapsHover}
                             label={swapsLabel}
                             setValue={setSwapsHover}
@@ -213,11 +212,11 @@ export default function Home() {
                         />
                     </ChartWrapper>
                     <ChartWrapper>
-                        <BarChart
+                        <LineChart
                             height={220}
                             minHeight={332}
                             data={protocolData.feeData}
-                            color={theme.blue1}
+                            color={activeNetwork.primaryColor}
                             setValue={setFeesHover}
                             setLabel={setFeesLabel}
                             value={feesHover}

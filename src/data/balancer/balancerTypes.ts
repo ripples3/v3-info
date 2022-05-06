@@ -29,6 +29,9 @@ export type TokenData = {
     priceUSD: number;
     priceUSDChange: number;
     priceUSDChangeWeek: number;
+
+    //protocol collector info
+    valueUSDCollected: number;
 };
 
 export interface PoolTokenData {

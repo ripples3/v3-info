@@ -17,6 +17,7 @@ import { TOKEN_HIDE } from '../../constants/index';
 import { TokenListToken } from '../../state/token-lists/token-lists';
 import { TokenData } from '../../data/balancer/balancerTypes';
 import getCuratedTokenName from 'utils/getCuratedTokenName';
+import { ERC20TokenData, WalletTokenData } from 'utils/getAddressTokenBalances';
 const Wrapper = styled(DarkGreyCard)`
     width: 100%;
 `;
@@ -100,7 +101,7 @@ const DataRow = ({ tokenData, index }: { tokenData: TokenData; index: number }) 
                     {formatDollarAmount(tokenData.volumeUSD)}
                 </Label>
                 <Label end={1} fontWeight={400}>
-                    {formatDollarAmount(tokenData.tvlUSD)}
+                    {formatDollarAmount(tokenData.valueUSDCollected)}
                 </Label>
             </ResponsiveGrid>
         </LinkWrapper>
@@ -110,29 +111,50 @@ const DataRow = ({ tokenData, index }: { tokenData: TokenData; index: number }) 
 const SORT_FIELD = {
     name: 'name',
     volumeUSD: 'volumeUSD',
-    tvlUSD: 'tvlUSD',
     priceUSD: 'priceUSD',
     priceUSDChange: 'priceUSDChange',
     priceUSDChangeWeek: 'priceUSDChangeWeek',
+    valueUSDCollected: 'valueUSDCollected',
 };
 
-const MAX_ITEMS = 20;
+const MAX_ITEMS = 30;
 
 export default function ProtocolFeeTokenTable({
     tokenDatas,
+    walletTokenDatas,
     maxItems = MAX_ITEMS,
 }: {
     tokenDatas: TokenData[] | undefined;
+    walletTokenDatas?: WalletTokenData;
     maxItems?: number;
 }) {
     // theming
     const theme = useTheme();
 
     // for sorting
-    const [sortField, setSortField] = useState(SORT_FIELD.tvlUSD);
+    const [sortField, setSortField] = useState(SORT_FIELD.valueUSDCollected);
     const [sortDirection, setSortDirection] = useState<boolean>(true);
 
+    console.log("walletTokenDatas", walletTokenDatas);
 
+    function curateTokenDatas(tokenDatas: TokenData[], walletTokenData: WalletTokenData): TokenData[] {
+        const newTokenDatas: TokenData[] = [];
+        walletTokenData.data.items.forEach(( item: ERC20TokenData ) => {
+            tokenDatas.forEach(( tokenData: TokenData ) => {
+            if (item.contract_address === tokenData.address && Number(parseInt(item.balance) / 10 ** item.contract_decimals * tokenData.priceUSD) > 5000 ) {
+                tokenData.valueUSDCollected = Number(parseInt(item.balance) / 10 ** item.contract_decimals * tokenData.priceUSD);
+                newTokenDatas.push(tokenData);
+            }
+        });
+        
+    });
+    return newTokenDatas;
+    }
+
+    //Reassign token data set
+    if (tokenDatas && walletTokenDatas) {
+        tokenDatas = curateTokenDatas(tokenDatas, walletTokenDatas);
+    }
     
 
     // pagination
@@ -180,14 +202,14 @@ export default function ProtocolFeeTokenTable({
         [sortDirection, sortField],
     );
 
-    if (!tokenDatas) {
+    if (!tokenDatas || !walletTokenDatas) {
         return <Loader />;
     }
 
     return (
         <Wrapper>
             {sortedTokens.length > 0 ? (
-                <AutoColumn gap="16px">
+                <AutoColumn gap="8px">
                     <ResponsiveGrid>
                         <Label color={theme.text2}>#</Label>
                         <ClickableText color={theme.text2} onClick={() => handleSort(SORT_FIELD.name)}>
@@ -203,14 +225,11 @@ export default function ProtocolFeeTokenTable({
                         >
                             Price Change {arrow(SORT_FIELD.priceUSDChange)}
                         </ClickableText>
-                        {/* <ClickableText end={1} onClick={() => handleSort(SORT_FIELD.priceUSDChangeWeek)}>
-            7d {arrow(SORT_FIELD.priceUSDChangeWeek)}
-          </ClickableText> */}
                         <ClickableText color={theme.text2} end={1} onClick={() => handleSort(SORT_FIELD.volumeUSD)}>
                             Volume 24H {arrow(SORT_FIELD.volumeUSD)}
                         </ClickableText>
-                        <ClickableText color={theme.text2} end={1} onClick={() => handleSort(SORT_FIELD.tvlUSD)}>
-                            TVL {arrow(SORT_FIELD.tvlUSD)}
+                        <ClickableText color={theme.text2} end={1} onClick={() => handleSort(SORT_FIELD.valueUSDCollected)}>
+                            Collected {arrow(SORT_FIELD.valueUSDCollected)}
                         </ClickableText>
                     </ResponsiveGrid>
 
