@@ -58,48 +58,52 @@ export default function Home() {
     const [feesLabel, setFeesLabel] = useState<string | undefined>();
     
     useEffect(() => {
-        if (!protocolData) {
         setLiquidityHover(undefined);
         setVolumeHover(undefined);
         setFeesHover(undefined);
         setSwapsHover(undefined);
-        } else {
-            setVolumeHover(protocolData.volume24);
-        }
     }, [activeNetwork]);
 
-    const [volumeWindow, setVolumeWindow] = useState(VolumeWindow.daily);
-
+    const [volumeWindow, setVolumeWindow] = useState(VolumeWindow.weekly);
+    const [feeWindow, setFeeWindow] = useState(VolumeWindow.weekly);
+    const [swapWindow, setSwapWindow] = useState(VolumeWindow.weekly);
 
 
     // if hover value undefined, reset to current day value
     useEffect(() => {
-        if (protocolData) {
+        if (!volumeHover && protocolData) {
             setVolumeHover(protocolData.volume24);
         }
-    }, [protocolData, volumeHover, activeNetwork]);
+    }, [volumeHover, protocolData]);
 
     useEffect(() => {
-        if (protocolData) {
+        if (liquidityHover === undefined && protocolData) {
           setLiquidityHover(protocolData.tvl)
         }
       }, [liquidityHover, protocolData])
 
     useEffect(() => {
-        if (protocolData) {
+        if (!feesHover && protocolData) {
             setFeesHover(protocolData.fees24);
         }
     }, [feesHover, protocolData]);
 
     useEffect(() => {
-        if (protocolData?.swaps24) {
+        if (!swapsHover && protocolData?.swaps24) {
             setSwapsHover(protocolData.swaps24);
         }
-    }, [swapsHover, activeNetwork, protocolData]);
+    }, [swapsHover, protocolData]);
 
 
+    //Sorted by time-window
     const weeklyVolumeData = useTransformedVolumeData(protocolData?.volumeData, 'week');
     const monthlyVolumeData = useTransformedVolumeData(protocolData?.volumeData, 'month');
+
+    const weeklyFeeData = useTransformedVolumeData(protocolData?.feeData, 'week');
+    const monthlyFeeData = useTransformedVolumeData(protocolData?.feeData, 'month');
+
+    const weeklySwapData = useTransformedVolumeData(protocolData?.swapData, 'week');
+    const monthlySwapData = useTransformedVolumeData(protocolData?.swapData, 'month');
 
     return (
         <PageWrapper>
@@ -133,7 +137,7 @@ export default function Home() {
                         />
                     </ChartWrapper>
                     <ChartWrapper>
-                    <LineChart
+                    <BarChart
                             height={220}
                             minHeight={332}
                             data={
@@ -141,13 +145,14 @@ export default function Home() {
                                   ? monthlyVolumeData
                                   : volumeWindow === VolumeWindow.weekly
                                   ? weeklyVolumeData
-                                  : protocolData?.volumeData
+                                  : protocolData.volumeData
                               }
                             color={activeNetwork.primaryColor}
                             setValue={setVolumeHover}
                             setLabel={setRightLabel}
                             value={volumeHover}
                             label={rightLabel}
+                            activeWindow={volumeWindow}
                             topRight={
                                 <RowFixed style={{ marginLeft: '-40px', marginTop: '8px' }}>
                                     <SmallOptionButton
@@ -174,7 +179,7 @@ export default function Home() {
                             }
                             topLeft={
                                 <AutoColumn gap="4px">
-                                    <TYPE.mediumHeader fontSize="16px">Volume 24H</TYPE.mediumHeader>
+                                    <TYPE.mediumHeader fontSize="16px">Trading Volume</TYPE.mediumHeader>
                                     <TYPE.largeHeader fontSize="32px">
                                         <MonoSpace> {formatDollarAmount(volumeHover, 2)}</MonoSpace>
                                     </TYPE.largeHeader>
@@ -188,42 +193,105 @@ export default function Home() {
                 </ResponsiveRow> : null }
                 {protocolData?.swapData?.length?
                 <ResponsiveRow>
-                    <ChartWrapper>
-                        <LineChart
-                            data={protocolData.swapData}
+                <ChartWrapper>
+                <BarChart
                             height={220}
                             minHeight={332}
+                            data={
+                                swapWindow === VolumeWindow.monthly
+                                  ? monthlySwapData
+                                  : swapWindow === VolumeWindow.weekly
+                                  ? weeklySwapData
+                                  : protocolData.swapData
+                              }
                             color={activeNetwork.primaryColor}
-                            value={swapsHover}
-                            label={swapsLabel}
                             setValue={setSwapsHover}
                             setLabel={setSwapsLabel}
+                            value={swapsHover}
+                            label={swapsLabel}
+                            activeWindow={swapWindow}
+                            topRight={
+                                <RowFixed style={{ marginLeft: '-40px', marginTop: '8px' }}>
+                                    <SmallOptionButton
+                                        active={swapWindow === VolumeWindow.daily}
+                                        onClick={() => setSwapWindow(VolumeWindow.daily)}
+                                    >
+                                        D
+                                    </SmallOptionButton>
+                                    <SmallOptionButton
+                                        active={swapWindow === VolumeWindow.weekly}
+                                        style={{ marginLeft: '8px' }}
+                                        onClick={() => setSwapWindow(VolumeWindow.weekly)}
+                                    >
+                                        W
+                                    </SmallOptionButton>
+                                    <SmallOptionButton
+                                        active={swapWindow === VolumeWindow.monthly}
+                                        style={{ marginLeft: '8px' }}
+                                        onClick={() => setSwapWindow(VolumeWindow.monthly)}
+                                    >
+                                        M
+                                    </SmallOptionButton>
+                                </RowFixed>
+                            }
                             topLeft={
                                 <AutoColumn gap="4px">
-                                    <TYPE.mediumHeader fontSize="16px">Swaps 24H</TYPE.mediumHeader>
+                                    <TYPE.mediumHeader fontSize="16px">Swaps</TYPE.mediumHeader>
                                     <TYPE.largeHeader fontSize="32px">
-                                        <MonoSpace>{numbro(swapsHover).format({ thousandSeparated: true })} </MonoSpace>
+                                        <MonoSpace> {formatDollarAmount(swapsHover, 2)}</MonoSpace>
                                     </TYPE.largeHeader>
                                     <TYPE.main fontSize="12px" height="14px">
-                                        {swapsLabel ? <MonoSpace>{swapsLabel} (UTC)</MonoSpace> : null}
+                                        {swapsLabel ? <MonoSpace>{feesLabel} (UTC)</MonoSpace> : null}
                                     </TYPE.main>
                                 </AutoColumn>
                             }
                         />
-                    </ChartWrapper>
-                    <ChartWrapper>
-                        <LineChart
+                </ChartWrapper>
+                <ChartWrapper>
+                        <BarChart
                             height={220}
                             minHeight={332}
-                            data={protocolData.feeData}
+                            data={
+                                feeWindow === VolumeWindow.monthly
+                                  ? monthlyFeeData
+                                  : feeWindow === VolumeWindow.weekly
+                                  ? weeklyFeeData
+                                  : protocolData.feeData
+                            
+                            }
                             color={activeNetwork.primaryColor}
                             setValue={setFeesHover}
                             setLabel={setFeesLabel}
                             value={feesHover}
                             label={feesLabel}
+                            activeWindow={feeWindow}
+                            topRight={
+                                <RowFixed style={{ marginLeft: '-40px', marginTop: '8px' }}>
+                                    <SmallOptionButton
+                                        active={feeWindow === VolumeWindow.daily}
+                                        onClick={() => setFeeWindow(VolumeWindow.daily)}
+                                    >
+                                        D
+                                    </SmallOptionButton>
+                                    <SmallOptionButton
+                                        active={feeWindow === VolumeWindow.weekly}
+                                        style={{ marginLeft: '8px' }}
+                                        onClick={() => setFeeWindow(VolumeWindow.weekly)}
+                                    >
+                                        W
+                                    </SmallOptionButton>
+                                    <SmallOptionButton
+                                        active={feeWindow === VolumeWindow.monthly}
+                                        style={{ marginLeft: '8px' }}
+                                        onClick={() => setFeeWindow(VolumeWindow.monthly)}
+                                    >
+                                        M
+                                    </SmallOptionButton>
+                                </RowFixed>
+                            }
                             topLeft={
                                 <AutoColumn gap="4px">
-                                    <TYPE.mediumHeader fontSize="16px">Fees 24H</TYPE.mediumHeader>
+                                    <TYPE.mediumHeader fontSize="16px">Collected fees</TYPE.mediumHeader>
                                     <TYPE.largeHeader fontSize="32px">
                                         <MonoSpace> {formatDollarAmount(feesHover, 2)}</MonoSpace>
                                     </TYPE.largeHeader>
@@ -234,7 +302,7 @@ export default function Home() {
                             }
                         />
                     </ChartWrapper>
-                </ResponsiveRow> : <Loader/> }
+            </ResponsiveRow> : <Loader/> }
                 {protocolData?.volumeChange?
                 <HideSmall>
                     <DarkGreyCard>

@@ -141,10 +141,12 @@ export default function ProtocolFeeTokenTable({
         const newTokenDatas: TokenData[] = [];
         walletTokenData.data.items.forEach(( item: ERC20TokenData ) => {
             tokenDatas.forEach(( tokenData: TokenData ) => {
+                if (item.quote_rate_24h) {
             if (item.contract_address === tokenData.address && Number(parseInt(item.balance) / 10 ** item.contract_decimals * tokenData.priceUSD) > 5000 ) {
                 tokenData.valueUSDCollected = Number(parseInt(item.balance) / 10 ** item.contract_decimals * tokenData.priceUSD);
                 newTokenDatas.push(tokenData);
             }
+        }
         });
         
     });

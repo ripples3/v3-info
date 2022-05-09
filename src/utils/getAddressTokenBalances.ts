@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useActiveNetworkVersion } from "state/application/hooks";
 
 const tokenUrl = "https://api.covalenthq.com/v1/1/address/0xce88686553686da562ce7cea497ce749da109f9f/balances_v2/?quote-currency=USD&format=JSON&nft=false&no-nft-fetch=false&key=ckey_0234f04900264446a5dfbd4687d";
 //const portfolioURL = "https://api.covalenthq.com/v1/1/address/0xce88686553686da562ce7cea497ce749da109f9f/portfolio_v2/?&key=ckey_0234f04900264446a5dfbd4687d"
@@ -40,14 +41,17 @@ export interface ERC20TokenData {
     nft_data?: any;
 }
 
-
+//TODO take address as input argument
 export function GetAddressTokenBalances () {
+    const [activeNetwork] = useActiveNetworkVersion();
+    const baseURI = 'https://api.covalenthq.com/v1/';
+    const queryParams = '/address/0xce88686553686da562ce7cea497ce749da109f9f/balances_v2/?quote-currency=USD&format=JSON&nft=false&no-nft-fetch=false&key=ckey_0234f04900264446a5dfbd4687d';
         const [jsonData, setJsonData] = useState<WalletTokenData>();
         //Fetch Balancer Front-End Json containing incentives data:
         useEffect(() => {
             const fetchData = async () => {
                 try {
-                    const response = await fetch(tokenUrl);
+                    const response = await fetch(baseURI + activeNetwork.chainId + queryParams);
                     const json: WalletTokenData = await response.json();
                     setJsonData(json);
                     
