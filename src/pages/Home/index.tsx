@@ -109,7 +109,7 @@ export default function Home() {
         <PageWrapper>
             <ThemedBackgroundGlobal backgroundColor={activeNetwork.bgColor} />
             <AutoColumn gap="16px">
-                <TYPE.main>Chain Overview</TYPE.main>
+                <TYPE.largeHeader>Chain Overview</TYPE.largeHeader>
                 {protocolData?.volumeData.length > 0 ?
                 <ResponsiveRow>
                     <ChartWrapper>
@@ -331,17 +331,17 @@ export default function Home() {
                     </DarkGreyCard>
                 </HideSmall> : null }
                 <RowBetween>
-                    <TYPE.main>Top Tokens</TYPE.main>
+                    <TYPE.largeHeader>Top Tokens</TYPE.largeHeader>
                     <StyledInternalLink to="tokens">Explore</StyledInternalLink>
                 </RowBetween>
                 <TokenTable tokenDatas={formattedTokens} />
                 <RowBetween>
-                    <TYPE.main>Top Pools</TYPE.main>
+                    <TYPE.largeHeader>Top Pools</TYPE.largeHeader>
                     <StyledInternalLink to="pools">Explore</StyledInternalLink>
                 </RowBetween>
                 <PoolTable poolDatas={poolData} />
                 <RowBetween>
-                    <TYPE.main>Large Swaps</TYPE.main>
+                    <TYPE.largeHeader>Large Swaps</TYPE.largeHeader>
                 </RowBetween>
                 <DarkGreyCard>
                     {protocolData?.whaleSwaps.length > 0 ? (

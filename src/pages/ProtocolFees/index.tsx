@@ -1,30 +1,32 @@
 import React, { useEffect, useState } from 'react';
+import ReactGA from 'react-ga';
 import styled from 'styled-components';
 import { PageWrapper } from 'pages/styled';
-import { AutoColumn } from 'components/Column';
 import useTheme from 'hooks/useTheme';
+import { AutoColumn } from 'components/Column';
 import { ResponsiveRow, RowBetween, RowFixed } from 'components/Row';
+import { getEtherscanLink, shortenAddress } from 'utils';
+import { ExternalLink } from 'react-feather';
 import { MonoSpace } from 'components/shared';
 import { formatDollarAmount } from 'utils/numbers';
 import Loader, { LocalLoader } from 'components/Loader';
 import LineChart from 'components/LineChart/alt';
-import { GenericChartEntry, VolumeWindow } from 'types';
-import { HideSmall, TYPE } from 'theme';
-import TokenTable from 'components/tokens/TokenTable';
+import { VolumeWindow } from 'types';
+import { TYPE } from 'theme';
 import { SmallOptionButton } from 'components/Button';
 import ProtocolFeeTokenTable from 'components/tokens/ProtocolFeeTokenTable';
-import { useSavedTokens } from 'state/user/hooks';
 import { DarkGreyCard } from 'components/Card';
 import { useBalancerTokens } from '../../data/balancer/useTokens';
-import { GetProtocolFeeTokenSet } from 'utils/getProtocolFeeCollectorTokens';
 import { GetAddressTokenBalances } from 'utils/getAddressTokenBalances';
 import { useBalancerProtocolData } from 'data/balancer/useProtocolData';
 import { useActiveNetworkVersion } from 'state/application/hooks';
 import { useTransformedVolumeData } from 'hooks/chart';
 import BarChart from 'components/BarChart/alt';
 import { BalancerChartDataItem } from 'data/balancer/balancerTypes';
-import { GetAddressHistoricalTokenData } from 'utils/getAddressHistoricalTokenData';
+import { ExternalLink as StyledExternalLink } from '../../theme/components';
 import { useHistoricalWalletData } from 'data/covalent/useHistoricalWalletData';
+import DebankLogo from '../../assets/svg/debank.svg';
+import { SupportedNetwork } from 'constants/networks';
 
 const ChartWrapper = styled.div`
     width: 49%;
@@ -34,16 +36,26 @@ const ChartWrapper = styled.div`
   `};
 `;
 
+const StyledDebankLogo = styled.img`
+    height: 16px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+`;
+
 export default function ProtocolFees() {
     useEffect(() => {
         window.scrollTo(0, 0);
     }, []);
+
+    const theme = useTheme();
 
     const [activeNetwork] = useActiveNetworkVersion();
     const protocolData = useBalancerProtocolData();
     const formattedTokens = useBalancerTokens();
     const walletTokenData = GetAddressTokenBalances();
     const historicalCollectorData = useHistoricalWalletData();
+    const debankLink = 'https://debank.com/profile/0xce88686553686da562ce7cea497ce749da109f9f';
 
 
     const [feesHover, setFeesHover] = useState<number | undefined>();
@@ -64,37 +76,44 @@ export default function ProtocolFees() {
 
     useEffect(() => {
         if (liquidityHover === undefined && historicalCollectorData) {
-          setLiquidityHover(historicalCollectorData.tvl)
+            setLiquidityHover(historicalCollectorData.tvl)
         }
-      }, [liquidityHover, protocolData])
+    }, [liquidityHover, protocolData])
 
 
     function adjustFees(data: BalancerChartDataItem[] | undefined) {
         const newData: BalancerChartDataItem[] = [];
         if (data) {
             data.forEach((entry) => {
-                const newEntry = {} as BalancerChartDataItem;
-                newEntry.time = entry.time;
-                newEntry.value = entry.value * 0.5;
-                newData.push(newEntry);
+                const date = new Date(entry.time);
+                if (date > new Date('2022-01-03')) {
+                    const newEntry = {} as BalancerChartDataItem;
+                    newEntry.time = entry.time;
+                    newEntry.value = entry.value * 0.5;
+                    newData.push(newEntry);
+                }
             })
 
         }
         return newData;
     }
 
-
     const [volumeWindow, setVolumeWindow] = useState(VolumeWindow.weekly);
     const weeklyVolumeData = useTransformedVolumeData(adjustFees(protocolData?.feeData), 'week');
     const monthlyVolumeData = useTransformedVolumeData(adjustFees(protocolData?.feeData), 'month');
 
-    
-
+    let sweepLimit = 0;
+    if (activeNetwork.id === SupportedNetwork.ETHEREUM) {
+        sweepLimit = 10000;
+    } else {
+        sweepLimit = 5000;
+    }
 
     return (
         <PageWrapper>
             <AutoColumn gap="lg">
-                <TYPE.main>Protocol Fee Collector Metrics</TYPE.main>
+                <TYPE.largeHeader>Protocol Fee Collector Metrics </TYPE.largeHeader> 
+                           
                 {protocolData?.feeData.length > 0 ?
                     <ResponsiveRow>
                         <ChartWrapper>
@@ -152,32 +171,68 @@ export default function ProtocolFees() {
                                 }
                             />
                         </ChartWrapper>
-                        {historicalCollectorData?.totalValueData ?
-                        <ChartWrapper> 
-                        <LineChart
-                            data={historicalCollectorData?.totalValueData}
-                            height={220}
-                            minHeight={332}
-                            color={activeNetwork.primaryColor}
-                            value={liquidityHover}
-                            label={leftLabel}
-                            setValue={setLiquidityHover}
-                            setLabel={setLeftLabel}
-                            topLeft={
-                                <AutoColumn gap="4px">
-                                    <TYPE.mediumHeader fontSize="16px">Net Worth</TYPE.mediumHeader>
-                                    <TYPE.largeHeader fontSize="32px">
-                                        <MonoSpace>{formatDollarAmount(liquidityHover, 2, true)} </MonoSpace>
-                                    </TYPE.largeHeader>
-                                    <TYPE.main fontSize="12px" height="14px">
-                                        {leftLabel ? <MonoSpace>{leftLabel} (UTC)</MonoSpace> : null}
-                                    </TYPE.main>
-                                </AutoColumn>
-                            }
-                        />
-                    </ChartWrapper> : <LocalLoader fill={false} />}
-                    </ResponsiveRow> : <Loader />} 
-                <ProtocolFeeTokenTable tokenDatas={formattedTokens} walletTokenDatas={walletTokenData} />
+
+                        <ChartWrapper>
+                            {historicalCollectorData?.tvl ?
+                                <LineChart
+                                    data={historicalCollectorData?.totalValueData}
+                                    height={220}
+                                    minHeight={332}
+                                    color={activeNetwork.primaryColor}
+                                    value={liquidityHover}
+                                    label={leftLabel}
+                                    setValue={setLiquidityHover}
+                                    setLabel={setLeftLabel}
+                                    topLeft={
+                                        <AutoColumn gap="4px">
+                                            <TYPE.mediumHeader fontSize="16px">Net Worth</TYPE.mediumHeader>
+                                            <TYPE.largeHeader fontSize="32px">
+                                                <MonoSpace>{formatDollarAmount(liquidityHover, 2, true)} </MonoSpace>
+                                            </TYPE.largeHeader>
+                                            <TYPE.main fontSize="12px" height="14px">
+                                                {leftLabel ? <MonoSpace>{leftLabel} (UTC)</MonoSpace> : null}
+                                            </TYPE.main>
+                                        </AutoColumn>
+                                    }
+                                    topRight={
+                                        <RowFixed align="top" justify="center">
+                                        {debankLink && (
+                                            <StyledExternalLink
+                                                href={debankLink}
+                                                style={{ marginLeft: '12px' }}
+                                                onClickCapture={() => {
+                                                    ReactGA.event({
+                                                        category: 'Debank',
+                                                        action: 'Debank portfolio page click',
+                                                    });
+                                                }}
+                                            >
+                                                <StyledDebankLogo src={DebankLogo} />
+                                            </StyledExternalLink>
+                                        )}
+                                        <StyledExternalLink href={getEtherscanLink(1, '0xce88686553686da562ce7cea497ce749da109f9f', 'address', activeNetwork)}>
+                                            <ExternalLink
+                                                stroke={theme.text2}
+                                                size={'17px'}
+                                                style={{ marginLeft: '12px' }}
+                                            />
+                                        </StyledExternalLink>
+                                        </RowFixed>
+                                    }
+                                /> : (
+                                    <AutoColumn gap="lg" justify='flex-start'>
+                                        <DarkGreyCard>
+                                            <TYPE.main fontSize="18px">Loading historical fee collector data...</TYPE.main>
+                                            <LocalLoader fill={false} />
+                                        </DarkGreyCard>
+                                    </ AutoColumn>
+                                )}
+                        </ChartWrapper>
+                    </ResponsiveRow> : <Loader />}
+                <TYPE.main>Tokens to be swept</TYPE.main> 
+                <ProtocolFeeTokenTable tokenDatas={formattedTokens} walletTokenDatas={walletTokenData} sweepLimitActive={true} />
+                <TYPE.main> Tokens below weekly sweep threshold ({formatDollarAmount(sweepLimit, 0, true)}) </TYPE.main> 
+                <ProtocolFeeTokenTable tokenDatas={formattedTokens} walletTokenDatas={walletTokenData} sweepLimitActive={false} />
             </AutoColumn>
         </PageWrapper>
     );

@@ -8,7 +8,7 @@ import { useActiveNetworkVersion } from 'state/application/hooks';
 import { GetAddressHistoricalTokenData, WalletHistoryData } from '../../utils/getAddressHistoricalTokenData';
 
 interface WalletHistoricalData {
-    totalValueData: BalancerChartDataItem[]; 
+    totalValueData: BalancerChartDataItem[];
     tvl?: number;
 }
 
@@ -23,38 +23,43 @@ export function useHistoricalWalletData(): WalletHistoricalData {
         const chartData: BalancerDateChartItem[] = [];
         if (walletData) {
             //Iterate through each timepoint, then obtain total value from all positions (no restrictions on position size)
-            for (let holdingsIndex = 0; holdingsIndex < 30; holdingsIndex ++) {
+            for (let holdingsIndex = 0; holdingsIndex < 30; holdingsIndex++) {
                 //obtain timestamp from first element
                 const chartItem = {} as BalancerDateChartItem;
                 chartItem.value = 0;
                 chartItem.time = new Date(walletData.data.items[0].holdings[holdingsIndex].timestamp);
                 //Sum up all token holdings
                 walletData.data.items.forEach((item) => {
-                chartItem.value += Number(item.holdings[holdingsIndex].close.quote);
-                
-            })
-            chartData.push(chartItem);
-        }
+                        if (typeof(item.holdings[holdingsIndex].close.quote) === 'number') {
+                        if (item.holdings[holdingsIndex].close.quote < 1000000) {
+                            chartItem.value += Number(item.holdings[holdingsIndex].close.quote);
+                        }
+                    }
+
+                })
+                chartData.push(chartItem);
+            }
         }
         return chartData;
     }
-    
+
     const walletHistoricalData = GetAddressHistoricalTokenData();
 
     if (!walletHistoricalData) {
         return { totalValueData: [] };
     }
 
+    //console.log("rawWalletData", walletHistoricalData);
     const walletChartData = getWalletBalancerChartData(walletHistoricalData);
 
     //Sort data
     const sortedAsc = walletChartData.sort(
         (objA, objB) => objA.time.getTime() - objB.time.getTime(),
-      );
+    );
 
     //Map back to BalancerChartDataItem
     const sortedWalletChartData = sortedAsc.map(item => {
-        return <BalancerChartDataItem> {
+        return <BalancerChartDataItem>{
             value: item.value,
             time: item.time.toString(),
         }

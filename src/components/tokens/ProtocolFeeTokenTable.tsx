@@ -18,6 +18,11 @@ import { TokenListToken } from '../../state/token-lists/token-lists';
 import { TokenData } from '../../data/balancer/balancerTypes';
 import getCuratedTokenName from 'utils/getCuratedTokenName';
 import { ERC20TokenData, WalletTokenData } from 'utils/getAddressTokenBalances';
+import { useActiveNetworkVersion } from 'state/application/hooks';
+import { SupportedNetwork } from 'constants/networks';
+
+
+
 const Wrapper = styled(DarkGreyCard)`
     width: 100%;
 `;
@@ -123,19 +128,29 @@ export default function ProtocolFeeTokenTable({
     tokenDatas,
     walletTokenDatas,
     maxItems = MAX_ITEMS,
+    sweepLimitActive,
 }: {
     tokenDatas: TokenData[] | undefined;
     walletTokenDatas?: WalletTokenData;
     maxItems?: number;
+    sweepLimitActive: boolean;
 }) {
     // theming
     const theme = useTheme();
 
+    const [activeNetwork] = useActiveNetworkVersion();
+    let sweepLimit = 0;
+
+
+    if (activeNetwork.id === SupportedNetwork.ETHEREUM) {
+        sweepLimit = 10000;
+    } else {
+        sweepLimit = 5000;
+    }
+
     // for sorting
     const [sortField, setSortField] = useState(SORT_FIELD.valueUSDCollected);
     const [sortDirection, setSortDirection] = useState<boolean>(true);
-
-    //console.log("walletTokenDatas", walletTokenDatas);
 
     function curateTokenDatas(tokenDatas: TokenData[], walletTokenData: WalletTokenData): TokenData[] {
         const newTokenDatas: TokenData[] = [];
@@ -143,7 +158,11 @@ export default function ProtocolFeeTokenTable({
             tokenDatas.forEach(( tokenData: TokenData ) => {
                 if (item.quote_rate_24h) {
                     if (item.quote_rate_24h) {
-            if (item.contract_address === tokenData.address && Number(parseInt(item.balance) / 10 ** item.contract_decimals * item.quote_rate_24h) > 5000 ) {
+            if ( sweepLimitActive && item.contract_address === tokenData.address && Number(parseInt(item.balance) / 10 ** item.contract_decimals * item.quote_rate_24h) > sweepLimit ) {
+                tokenData.valueUSDCollected = Number(parseInt(item.balance) / 10 ** item.contract_decimals * item.quote_rate_24h);
+                tokenData.priceUSD = item.quote_rate_24h;
+                newTokenDatas.push(tokenData);
+            } else if ( !sweepLimitActive && item.contract_address === tokenData.address && Number(parseInt(item.balance) / 10 ** item.contract_decimals * item.quote_rate_24h) <= sweepLimit ) {
                 tokenData.valueUSDCollected = Number(parseInt(item.balance) / 10 ** item.contract_decimals * item.quote_rate_24h);
                 tokenData.priceUSD = item.quote_rate_24h;
                 newTokenDatas.push(tokenData);
