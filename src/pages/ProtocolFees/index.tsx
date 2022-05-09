@@ -6,9 +6,9 @@ import useTheme from 'hooks/useTheme';
 import { ResponsiveRow, RowBetween, RowFixed } from 'components/Row';
 import { MonoSpace } from 'components/shared';
 import { formatDollarAmount } from 'utils/numbers';
-import Loader from 'components/Loader';
+import Loader, { LocalLoader } from 'components/Loader';
 import LineChart from 'components/LineChart/alt';
-import { VolumeWindow } from 'types';
+import { GenericChartEntry, VolumeWindow } from 'types';
 import { HideSmall, TYPE } from 'theme';
 import TokenTable from 'components/tokens/TokenTable';
 import { SmallOptionButton } from 'components/Button';
@@ -22,6 +22,9 @@ import { useBalancerProtocolData } from 'data/balancer/useProtocolData';
 import { useActiveNetworkVersion } from 'state/application/hooks';
 import { useTransformedVolumeData } from 'hooks/chart';
 import BarChart from 'components/BarChart/alt';
+import { BalancerChartDataItem } from 'data/balancer/balancerTypes';
+import { GetAddressHistoricalTokenData } from 'utils/getAddressHistoricalTokenData';
+import { useHistoricalWalletData } from 'data/covalent/useHistoricalWalletData';
 
 const ChartWrapper = styled.div`
     width: 49%;
@@ -36,30 +39,56 @@ export default function ProtocolFees() {
         window.scrollTo(0, 0);
     }, []);
 
-
-
     const [activeNetwork] = useActiveNetworkVersion();
     const protocolData = useBalancerProtocolData();
     const formattedTokens = useBalancerTokens();
     const walletTokenData = GetAddressTokenBalances();
+    const historicalCollectorData = useHistoricalWalletData();
+
 
     const [feesHover, setFeesHover] = useState<number | undefined>();
     const [feesLabel, setFeesLabel] = useState<string | undefined>();
+    const [liquidityHover, setLiquidityHover] = useState<number | undefined>();
+    const [leftLabel, setLeftLabel] = useState<string | undefined>();
 
     useEffect(() => {
         setFeesHover(undefined);
+        setLiquidityHover(undefined);
     }, [activeNetwork]);
 
     useEffect(() => {
-        if (!feesHover && protocolData) {
-            setFeesHover(protocolData.fees24);
+        if (!feesHover && protocolData.fees24) {
+            setFeesHover(protocolData.fees24 * 0.5);
         }
     }, [feesHover, protocolData]);
 
+    useEffect(() => {
+        if (liquidityHover === undefined && historicalCollectorData) {
+          setLiquidityHover(historicalCollectorData.tvl)
+        }
+      }, [liquidityHover, protocolData])
+
+
+    function adjustFees(data: BalancerChartDataItem[] | undefined) {
+        const newData: BalancerChartDataItem[] = [];
+        if (data) {
+            data.forEach((entry) => {
+                const newEntry = {} as BalancerChartDataItem;
+                newEntry.time = entry.time;
+                newEntry.value = entry.value * 0.5;
+                newData.push(newEntry);
+            })
+
+        }
+        return newData;
+    }
+
 
     const [volumeWindow, setVolumeWindow] = useState(VolumeWindow.weekly);
-    const weeklyVolumeData = useTransformedVolumeData(protocolData?.feeData, 'week');
-    const monthlyVolumeData = useTransformedVolumeData(protocolData?.feeData, 'month');
+    const weeklyVolumeData = useTransformedVolumeData(adjustFees(protocolData?.feeData), 'week');
+    const monthlyVolumeData = useTransformedVolumeData(adjustFees(protocolData?.feeData), 'month');
+
+    
 
 
     return (
@@ -67,63 +96,87 @@ export default function ProtocolFees() {
             <AutoColumn gap="lg">
                 <TYPE.main>Protocol Fee Collector Metrics</TYPE.main>
                 {protocolData?.feeData.length > 0 ?
-                <ResponsiveRow>
-                <ChartWrapper>
-                        <BarChart
+                    <ResponsiveRow>
+                        <ChartWrapper>
+                            <BarChart
+                                height={220}
+                                minHeight={332}
+                                data={
+                                    volumeWindow === VolumeWindow.monthly
+                                        ? monthlyVolumeData
+                                        : volumeWindow === VolumeWindow.weekly
+                                            ? weeklyVolumeData
+                                            : adjustFees(protocolData?.feeData)
+
+                                }
+                                color={activeNetwork.primaryColor}
+                                setValue={setFeesHover}
+                                setLabel={setFeesLabel}
+                                value={feesHover}
+                                label={feesLabel}
+                                activeWindow={volumeWindow}
+                                topRight={
+                                    <RowFixed style={{ marginLeft: '-40px', marginTop: '8px' }}>
+                                        <SmallOptionButton
+                                            active={volumeWindow === VolumeWindow.daily}
+                                            onClick={() => setVolumeWindow(VolumeWindow.daily)}
+                                        >
+                                            D
+                                        </SmallOptionButton>
+                                        <SmallOptionButton
+                                            active={volumeWindow === VolumeWindow.weekly}
+                                            style={{ marginLeft: '8px' }}
+                                            onClick={() => setVolumeWindow(VolumeWindow.weekly)}
+                                        >
+                                            W
+                                        </SmallOptionButton>
+                                        <SmallOptionButton
+                                            active={volumeWindow === VolumeWindow.monthly}
+                                            style={{ marginLeft: '8px' }}
+                                            onClick={() => setVolumeWindow(VolumeWindow.monthly)}
+                                        >
+                                            M
+                                        </SmallOptionButton>
+                                    </RowFixed>
+                                }
+                                topLeft={
+                                    <AutoColumn gap="4px">
+                                        <TYPE.mediumHeader fontSize="16px">Collected fees</TYPE.mediumHeader>
+                                        <TYPE.largeHeader fontSize="32px">
+                                            <MonoSpace> {formatDollarAmount(feesHover, 2)}</MonoSpace>
+                                        </TYPE.largeHeader>
+                                        <TYPE.main fontSize="12px" height="14px">
+                                            {feesLabel ? <MonoSpace>{feesLabel} (UTC)</MonoSpace> : null}
+                                        </TYPE.main>
+                                    </AutoColumn>
+                                }
+                            />
+                        </ChartWrapper>
+                        {historicalCollectorData?.totalValueData ?
+                        <ChartWrapper> 
+                        <LineChart
+                            data={historicalCollectorData?.totalValueData}
                             height={220}
                             minHeight={332}
-                            data={
-                                volumeWindow === VolumeWindow.monthly
-                                  ? monthlyVolumeData
-                                  : volumeWindow === VolumeWindow.weekly
-                                  ? weeklyVolumeData
-                                  : protocolData?.feeData
-                            
-                            }
                             color={activeNetwork.primaryColor}
-                            setValue={setFeesHover}
-                            setLabel={setFeesLabel}
-                            value={feesHover}
-                            label={feesLabel}
-                            activeWindow={volumeWindow}
-                            topRight={
-                                <RowFixed style={{ marginLeft: '-40px', marginTop: '8px' }}>
-                                    <SmallOptionButton
-                                        active={volumeWindow === VolumeWindow.daily}
-                                        onClick={() => setVolumeWindow(VolumeWindow.daily)}
-                                    >
-                                        D
-                                    </SmallOptionButton>
-                                    <SmallOptionButton
-                                        active={volumeWindow === VolumeWindow.weekly}
-                                        style={{ marginLeft: '8px' }}
-                                        onClick={() => setVolumeWindow(VolumeWindow.weekly)}
-                                    >
-                                        W
-                                    </SmallOptionButton>
-                                    <SmallOptionButton
-                                        active={volumeWindow === VolumeWindow.monthly}
-                                        style={{ marginLeft: '8px' }}
-                                        onClick={() => setVolumeWindow(VolumeWindow.monthly)}
-                                    >
-                                        M
-                                    </SmallOptionButton>
-                                </RowFixed>
-                            }
+                            value={liquidityHover}
+                            label={leftLabel}
+                            setValue={setLiquidityHover}
+                            setLabel={setLeftLabel}
                             topLeft={
                                 <AutoColumn gap="4px">
-                                    <TYPE.mediumHeader fontSize="16px">Collected fees</TYPE.mediumHeader>
+                                    <TYPE.mediumHeader fontSize="16px">Net Worth</TYPE.mediumHeader>
                                     <TYPE.largeHeader fontSize="32px">
-                                        <MonoSpace> {formatDollarAmount(feesHover, 2)}</MonoSpace>
+                                        <MonoSpace>{formatDollarAmount(liquidityHover, 2, true)} </MonoSpace>
                                     </TYPE.largeHeader>
                                     <TYPE.main fontSize="12px" height="14px">
-                                        {feesLabel ? <MonoSpace>{feesLabel} (UTC)</MonoSpace> : null}
+                                        {leftLabel ? <MonoSpace>{leftLabel} (UTC)</MonoSpace> : null}
                                     </TYPE.main>
                                 </AutoColumn>
                             }
                         />
-                    </ChartWrapper>
-                </ResponsiveRow> : <Loader/> }
+                    </ChartWrapper> : <LocalLoader fill={false} />}
+                    </ResponsiveRow> : <Loader />} 
                 <ProtocolFeeTokenTable tokenDatas={formattedTokens} walletTokenDatas={walletTokenData} />
             </AutoColumn>
         </PageWrapper>

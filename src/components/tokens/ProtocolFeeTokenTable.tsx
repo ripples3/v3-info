@@ -135,17 +135,20 @@ export default function ProtocolFeeTokenTable({
     const [sortField, setSortField] = useState(SORT_FIELD.valueUSDCollected);
     const [sortDirection, setSortDirection] = useState<boolean>(true);
 
-    console.log("walletTokenDatas", walletTokenDatas);
+    //console.log("walletTokenDatas", walletTokenDatas);
 
     function curateTokenDatas(tokenDatas: TokenData[], walletTokenData: WalletTokenData): TokenData[] {
         const newTokenDatas: TokenData[] = [];
         walletTokenData.data.items.forEach(( item: ERC20TokenData ) => {
             tokenDatas.forEach(( tokenData: TokenData ) => {
                 if (item.quote_rate_24h) {
-            if (item.contract_address === tokenData.address && Number(parseInt(item.balance) / 10 ** item.contract_decimals * tokenData.priceUSD) > 5000 ) {
-                tokenData.valueUSDCollected = Number(parseInt(item.balance) / 10 ** item.contract_decimals * tokenData.priceUSD);
+                    if (item.quote_rate_24h) {
+            if (item.contract_address === tokenData.address && Number(parseInt(item.balance) / 10 ** item.contract_decimals * item.quote_rate_24h) > 5000 ) {
+                tokenData.valueUSDCollected = Number(parseInt(item.balance) / 10 ** item.contract_decimals * item.quote_rate_24h);
+                tokenData.priceUSD = item.quote_rate_24h;
                 newTokenDatas.push(tokenData);
             }
+        }
         }
         });
         
@@ -218,7 +221,7 @@ export default function ProtocolFeeTokenTable({
                             Name {arrow(SORT_FIELD.name)}
                         </ClickableText>
                         <ClickableText color={theme.text2} end={1} onClick={() => handleSort(SORT_FIELD.priceUSD)}>
-                            Price {arrow(SORT_FIELD.priceUSD)}
+                            24h Avg Price {arrow(SORT_FIELD.priceUSD)}
                         </ClickableText>
                         <ClickableText
                             color={theme.text2}

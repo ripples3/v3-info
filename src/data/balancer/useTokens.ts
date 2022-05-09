@@ -74,6 +74,7 @@ export function useBalancerTokens(): TokenData[] {
         const priceData24 = getTokenPriceValues(token.address, prices24);
         //const priceData48 = getTokenPriceValues(token.address, prices48);
         const priceDataWeek = getTokenPriceValues(token.address, pricesWeek);
+        const valueUSDCollected = 0;
 
         return {
             ...token,
@@ -87,6 +88,7 @@ export function useBalancerTokens(): TokenData[] {
             feesUSD: 0,
             tvlToken: tokenData.tvlToken,
             tvlUSD: tokenData.tvl,
+            valueUSDCollected: valueUSDCollected,
             tvlUSDChange: (tokenData.tvl - tokenData24.tvl) / tokenData24.tvl,
             priceUSD: priceData.price,
             priceUSDChange:
