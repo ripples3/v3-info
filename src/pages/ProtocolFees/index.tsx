@@ -8,14 +8,14 @@ import { ResponsiveRow, RowBetween, RowFixed } from 'components/Row';
 import { getEtherscanLink, shortenAddress } from 'utils';
 import { ExternalLink } from 'react-feather';
 import { MonoSpace } from 'components/shared';
-import { formatDollarAmount } from 'utils/numbers';
+import { formatAmount, formatDollarAmount } from 'utils/numbers';
 import Loader, { LocalLoader } from 'components/Loader';
 import LineChart from 'components/LineChart/alt';
 import { VolumeWindow } from 'types';
 import { TYPE } from 'theme';
 import { SmallOptionButton } from 'components/Button';
 import ProtocolFeeTokenTable from 'components/tokens/ProtocolFeeTokenTable';
-import { DarkGreyCard } from 'components/Card';
+import { DarkGreyCard, GreyBadge, GreyCard } from 'components/Card';
 import { useBalancerTokens } from '../../data/balancer/useTokens';
 import { GetAddressTokenBalances } from 'utils/getAddressTokenBalances';
 import { useBalancerProtocolData } from 'data/balancer/useProtocolData';
@@ -27,6 +27,11 @@ import { ExternalLink as StyledExternalLink } from '../../theme/components';
 import { useHistoricalWalletData } from 'data/covalent/useHistoricalWalletData';
 import DebankLogo from '../../assets/svg/debank.svg';
 import { SupportedNetwork } from 'constants/networks';
+import CurrencyLogo from 'components/CurrencyLogo';
+import Percent from 'components/Percent';
+import curateTokenDatas from 'utils/curateTokenDatas';
+import { TokenData } from 'data/balancer/balancerTypes';
+import { COVALENT_TOKEN_BLACKLIST } from 'data/covalent/tokenBlackList';
 
 const ChartWrapper = styled.div`
     width: 49%;
@@ -43,6 +48,17 @@ const StyledDebankLogo = styled.img`
     align-items: center;
 `;
 
+const ContentLayout = styled.div`
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    grid-gap: 1em;
+
+    @media screen and (max-width: 800px) {
+        grid-template-columns: 1fr;
+        grid-template-rows: 1fr 1fr;
+    }
+`;
+
 export default function ProtocolFees() {
     useEffect(() => {
         window.scrollTo(0, 0);
@@ -56,6 +72,8 @@ export default function ProtocolFees() {
     const walletTokenData = GetAddressTokenBalances();
     const historicalCollectorData = useHistoricalWalletData();
     const debankLink = 'https://debank.com/profile/0xce88686553686da562ce7cea497ce749da109f9f';
+    let balAddress = '0xba100000625a3754423978a60c9317c58a424e3d';
+    const bbaUsdAddress = '0x7b50775383d3d6f0215a8f290f2c9e2eebbeceb2';
 
 
     const [feesHover, setFeesHover] = useState<number | undefined>();
@@ -98,140 +116,225 @@ export default function ProtocolFees() {
         return newData;
     }
 
-    const [volumeWindow, setVolumeWindow] = useState(VolumeWindow.weekly);
+    const [volumeWindow, setVolumeWindow] = useState(VolumeWindow.daily);
     const weeklyVolumeData = useTransformedVolumeData(adjustFees(protocolData?.feeData), 'week');
     const monthlyVolumeData = useTransformedVolumeData(adjustFees(protocolData?.feeData), 'month');
 
     let sweepLimit = 0;
     if (activeNetwork.id === SupportedNetwork.ETHEREUM) {
         sweepLimit = 10000;
-    } else {
+    } else if (activeNetwork.id == SupportedNetwork.ARBITRUM) {
+        balAddress = '0x040d1edc9569d4bab2d15287dc5a4f10f56a56b8';
+        sweepLimit = 5000;
+    } else if (activeNetwork.id == SupportedNetwork.POLYGON) {
+        balAddress = '0x9a71012B13CA4d3D0Cdc72A177DF3ef03b0E76A3';
         sweepLimit = 5000;
     }
+
+    //Get curated token dataset to calcuate BAL and bb-a-USD distribution values
+    let balAmount = 0;
+    let bbaUsdAmount = 0;
+    let totalAmount = 0;
+    let curatedTokenDatas: TokenData[] = [];
+    if (formattedTokens && walletTokenData) {
+        curatedTokenDatas = curateTokenDatas(formattedTokens, walletTokenData, sweepLimit, true);
+        curatedTokenDatas = curatedTokenDatas.filter((x) => !!x && !COVALENT_TOKEN_BLACKLIST.includes(x.address));
+        curatedTokenDatas.forEach ((item) => {
+            if (item.address === balAddress) {
+                balAmount = item.valueUSDCollected;
+            } else {
+                bbaUsdAmount += item.valueUSDCollected;
+            }
+            totalAmount += item.valueUSDCollected;
+        });
+    }
+
+    
+   
 
     return (
         <PageWrapper>
             <AutoColumn gap="lg">
-                <TYPE.largeHeader>Protocol Fee Collector Metrics </TYPE.largeHeader> 
-                           
+                <TYPE.largeHeader>Protocol Fee Collector Metrics </TYPE.largeHeader>
+
                 {protocolData?.feeData.length > 0 ?
                     <ResponsiveRow>
-                        <ChartWrapper>
-                            <BarChart
-                                height={220}
-                                minHeight={332}
-                                data={
-                                    volumeWindow === VolumeWindow.monthly
-                                        ? monthlyVolumeData
-                                        : volumeWindow === VolumeWindow.weekly
-                                            ? weeklyVolumeData
-                                            : adjustFees(protocolData?.feeData)
 
-                                }
-                                color={activeNetwork.primaryColor}
-                                setValue={setFeesHover}
-                                setLabel={setFeesLabel}
-                                value={feesHover}
-                                label={feesLabel}
-                                activeWindow={volumeWindow}
-                                topRight={
-                                    <RowFixed style={{ marginLeft: '-40px', marginTop: '8px' }}>
-                                        <SmallOptionButton
-                                            active={volumeWindow === VolumeWindow.daily}
-                                            onClick={() => setVolumeWindow(VolumeWindow.daily)}
-                                        >
-                                            D
-                                        </SmallOptionButton>
-                                        <SmallOptionButton
-                                            active={volumeWindow === VolumeWindow.weekly}
-                                            style={{ marginLeft: '8px' }}
-                                            onClick={() => setVolumeWindow(VolumeWindow.weekly)}
-                                        >
-                                            W
-                                        </SmallOptionButton>
-                                        <SmallOptionButton
-                                            active={volumeWindow === VolumeWindow.monthly}
-                                            style={{ marginLeft: '8px' }}
-                                            onClick={() => setVolumeWindow(VolumeWindow.monthly)}
-                                        >
-                                            M
-                                        </SmallOptionButton>
-                                    </RowFixed>
-                                }
-                                topLeft={
-                                    <AutoColumn gap="4px">
-                                        <TYPE.mediumHeader fontSize="16px">Collected fees</TYPE.mediumHeader>
-                                        <TYPE.largeHeader fontSize="32px">
-                                            <MonoSpace> {formatDollarAmount(feesHover, 2)}</MonoSpace>
-                                        </TYPE.largeHeader>
-                                        <TYPE.main fontSize="12px" height="14px">
-                                            {feesLabel ? <MonoSpace>{feesLabel} (UTC)</MonoSpace> : null}
-                                        </TYPE.main>
-                                    </AutoColumn>
-                                }
-                            />
-                        </ChartWrapper>
+                        <BarChart
+                            height={220}
+                            minHeight={332}
+                            data={
+                                volumeWindow === VolumeWindow.monthly
+                                    ? monthlyVolumeData
+                                    : volumeWindow === VolumeWindow.weekly
+                                        ? weeklyVolumeData
+                                        : adjustFees(protocolData?.feeData)
 
-                        <ChartWrapper>
-                            {historicalCollectorData?.tvl ?
-                                <LineChart
-                                    data={historicalCollectorData?.totalValueData}
-                                    height={220}
-                                    minHeight={332}
-                                    color={activeNetwork.primaryColor}
-                                    value={liquidityHover}
-                                    label={leftLabel}
-                                    setValue={setLiquidityHover}
-                                    setLabel={setLeftLabel}
-                                    topLeft={
-                                        <AutoColumn gap="4px">
-                                            <TYPE.mediumHeader fontSize="16px">Net Worth</TYPE.mediumHeader>
-                                            <TYPE.largeHeader fontSize="32px">
-                                                <MonoSpace>{formatDollarAmount(liquidityHover, 2, true)} </MonoSpace>
-                                            </TYPE.largeHeader>
-                                            <TYPE.main fontSize="12px" height="14px">
-                                                {leftLabel ? <MonoSpace>{leftLabel} (UTC)</MonoSpace> : null}
-                                            </TYPE.main>
-                                        </AutoColumn>
-                                    }
-                                    topRight={
-                                        <RowFixed align="top" justify="center">
-                                        {debankLink && (
-                                            <StyledExternalLink
-                                                href={debankLink}
-                                                style={{ marginLeft: '12px' }}
-                                                onClickCapture={() => {
-                                                    ReactGA.event({
-                                                        category: 'Debank',
-                                                        action: 'Debank portfolio page click',
-                                                    });
-                                                }}
-                                            >
-                                                <StyledDebankLogo src={DebankLogo} />
-                                            </StyledExternalLink>
-                                        )}
-                                        <StyledExternalLink href={getEtherscanLink(1, '0xce88686553686da562ce7cea497ce749da109f9f', 'address', activeNetwork)}>
-                                            <ExternalLink
-                                                stroke={theme.text2}
-                                                size={'17px'}
-                                                style={{ marginLeft: '12px' }}
-                                            />
-                                        </StyledExternalLink>
-                                        </RowFixed>
-                                    }
-                                /> : (
-                                    <AutoColumn gap="lg" justify='flex-start'>
-                                        <DarkGreyCard>
-                                            <TYPE.main fontSize="18px">Loading historical fee collector data...</TYPE.main>
-                                            <LocalLoader fill={false} />
-                                        </DarkGreyCard>
-                                    </ AutoColumn>
-                                )}
-                        </ChartWrapper>
+                            }
+                            color={activeNetwork.primaryColor}
+                            setValue={setFeesHover}
+                            setLabel={setFeesLabel}
+                            value={feesHover}
+                            label={feesLabel}
+                            activeWindow={volumeWindow}
+                            topRight={
+                                <RowFixed style={{ marginLeft: '-40px', marginTop: '8px' }}>
+                                    <SmallOptionButton
+                                        active={volumeWindow === VolumeWindow.daily}
+                                        onClick={() => setVolumeWindow(VolumeWindow.daily)}
+                                    >
+                                        D
+                                    </SmallOptionButton>
+                                    <SmallOptionButton
+                                        active={volumeWindow === VolumeWindow.weekly}
+                                        style={{ marginLeft: '8px' }}
+                                        onClick={() => setVolumeWindow(VolumeWindow.weekly)}
+                                    >
+                                        W
+                                    </SmallOptionButton>
+                                    <SmallOptionButton
+                                        active={volumeWindow === VolumeWindow.monthly}
+                                        style={{ marginLeft: '8px' }}
+                                        onClick={() => setVolumeWindow(VolumeWindow.monthly)}
+                                    >
+                                        M
+                                    </SmallOptionButton>
+                                </RowFixed>
+                            }
+                            topLeft={
+                                <AutoColumn gap="4px">
+                                    <TYPE.mediumHeader fontSize="16px">Collected fees</TYPE.mediumHeader>
+                                    <TYPE.largeHeader fontSize="32px">
+                                        <MonoSpace> {formatDollarAmount(feesHover, 2)}</MonoSpace>
+                                    </TYPE.largeHeader>
+                                    <TYPE.main fontSize="12px" height="14px">
+                                        {feesLabel ? <MonoSpace>{feesLabel} (UTC)</MonoSpace> : null}
+                                    </TYPE.main>
+                                </AutoColumn>
+                            }
+                        />
+
+
                     </ResponsiveRow> : <Loader />}
-                <TYPE.main>Tokens to be swept</TYPE.main> 
+                <ContentLayout>
+                    {totalAmount > 0 ?
+                        <DarkGreyCard>
+                            <AutoColumn gap="lg">
+                            <AutoColumn gap="4px">
+                                    <TYPE.main fontWeight={400}>Distribution worth</TYPE.main>
+                                    <TYPE.label fontSize="24px">{formatDollarAmount(totalAmount)}</TYPE.label>
+                                </AutoColumn>
+                                <GreyCard padding="16px">
+                                    <AutoColumn gap="md">
+                                        <TYPE.main>Distribution to veBAL holders</TYPE.main>
+                                        <RowBetween key={balAddress}>
+                                            <RowFixed>
+                                                <CurrencyLogo address={balAddress} size={'20px'} />
+                                                <TYPE.label fontSize="14px" ml="8px">
+                                                    {'BAL'}
+                                                </TYPE.label>
+                                            </RowFixed>
+                                            <TYPE.label fontSize="14px">{formatDollarAmount(balAmount* 0.75)}</TYPE.label>
+                                        </RowBetween>
+                                        <RowBetween key={bbaUsdAddress}>
+                                            <RowFixed>
+                                                <CurrencyLogo address={bbaUsdAddress} size={'20px'} />
+                                                <TYPE.label fontSize="14px" ml="8px">
+                                                    {'bb-a-USD'}
+                                                </TYPE.label>
+                                            </RowFixed>
+                                            <TYPE.label fontSize="14px">{formatDollarAmount(bbaUsdAmount * 0.75)}</TYPE.label>
+                                        </RowBetween>
+                                    </AutoColumn>
+                                </GreyCard>
+                                <GreyCard padding="16px">
+                                    <AutoColumn gap="md">
+                                        <TYPE.main>Distribution to DAO Treasury</TYPE.main>
+                                        <RowBetween key={balAddress}>
+                                            <RowFixed>
+                                                <CurrencyLogo address={balAddress} size={'20px'} />
+                                                <TYPE.label fontSize="14px" ml="8px">
+                                                    {'BAL'}
+                                                </TYPE.label>
+                                            </RowFixed>
+                                            <TYPE.label fontSize="14px">{formatDollarAmount(balAmount * 0.25)}</TYPE.label>
+                                        </RowBetween>
+                                        <RowBetween key={bbaUsdAddress}>
+                                            <RowFixed>
+                                                <CurrencyLogo address={bbaUsdAddress} size={'20px'} />
+                                                <TYPE.label fontSize="14px" ml="8px">
+                                                    {'bb-a-USD'}
+                                                </TYPE.label>
+                                            </RowFixed>
+                                            <TYPE.label fontSize="14px">{formatDollarAmount(bbaUsdAmount * 0.25)}</TYPE.label>
+                                        </RowBetween>
+                                    </AutoColumn>
+                                </GreyCard>
+                            </AutoColumn>
+                        </DarkGreyCard>
+                        : <AutoColumn gap="lg" justify='flex-start'>
+                        <DarkGreyCard>
+                            <TYPE.main fontSize="18px">Loading distribution estimates...</TYPE.main>
+                            <LocalLoader fill={false} />
+                        </DarkGreyCard>
+                    </ AutoColumn>}
+                    {historicalCollectorData?.tvl ?
+                        <LineChart
+                            data={historicalCollectorData?.totalValueData}
+                            height={220}
+                            minHeight={400}
+                            color={activeNetwork.primaryColor}
+                            value={liquidityHover}
+                            label={leftLabel}
+                            setValue={setLiquidityHover}
+                            setLabel={setLeftLabel}
+                            topLeft={
+                                <AutoColumn gap="4px">
+                                    <TYPE.mediumHeader fontSize="16px">Net Worth</TYPE.mediumHeader>
+                                    <TYPE.largeHeader fontSize="32px">
+                                        <MonoSpace>{formatDollarAmount(liquidityHover, 2, true)} </MonoSpace>
+                                    </TYPE.largeHeader>
+                                    <TYPE.main fontSize="12px" height="14px">
+                                        {leftLabel ? <MonoSpace>{leftLabel} (UTC)</MonoSpace> : null}
+                                    </TYPE.main>
+                                </AutoColumn>
+                            }
+                            topRight={
+                                <RowFixed align="top" justify="center">
+                                    {debankLink && (
+                                        <StyledExternalLink
+                                            href={debankLink}
+                                            style={{ marginLeft: '12px' }}
+                                            onClickCapture={() => {
+                                                ReactGA.event({
+                                                    category: 'Debank',
+                                                    action: 'Debank portfolio page click',
+                                                });
+                                            }}
+                                        >
+                                            <StyledDebankLogo src={DebankLogo} />
+                                        </StyledExternalLink>
+                                    )}
+                                    <StyledExternalLink href={getEtherscanLink(1, '0xce88686553686da562ce7cea497ce749da109f9f', 'address', activeNetwork)}>
+                                        <ExternalLink
+                                            stroke={theme.text2}
+                                            size={'17px'}
+                                            style={{ marginLeft: '12px' }}
+                                        />
+                                    </StyledExternalLink>
+                                </RowFixed>
+                            }
+                        /> : <AutoColumn gap="lg" justify='flex-start'>
+                        <DarkGreyCard>
+                            <TYPE.main fontSize="18px">Loading fee collector data...</TYPE.main>
+                            <LocalLoader fill={false} />
+                        </DarkGreyCard>
+                    </ AutoColumn>}
+                </ContentLayout>
+                    
+                <TYPE.main>Tokens to be swept</TYPE.main>
                 <ProtocolFeeTokenTable tokenDatas={formattedTokens} walletTokenDatas={walletTokenData} sweepLimitActive={true} />
-                <TYPE.main> Tokens below weekly sweep threshold ({formatDollarAmount(sweepLimit, 0, true)}) </TYPE.main> 
+                <TYPE.main> Tokens below weekly sweep threshold ({formatDollarAmount(sweepLimit, 0, true)}) </TYPE.main>
                 <ProtocolFeeTokenTable tokenDatas={formattedTokens} walletTokenDatas={walletTokenData} sweepLimitActive={false} />
             </AutoColumn>
         </PageWrapper>

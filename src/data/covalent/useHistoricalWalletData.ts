@@ -24,14 +24,14 @@ export function useHistoricalWalletData(): WalletHistoricalData {
         const chartData: BalancerDateChartItem[] = [];
         if (walletData) {
             //Iterate through each timepoint, then obtain total value from all positions (no restrictions on position size)
-            for (let holdingsIndex = 0; holdingsIndex < 30; holdingsIndex++) {
+            for (let holdingsIndex = 0; holdingsIndex <= 30; holdingsIndex++) {
                 //obtain timestamp from first element
                 const chartItem = {} as BalancerDateChartItem;
                 chartItem.value = 0;
                 chartItem.time = new Date(walletData.data.items[0].holdings[holdingsIndex].timestamp);
                 //Sum up all token holdings
                 walletData.data.items.forEach((item) => {
-                        if (typeof(item.holdings[holdingsIndex].close.quote) === 'number' && ! COVALENT_TOKEN_BLACKLIST.includes(item.contract_address)) {
+                    if (typeof (item.holdings[holdingsIndex].close.quote) === 'number' && !COVALENT_TOKEN_BLACKLIST.includes(item.contract_address)) {
                         if (item.holdings[holdingsIndex].close.quote < 1000000) {
                             chartItem.value += Number(item.holdings[holdingsIndex].close.quote);
                         }
@@ -47,10 +47,12 @@ export function useHistoricalWalletData(): WalletHistoricalData {
     const walletHistoricalData = GetAddressHistoricalTokenData()
 
     if (!walletHistoricalData) {
-        return { totalValueData: [] };
+        return { 
+            totalValueData: [], 
+        };
     }
 
-    console.log("rawWalletData", walletHistoricalData);
+    //console.log("rawWalletData", walletHistoricalData);
     const walletChartData = getWalletBalancerChartData(walletHistoricalData);
 
     //Sort data
@@ -65,8 +67,8 @@ export function useHistoricalWalletData(): WalletHistoricalData {
             time: item.time.toString(),
         }
     }
-
     )
+    
     return {
         totalValueData: sortedWalletChartData,
         tvl: sortedWalletChartData[sortedWalletChartData.length - 1].value,

@@ -21,6 +21,7 @@ import getCuratedTokenName from 'utils/getCuratedTokenName';
 import { ERC20TokenData, WalletTokenData } from 'utils/getAddressTokenBalances';
 import { useActiveNetworkVersion } from 'state/application/hooks';
 import { SupportedNetwork } from 'constants/networks';
+import curateTokenDatas from 'utils/curateTokenDatas';
 
 
 
@@ -101,7 +102,7 @@ const DataRow = ({ tokenData, index }: { tokenData: TokenData; index: number }) 
                     {formatDollarAmount(tokenData.priceUSD)}
                 </Label>
                 <Label end={1} fontWeight={400}>
-                {formatDollarAmount(tokenData.volumeUSD)}
+                    {formatDollarAmount(tokenData.volumeUSD)}
                 </Label>
                 <Label end={1} fontWeight={400}>
                     {formatDollarAmount(tokenData.volumeUSDWeek)}
@@ -154,34 +155,13 @@ export default function ProtocolFeeTokenTable({
     const [sortField, setSortField] = useState(SORT_FIELD.valueUSDCollected);
     const [sortDirection, setSortDirection] = useState<boolean>(true);
 
-    function curateTokenDatas(tokenDatas: TokenData[], walletTokenData: WalletTokenData): TokenData[] {
-        const newTokenDatas: TokenData[] = [];
-        walletTokenData.data.items.forEach(( item: ERC20TokenData ) => {
-            tokenDatas.forEach(( tokenData: TokenData ) => {
-                if (item.quote_rate_24h) {
-                    if (item.quote_rate_24h) {
-            if ( sweepLimitActive && item.contract_address === tokenData.address && Number(parseInt(item.balance) / 10 ** item.contract_decimals * item.quote_rate_24h) > sweepLimit ) {
-                tokenData.valueUSDCollected = Number(parseInt(item.balance) / 10 ** item.contract_decimals * item.quote_rate_24h);
-                tokenData.priceUSD = item.quote_rate_24h;
-                newTokenDatas.push(tokenData);
-            } else if ( !sweepLimitActive && item.contract_address === tokenData.address && Number(parseInt(item.balance) / 10 ** item.contract_decimals * item.quote_rate_24h) <= sweepLimit ) {
-                tokenData.valueUSDCollected = Number(parseInt(item.balance) / 10 ** item.contract_decimals * item.quote_rate_24h);
-                tokenData.priceUSD = item.quote_rate_24h;
-                newTokenDatas.push(tokenData);
-            }
-        }
-        }
-        });
-        
-    });
-    return newTokenDatas;
-    }
+
 
     //Reassign token data set
     if (tokenDatas && walletTokenDatas) {
-        tokenDatas = curateTokenDatas(tokenDatas, walletTokenDatas);
+        tokenDatas = curateTokenDatas(tokenDatas, walletTokenDatas, sweepLimit, sweepLimitActive);
     }
-    
+
 
     // pagination
     const [page, setPage] = useState(1);
@@ -199,17 +179,17 @@ export default function ProtocolFeeTokenTable({
     const sortedTokens = useMemo(() => {
         return tokenDatas
             ? tokenDatas
-                  .filter((x) => !!x && !COVALENT_TOKEN_BLACKLIST.includes(x.address))
-                  .sort((a, b) => {
-                      if (a && b) {
-                          return a[sortField as keyof TokenData] > b[sortField as keyof TokenData]
-                              ? (sortDirection ? -1 : 1) * 1
-                              : (sortDirection ? -1 : 1) * -1;
-                      } else {
-                          return -1;
-                      }
-                  })
-                  .slice(maxItems * (page - 1), page * maxItems)
+                .filter((x) => !!x && !COVALENT_TOKEN_BLACKLIST.includes(x.address))
+                .sort((a, b) => {
+                    if (a && b) {
+                        return a[sortField as keyof TokenData] > b[sortField as keyof TokenData]
+                            ? (sortDirection ? -1 : 1) * 1
+                            : (sortDirection ? -1 : 1) * -1;
+                    } else {
+                        return -1;
+                    }
+                })
+                .slice(maxItems * (page - 1), page * maxItems)
             : [];
     }, [tokenDatas, maxItems, page, sortDirection, sortField]);
 
