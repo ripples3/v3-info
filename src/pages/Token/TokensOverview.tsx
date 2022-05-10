@@ -15,7 +15,6 @@ export default function TokensOverview() {
 
     const [savedTokens] = useSavedTokens();
     const formattedTokens = useBalancerTokens();
-    console.log("formattedTokens", formattedTokens);
     const watchListTokens = formattedTokens.filter((token) => savedTokens.includes(token.address));
 
     return (

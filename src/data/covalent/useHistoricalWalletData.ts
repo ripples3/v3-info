@@ -6,6 +6,7 @@ import { unixToDate } from '../../utils/date';
 import { BalancerChartDataItem } from 'data/balancer/balancerTypes';
 import { useActiveNetworkVersion } from 'state/application/hooks';
 import { GetAddressHistoricalTokenData, WalletHistoryData } from '../../utils/getAddressHistoricalTokenData';
+import { COVALENT_TOKEN_BLACKLIST } from './tokenBlackList';
 
 interface WalletHistoricalData {
     totalValueData: BalancerChartDataItem[];
@@ -30,7 +31,7 @@ export function useHistoricalWalletData(): WalletHistoricalData {
                 chartItem.time = new Date(walletData.data.items[0].holdings[holdingsIndex].timestamp);
                 //Sum up all token holdings
                 walletData.data.items.forEach((item) => {
-                        if (typeof(item.holdings[holdingsIndex].close.quote) === 'number') {
+                        if (typeof(item.holdings[holdingsIndex].close.quote) === 'number' && ! COVALENT_TOKEN_BLACKLIST.includes(item.contract_address)) {
                         if (item.holdings[holdingsIndex].close.quote < 1000000) {
                             chartItem.value += Number(item.holdings[holdingsIndex].close.quote);
                         }
@@ -43,13 +44,13 @@ export function useHistoricalWalletData(): WalletHistoricalData {
         return chartData;
     }
 
-    const walletHistoricalData = GetAddressHistoricalTokenData();
+    const walletHistoricalData = GetAddressHistoricalTokenData()
 
     if (!walletHistoricalData) {
         return { totalValueData: [] };
     }
 
-    //console.log("rawWalletData", walletHistoricalData);
+    console.log("rawWalletData", walletHistoricalData);
     const walletChartData = getWalletBalancerChartData(walletHistoricalData);
 
     //Sort data

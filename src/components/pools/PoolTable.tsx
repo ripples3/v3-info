@@ -158,7 +158,7 @@ export default function PoolTable({ poolDatas, maxItems = MAX_ITEMS }: { poolDat
     return (
         <Wrapper>
             {sortedPools.length > 0 ? (
-                <AutoColumn gap="16px">
+                <AutoColumn gap="12px">
                     <ResponsiveGrid>
                         <Label color={theme.text2}>#</Label>
                         <ClickableText color={theme.text2} onClick={() => handleSort(SORT_FIELD.feeTier)}>

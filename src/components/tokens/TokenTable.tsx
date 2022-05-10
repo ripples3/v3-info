@@ -184,7 +184,7 @@ export default function TokenTable({
     return (
         <Wrapper>
             {sortedTokens.length > 0 ? (
-                <AutoColumn gap="16px">
+                <AutoColumn gap="8px">
                     <ResponsiveGrid>
                         <Label color={theme.text2}>#</Label>
                         <ClickableText color={theme.text2} onClick={() => handleSort(SORT_FIELD.name)}>

@@ -14,6 +14,7 @@ import { PageButtons, Arrow, Break } from 'components/shared';
 import HoverInlineText from '../HoverInlineText';
 import useTheme from 'hooks/useTheme';
 import { TOKEN_HIDE } from '../../constants/index';
+import { COVALENT_TOKEN_BLACKLIST } from 'data/covalent/tokenBlackList';
 import { TokenListToken } from '../../state/token-lists/token-lists';
 import { TokenData } from '../../data/balancer/balancerTypes';
 import getCuratedTokenName from 'utils/getCuratedTokenName';
@@ -100,10 +101,10 @@ const DataRow = ({ tokenData, index }: { tokenData: TokenData; index: number }) 
                     {formatDollarAmount(tokenData.priceUSD)}
                 </Label>
                 <Label end={1} fontWeight={400}>
-                    <Percent value={tokenData.priceUSDChange} fontWeight={400} />
+                {formatDollarAmount(tokenData.volumeUSD)}
                 </Label>
                 <Label end={1} fontWeight={400}>
-                    {formatDollarAmount(tokenData.volumeUSD)}
+                    {formatDollarAmount(tokenData.volumeUSDWeek)}
                 </Label>
                 <Label end={1} fontWeight={400}>
                     {formatDollarAmount(tokenData.valueUSDCollected)}
@@ -116,6 +117,7 @@ const DataRow = ({ tokenData, index }: { tokenData: TokenData; index: number }) 
 const SORT_FIELD = {
     name: 'name',
     volumeUSD: 'volumeUSD',
+    volumeUSDWeek: 'volumeUSDWeek',
     priceUSD: 'priceUSD',
     priceUSDChange: 'priceUSDChange',
     priceUSDChangeWeek: 'priceUSDChangeWeek',
@@ -197,7 +199,7 @@ export default function ProtocolFeeTokenTable({
     const sortedTokens = useMemo(() => {
         return tokenDatas
             ? tokenDatas
-                  .filter((x) => !!x && !TOKEN_HIDE.includes(x.address))
+                  .filter((x) => !!x && !COVALENT_TOKEN_BLACKLIST.includes(x.address))
                   .sort((a, b) => {
                       if (a && b) {
                           return a[sortField as keyof TokenData] > b[sortField as keyof TokenData]
@@ -240,17 +242,13 @@ export default function ProtocolFeeTokenTable({
                             Name {arrow(SORT_FIELD.name)}
                         </ClickableText>
                         <ClickableText color={theme.text2} end={1} onClick={() => handleSort(SORT_FIELD.priceUSD)}>
-                            24h Avg Price {arrow(SORT_FIELD.priceUSD)}
-                        </ClickableText>
-                        <ClickableText
-                            color={theme.text2}
-                            end={1}
-                            onClick={() => handleSort(SORT_FIELD.priceUSDChange)}
-                        >
-                            Price Change {arrow(SORT_FIELD.priceUSDChange)}
+                            Avg Price 24H {arrow(SORT_FIELD.priceUSD)}
                         </ClickableText>
                         <ClickableText color={theme.text2} end={1} onClick={() => handleSort(SORT_FIELD.volumeUSD)}>
                             Volume 24H {arrow(SORT_FIELD.volumeUSD)}
+                        </ClickableText>
+                        <ClickableText color={theme.text2} end={1} onClick={() => handleSort(SORT_FIELD.volumeUSDWeek)}>
+                            Volume 7d {arrow(SORT_FIELD.volumeUSDWeek)}
                         </ClickableText>
                         <ClickableText color={theme.text2} end={1} onClick={() => handleSort(SORT_FIELD.valueUSDCollected)}>
                             Collected {arrow(SORT_FIELD.valueUSDCollected)}

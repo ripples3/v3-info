@@ -175,7 +175,7 @@ export default function Header() {
                     </StyledNavLink>
                     {/*<StyledNavLink id={`stake-nav-link`} to={networkPrefix(activeNewtork) + 'incentives'}>
                         Incentives
-    </StyledNavLink>*/}
+                    </StyledNavLink>*/}
                     <StyledNavLink id={`stake-nav-link`} to={networkPrefix(activeNewtork) + 'pools'}>
                         Pools
                     </StyledNavLink>
@@ -183,8 +183,8 @@ export default function Header() {
                         Tokens
                     </StyledNavLink>
                     <StyledNavLink id={`stake-nav-link`} to={networkPrefix(activeNewtork) + 'protocolFees'}>
-                        Protocol Fees
-    </StyledNavLink>
+                        Fees
+                    </StyledNavLink>
                 </HeaderLinks>
             </HeaderRow>
             <HeaderControls>

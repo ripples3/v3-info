@@ -1,0 +1,3 @@
+export const COVALENT_TOKEN_BLACKLIST = [
+    '0x41c37a4683d6a05adb31c39d71348a8403b13ca9'
+]

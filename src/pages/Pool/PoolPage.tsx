@@ -110,7 +110,6 @@ export default function PoolPage({
         (poolData?.tokens || []).map((token) => token.address),
         poolData ? [poolData.id] : [],
     );
-    console.log("swaps:", poolData);
 
     const [view, setView] = useState(ChartView.VOL);
     const [latestValue, setLatestValue] = useState<number | undefined>();
