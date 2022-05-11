@@ -335,7 +335,7 @@ export default function PoolPage({
             ) : (
                 <AutoColumn gap="lg">
                 <DarkGreyCard>
-                    <TYPE.main fontSize="24px">Loading pool data...</TYPE.main>
+                    <TYPE.main fontSize="24px">Fetching pool data...</TYPE.main>
                 <LocalLoader fill={false} />
                 </DarkGreyCard>
                 </ AutoColumn>

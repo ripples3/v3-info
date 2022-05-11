@@ -8,6 +8,7 @@ import { AutoColumn } from 'components/Column';
 import CurrencyLogo from 'components/CurrencyLogo';
 import { RowFixed } from 'components/Row';
 import { formatDollarAmount } from 'utils/numbers';
+import Percent from 'components/Percent';
 import { Label, ClickableText } from '../Text';
 import { PageButtons, Arrow, Break } from 'components/shared';
 import HoverInlineText from '../HoverInlineText';
@@ -124,41 +125,19 @@ const SORT_FIELD = {
 
 const MAX_ITEMS = 30;
 
-export default function ProtocolFeeTokenTable({
+export default function TreasuryTokenPortfolioTable({
     tokenDatas,
-    walletTokenDatas,
     maxItems = MAX_ITEMS,
-    sweepLimitActive,
 }: {
     tokenDatas: TokenData[] | undefined;
-    walletTokenDatas?: WalletTokenData;
     maxItems?: number;
-    sweepLimitActive: boolean;
 }) {
     // theming
     const theme = useTheme();
 
-    const [activeNetwork] = useActiveNetworkVersion();
-    let sweepLimit = 0;
-
-
-    if (activeNetwork.id === SupportedNetwork.ETHEREUM) {
-        sweepLimit = 10000;
-    } else {
-        sweepLimit = 5000;
-    }
-
     // for sorting
     const [sortField, setSortField] = useState(SORT_FIELD.valueUSDCollected);
     const [sortDirection, setSortDirection] = useState<boolean>(true);
-
-
-
-    //Reassign token data set
-    if (tokenDatas && walletTokenDatas) {
-        tokenDatas = curateTokenDatas(tokenDatas, walletTokenDatas, sweepLimit, sweepLimitActive);
-    }
-
 
     // pagination
     const [page, setPage] = useState(1);
@@ -205,7 +184,7 @@ export default function ProtocolFeeTokenTable({
         [sortDirection, sortField],
     );
 
-    if (!tokenDatas || !walletTokenDatas) {
+    if (!tokenDatas) {
         return <Loader />;
     }
 
@@ -228,7 +207,7 @@ export default function ProtocolFeeTokenTable({
                             Volume 7d {arrow(SORT_FIELD.volumeUSDWeek)}
                         </ClickableText>
                         <ClickableText color={theme.text2} end={1} onClick={() => handleSort(SORT_FIELD.valueUSDCollected)}>
-                            Collected {arrow(SORT_FIELD.valueUSDCollected)}
+                            Worth {arrow(SORT_FIELD.valueUSDCollected)}
                         </ClickableText>
                     </ResponsiveGrid>
 

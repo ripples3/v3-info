@@ -8,9 +8,10 @@ import { ResponsiveRow, RowBetween, RowFixed } from 'components/Row';
 import { getEtherscanLink, shortenAddress } from 'utils';
 import { ExternalLink } from 'react-feather';
 import { MonoSpace } from 'components/shared';
-import { formatAmount, formatDollarAmount } from 'utils/numbers';
+import { formatDollarAmount } from 'utils/numbers';
 import Loader, { LocalLoader } from 'components/Loader';
 import LineChart from 'components/LineChart/alt';
+import Percent from 'components/Percent';
 import { VolumeWindow } from 'types';
 import { TYPE } from 'theme';
 import { SmallOptionButton } from 'components/Button';
@@ -28,10 +29,10 @@ import { useHistoricalWalletData } from 'data/covalent/useHistoricalWalletData';
 import DebankLogo from '../../assets/svg/debank.svg';
 import { SupportedNetwork } from 'constants/networks';
 import CurrencyLogo from 'components/CurrencyLogo';
-import Percent from 'components/Percent';
 import curateTokenDatas from 'utils/curateTokenDatas';
 import { TokenData } from 'data/balancer/balancerTypes';
 import { COVALENT_TOKEN_BLACKLIST } from 'data/covalent/tokenBlackList';
+import { FEE_COLLECTOR_ADDRESS } from 'constants/wallets';
 
 const ChartWrapper = styled.div`
     width: 49%;
@@ -69,8 +70,8 @@ export default function ProtocolFees() {
     const [activeNetwork] = useActiveNetworkVersion();
     const protocolData = useBalancerProtocolData();
     const formattedTokens = useBalancerTokens();
-    const walletTokenData = GetAddressTokenBalances();
-    const historicalCollectorData = useHistoricalWalletData();
+    const walletTokenData = GetAddressTokenBalances(FEE_COLLECTOR_ADDRESS);
+    const historicalCollectorData = useHistoricalWalletData(FEE_COLLECTOR_ADDRESS);
     const debankLink = 'https://debank.com/profile/0xce88686553686da562ce7cea497ce749da109f9f';
     let balAddress = '0xba100000625a3754423978a60c9317c58a424e3d';
     const bbaUsdAddress = '0x7b50775383d3d6f0215a8f290f2c9e2eebbeceb2';
@@ -149,9 +150,19 @@ export default function ProtocolFees() {
         });
     }
 
-    
-   
+    let dailyChange = 0;
+    if (historicalCollectorData?.totalValueData.length) {
+        dailyChange = historicalCollectorData.totalValueData[historicalCollectorData.totalValueData.length - 1].value - historicalCollectorData.totalValueData[historicalCollectorData.totalValueData.length - 2].value;
+    }
 
+    //TODO: fix edge case redundancy code here ( this happens right after a sweep):
+    let isEmptySet = false;
+    if (formattedTokens && walletTokenData) {
+        if (formattedTokens.length > 0 && curateTokenDatas(formattedTokens, walletTokenData, sweepLimit, true).length == 0) {
+            isEmptySet = true;
+        }
+    }
+    
     return (
         <PageWrapper>
             <AutoColumn gap="lg">
@@ -217,11 +228,11 @@ export default function ProtocolFees() {
 
                     </ResponsiveRow> : <Loader />}
                 <ContentLayout>
-                    {totalAmount > 0 ?
+                    {totalAmount > 0 && historicalCollectorData?.tvl ?
                         <DarkGreyCard>
                             <AutoColumn gap="lg">
                             <AutoColumn gap="4px">
-                                    <TYPE.main fontWeight={400}>Distribution worth</TYPE.main>
+                                    <TYPE.main fontWeight={400}>Upcoming Distribution worth</TYPE.main>
                                     <TYPE.label fontSize="24px">{formatDollarAmount(totalAmount)}</TYPE.label>
                                 </AutoColumn>
                                 <GreyCard padding="16px">
@@ -269,12 +280,18 @@ export default function ProtocolFees() {
                                             <TYPE.label fontSize="14px">{formatDollarAmount(bbaUsdAmount * 0.25)}</TYPE.label>
                                         </RowBetween>
                                     </AutoColumn>
+                                    
                                 </GreyCard>
+                                <AutoColumn gap="4px">
+                                    <TYPE.main fontWeight={400}>24h Change</TYPE.main>
+                                    <TYPE.label fontSize="24px">{formatDollarAmount(Math.abs(dailyChange))}</TYPE.label>
+                                    <Percent value={100 / historicalCollectorData?.tvl * dailyChange} />
+                                </AutoColumn>
                             </AutoColumn>
                         </DarkGreyCard>
                         : <AutoColumn gap="lg" justify='flex-start'>
                         <DarkGreyCard>
-                            <TYPE.main fontSize="18px">Loading distribution estimates...</TYPE.main>
+                            <TYPE.main fontSize="18px">Fetching distribution estimates...</TYPE.main>
                             <LocalLoader fill={false} />
                         </DarkGreyCard>
                     </ AutoColumn>}
@@ -282,7 +299,7 @@ export default function ProtocolFees() {
                         <LineChart
                             data={historicalCollectorData?.totalValueData}
                             height={220}
-                            minHeight={400}
+                            minHeight={475}
                             color={activeNetwork.primaryColor}
                             value={liquidityHover}
                             label={leftLabel}
@@ -290,7 +307,7 @@ export default function ProtocolFees() {
                             setLabel={setLeftLabel}
                             topLeft={
                                 <AutoColumn gap="4px">
-                                    <TYPE.mediumHeader fontSize="16px">Net Worth</TYPE.mediumHeader>
+                                    <TYPE.mediumHeader fontSize="16px">Historical Net Worth</TYPE.mediumHeader>
                                     <TYPE.largeHeader fontSize="32px">
                                         <MonoSpace>{formatDollarAmount(liquidityHover, 2, true)} </MonoSpace>
                                     </TYPE.largeHeader>
@@ -326,14 +343,17 @@ export default function ProtocolFees() {
                             }
                         /> : <AutoColumn gap="lg" justify='flex-start'>
                         <DarkGreyCard>
-                            <TYPE.main fontSize="18px">Loading fee collector data...</TYPE.main>
+                            <TYPE.main fontSize="18px">Fetching historical data...</TYPE.main>
                             <LocalLoader fill={false} />
                         </DarkGreyCard>
                     </ AutoColumn>}
                 </ContentLayout>
-                    
+                {! isEmptySet ? 
                 <TYPE.main>Tokens to be swept</TYPE.main>
+                : null }
+                {! isEmptySet ? 
                 <ProtocolFeeTokenTable tokenDatas={formattedTokens} walletTokenDatas={walletTokenData} sweepLimitActive={true} />
+                : null }
                 <TYPE.main> Tokens below weekly sweep threshold ({formatDollarAmount(sweepLimit, 0, true)}) </TYPE.main>
                 <ProtocolFeeTokenTable tokenDatas={formattedTokens} walletTokenDatas={walletTokenData} sweepLimitActive={false} />
             </AutoColumn>

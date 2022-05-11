@@ -60,10 +60,10 @@ import { useActiveNetworkVersion } from "state/application/hooks";
     }
 
 //TODO take address as input argument
-export function GetAddressHistoricalTokenData () {
+export function GetAddressHistoricalTokenData (address: string) {
     const [activeNetwork] = useActiveNetworkVersion();
     const baseURI = 'https://api.covalenthq.com/v1/';
-    const queryParams = '/address/0xce88686553686da562ce7cea497ce749da109f9f/portfolio_v2/?&key=ckey_0234f04900264446a5dfbd4687d';
+    const queryParams = '/address/' + address + '/portfolio_v2/?&key=ckey_0234f04900264446a5dfbd4687d';
         const [jsonData, setJsonData] = useState<WalletHistoryData>();
         //Fetch Balancer Front-End Json containing incentives data:
         useEffect(() => {
