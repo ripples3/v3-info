@@ -122,7 +122,7 @@ const SORT_FIELD = {
     valueUSDCollected: 'valueUSDCollected',
 };
 
-const MAX_ITEMS = 30;
+const MAX_ITEMS = 10;
 
 export default function ProtocolFeeTokenTable({
     tokenDatas,

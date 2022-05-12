@@ -116,7 +116,7 @@ const SORT_FIELD = {
     priceUSDChangeWeek: 'priceUSDChangeWeek',
 };
 
-const MAX_ITEMS = 20;
+const MAX_ITEMS = 10;
 
 export default function TokenTable({
     tokenDatas,

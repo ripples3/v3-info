@@ -157,13 +157,40 @@ query GetPoolChartData($poolId: String!, $startTimestamp: Int!) {
         swapVolume
         swapFees
         timestamp
-        swapVolume
-        swapFees
+        totalSwapVolume
+        totalSwapFee
+        totalLiquidity
+        swapsCount
+        holdersCount
         pool {
             id
         }
     }
 }
+
+query BalancerPoolSwapFeeSnapshot($startTimestamp: Int!, $endTimeStamp: Int!) {
+        poolSnapshots(
+            first: 1000
+            orderBy: swapFees
+            orderDirection: desc
+            where: { timestamp_in: [$startTimestamp, $endTimeStamp] }
+        ) {
+          amounts
+          holdersCount
+          id
+          totalLiquidity
+          swapVolume
+          swapsCount
+          totalShares
+          totalSwapFee
+          totalSwapVolume
+            timestamp
+            pool {
+              id
+            }
+            swapFees
+          }
+    }
 
 fragment LatestPrice on LatestPrice {
     asset
@@ -254,6 +281,108 @@ query BalancerTokenPrices(
     ) {
         ...BalancerTokenPrice
     }
+}
+
+query BalancerChartTokenPrices(
+    $asset: Bytes!
+) {
+    prices1: tokenPrices(
+        skip: 0
+        first: 1000
+        orderBy: timestamp
+        orderDirection: desc
+        where: { asset: $asset }
+    ) {
+        ...BalancerChartTokenPrice
+    }
+    prices2: tokenPrices(
+        skip: 1000
+        first: 1000
+        orderBy: timestamp
+        orderDirection: desc
+        where: { asset: $asset }
+    ) {
+        ...BalancerChartTokenPrice
+    }
+    prices3: tokenPrices(
+        skip: 2000
+        first: 1000
+        orderBy: timestamp
+        orderDirection: desc
+        where: { asset: $asset }
+    ) {
+        ...BalancerChartTokenPrice
+    }
+    prices4: tokenPrices(
+        skip: 3000
+        first: 1000
+        orderBy: timestamp
+        orderDirection: desc
+        where: { asset: $asset }
+    ) {
+        ...BalancerChartTokenPrice
+    }
+    prices5: tokenPrices(
+        skip: 4000
+        first: 1000
+        orderBy: timestamp
+        orderDirection: desc
+        where: { asset: $asset }
+    ) {
+        ...BalancerChartTokenPrice
+    }
+    prices6: tokenPrices(
+        skip: 5000
+        first: 1000
+        orderBy: timestamp
+        orderDirection: desc
+        where: { asset: $asset }
+    ) {
+        ...BalancerChartTokenPrice
+    }
+    prices7: tokenPrices(
+        skip: 6000
+        first: 1000
+        orderBy: timestamp
+        orderDirection: desc
+        where: { asset: $asset }
+    ) {
+        ...BalancerChartTokenPrice
+    }
+    prices8: tokenPrices(
+        skip: 7000
+        first: 1000
+        orderBy: timestamp
+        orderDirection: desc
+        where: { asset: $asset }
+    ) {
+        ...BalancerChartTokenPrice
+    }
+    prices9: tokenPrices(
+        skip: 8000
+        first: 1000
+        orderBy: timestamp
+        orderDirection: desc
+        where: { asset: $asset }
+    ) {
+        ...BalancerChartTokenPrice
+    }
+    prices10: tokenPrices(
+        skip: 9000
+        first: 1000
+        orderBy: timestamp
+        orderDirection: desc
+        where: { asset: $asset }
+    ) {
+        ...BalancerChartTokenPrice
+    }
+}
+
+fragment BalancerChartTokenPrice on TokenPrice {
+    id
+    timestamp
+    priceUSD
+    amount
 }
 
 fragment BalancerTokenPrice on TokenPrice {

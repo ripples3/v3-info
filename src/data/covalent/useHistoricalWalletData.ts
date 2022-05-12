@@ -33,7 +33,6 @@ export function useHistoricalWalletData(address: string): WalletHistoricalData {
                 walletData.data.items.forEach((item) => {
                     if (!COVALENT_TOKEN_BLACKLIST.includes(item.contract_address)) {
                     if (item.holdings[holdingsIndex].close.quote && typeof item.holdings[holdingsIndex].close.quote === 'number') {
-
                             chartItem.value += Number(item.holdings[holdingsIndex].close.quote);
                     }
                 }

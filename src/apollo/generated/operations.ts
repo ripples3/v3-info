@@ -367,6 +367,31 @@ export const GetPoolChartData = gql`
         }
     }
 `;
+export const BalancerPoolSwapFeeSnapshot = gql`
+    query BalancerPoolSwapFeeSnapshot($startTimestamp: Int!, $endTimeStamp: Int!) {
+        poolSnapshots(
+            first: 1000
+            orderBy: swapFees
+            orderDirection: desc
+            where: { timestamp_in: [$startTimestamp, $endTimeStamp] }
+        ) {
+            amounts
+            holdersCount
+            id
+            totalLiquidity
+            swapVolume
+            swapsCount
+            totalShares
+            totalSwapFee
+            totalSwapVolume
+            timestamp
+            pool {
+                id
+            }
+            swapFees
+        }
+    }
+`;
 export const BalancerProtocolData = gql`
     query BalancerProtocolData(
         $skip: Int

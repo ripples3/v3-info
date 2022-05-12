@@ -74,9 +74,9 @@ export default function ProtocolFees() {
     const historicalCollectorData = useHistoricalWalletData(FEE_COLLECTOR_ADDRESS);
     const debankLink = 'https://debank.com/profile/0xce88686553686da562ce7cea497ce749da109f9f';
     let balAddress = '0xba100000625a3754423978a60c9317c58a424e3d';
+    let usdcAddress = '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48';
     const bbaUsdAddress = '0x7b50775383d3d6f0215a8f290f2c9e2eebbeceb2';
-
-
+    
     const [feesHover, setFeesHover] = useState<number | undefined>();
     const [feesLabel, setFeesLabel] = useState<string | undefined>();
     const [liquidityHover, setLiquidityHover] = useState<number | undefined>();
@@ -126,9 +126,11 @@ export default function ProtocolFees() {
         sweepLimit = 10000;
     } else if (activeNetwork.id == SupportedNetwork.ARBITRUM) {
         balAddress = '0x040d1edc9569d4bab2d15287dc5a4f10f56a56b8';
+        usdcAddress = '0xff970a61a04b1ca14834a43f5de4533ebddb5cc8';
         sweepLimit = 5000;
     } else if (activeNetwork.id == SupportedNetwork.POLYGON) {
         balAddress = '0x9a71012B13CA4d3D0Cdc72A177DF3ef03b0E76A3';
+        usdcAddress = '0x2791bca1f2de4661ed88a30c99a7a9449aa84174';
         sweepLimit = 5000;
     }
 
@@ -245,7 +247,7 @@ export default function ProtocolFees() {
                                                     {'BAL'}
                                                 </TYPE.label>
                                             </RowFixed>
-                                            <TYPE.label fontSize="14px">{formatDollarAmount(balAmount* 0.75)}</TYPE.label>
+                                            <TYPE.label fontSize="14px">{formatDollarAmount(balAmount)}</TYPE.label>
                                         </RowBetween>
                                         <RowBetween key={bbaUsdAddress}>
                                             <RowFixed>
@@ -254,30 +256,21 @@ export default function ProtocolFees() {
                                                     {'bb-a-USD'}
                                                 </TYPE.label>
                                             </RowFixed>
-                                            <TYPE.label fontSize="14px">{formatDollarAmount(bbaUsdAmount * 0.75)}</TYPE.label>
+                                            <TYPE.label fontSize="14px">{formatDollarAmount(bbaUsdAmount * 0.75 - balAmount * 0.25)}</TYPE.label>
                                         </RowBetween>
                                     </AutoColumn>
                                 </GreyCard>
                                 <GreyCard padding="16px">
                                     <AutoColumn gap="md">
                                         <TYPE.main>Distribution to DAO Treasury</TYPE.main>
-                                        <RowBetween key={balAddress}>
+                                        <RowBetween key={usdcAddress}>
                                             <RowFixed>
-                                                <CurrencyLogo address={balAddress} size={'20px'} />
+                                                <CurrencyLogo address={usdcAddress} size={'20px'} />
                                                 <TYPE.label fontSize="14px" ml="8px">
-                                                    {'BAL'}
+                                                    {'USDC'}
                                                 </TYPE.label>
                                             </RowFixed>
-                                            <TYPE.label fontSize="14px">{formatDollarAmount(balAmount * 0.25)}</TYPE.label>
-                                        </RowBetween>
-                                        <RowBetween key={bbaUsdAddress}>
-                                            <RowFixed>
-                                                <CurrencyLogo address={bbaUsdAddress} size={'20px'} />
-                                                <TYPE.label fontSize="14px" ml="8px">
-                                                    {'bb-a-USD'}
-                                                </TYPE.label>
-                                            </RowFixed>
-                                            <TYPE.label fontSize="14px">{formatDollarAmount(bbaUsdAmount * 0.25)}</TYPE.label>
+                                            <TYPE.label fontSize="14px">{formatDollarAmount(bbaUsdAmount * 0.25 + balAmount * 0.25)}</TYPE.label>
                                         </RowBetween>
                                     </AutoColumn>
                                     
@@ -286,14 +279,20 @@ export default function ProtocolFees() {
                                     <TYPE.main fontWeight={400}>24h Change</TYPE.main>
                                     <TYPE.label fontSize="24px">{formatDollarAmount(Math.abs(dailyChange))}</TYPE.label>
                                     <Percent value={100 / historicalCollectorData?.tvl * dailyChange} />
-                                </AutoColumn>
+                                </AutoColumn> 
                             </AutoColumn>
                         </DarkGreyCard>
-                        : <AutoColumn gap="lg" justify='flex-start'>
+                        : 
+                        <AutoColumn gap="lg" justify='flex-start'>
+                            {! isEmptySet ? 
                         <DarkGreyCard>
+                        
                             <TYPE.main fontSize="18px">Fetching distribution estimates...</TYPE.main>
-                            <LocalLoader fill={false} />
-                        </DarkGreyCard>
+                            <LocalLoader fill={false} /> 
+                        </DarkGreyCard> : (
+                                <DarkGreyCard>
+                                <TYPE.main>No fees to distribute</TYPE.main>
+                                </DarkGreyCard> )}
                     </ AutoColumn>}
                     {historicalCollectorData?.tvl ?
                         <LineChart
