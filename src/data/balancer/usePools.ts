@@ -1,5 +1,6 @@
 import {
     BalancerPoolFragment,
+    BalancerPoolSnapshotFragment,
     useGetPoolChartDataQuery,
     useGetPoolDataLazyQuery,
     useBalancerPoolSwapFeeSnapshotQuery,
@@ -15,12 +16,12 @@ import { BalancerChartDataItem, PoolData } from './balancerTypes';
 function getPoolValues(
     poolId: string,
     pools: BalancerPoolFragment[],
-    poolSwapFeeSnapshots?: PoolSnapshot[],
+    poolSwapFeeSnapshots?: BalancerPoolSnapshotFragment[],
 ): { tvl: number; volume: number; swapCount: number; fees: number, feesEpoch: number , poolType: string | null | undefined} {
     const pool = pools.find((pool) => poolId === pool.id);
     let epochFees = 0;
     if (poolSwapFeeSnapshots) {
-    const feeData = getEpochSwapFees(poolId, today.getTime(), prevThuDate.getTime(), poolSwapFeeSnapshots);
+    const feeData = getEpochSwapFees(poolId, Math.floor(today.getTime() / 1000), Math.floor(prevThuDate.getTime() / 1000), poolSwapFeeSnapshots);
     epochFees = feeData.swapFee;
     }
 
@@ -32,7 +33,7 @@ function getPoolValues(
         tvl: parseFloat(pool.totalLiquidity),
         volume: parseFloat(pool.totalSwapVolume),
         fees: parseFloat(pool.totalSwapFee),
-        feesEpoch: epochFees,
+        feesEpoch: epochFees * 0.5,
         swapCount: parseFloat(pool.swapsCount),
        poolType: pool.poolType,
     };
@@ -42,13 +43,13 @@ function getEpochSwapFees(
     poolId: string,
     startTimeStamp: number,
     endTimeStamp: number,
-    poolSnapshots: PoolSnapshot[],
+    poolSnapshots: BalancerPoolSnapshotFragment[],
 ) : {swapFee: number} {
     let snapshotFee = 0;
     let startFee  = 0;
     let endFee = 0;
     poolSnapshots.forEach((pool) => {
-        if (pool.id === poolId) {
+        if (pool.pool.id === poolId) {
             if (pool.timestamp === endTimeStamp) {
                 endFee = Number(pool.swapFees);
             }
@@ -58,15 +59,16 @@ function getEpochSwapFees(
         }
         
     })
-    snapshotFee = endFee - startFee;
+    snapshotFee = startFee - endFee;
     return {swapFee: snapshotFee};
 }
 
 
 //Poolsnapshots are taken OO:OO UTC. Generate previous snapshot date and previous Thu. Used to calculate weekly sweep fee generators
-const target = 4 // Monday
+const target = 2 // Wednesday
 const prevThuDate = new Date()
 prevThuDate.setDate(prevThuDate.getDate() - ( prevThuDate.getDay() == target ? 7 : (prevThuDate.getDay() + (7 - target)) % 7 ));
+prevThuDate.setUTCHours(0,0,0,0);
 const today = new Date();
 today.setUTCHours(0,0,0,0);
 
@@ -76,14 +78,8 @@ export function useBalancerPools(): PoolData[] {
     const { blocks, error: blockError } = useBlocksFromTimestamps([t24, t48, tWeek]);
     const [block24, block48, blockWeek] = blocks ?? [];
     const [getPoolData, { data }] = useGetPoolDataLazyQuery();
-    const  sweepFeeData  = useBalancerPoolSwapFeeSnapshotQuery({
-        variables: { startTimestamp: Math.floor(today.getTime() / 1000) , endTimeStamp: Math.floor(prevThuDate.getTime() / 1000)},
-        context: {
-            uri: activeNetwork.clientUri,
-        }
-    });
+    const feeData = useBalancerSwapFeePoolData();
 
-    //console.log("historicalData", sweepFeeData);
     //const incentives = GetIncentiveList();
     //console.log("incentives", incentives['week_52']);
 
@@ -110,7 +106,7 @@ export function useBalancerPools(): PoolData[] {
     const { pools, pools24, pools48, poolsWeek, prices } = data;
 
     return pools.map((pool) => {
-        const poolData = getPoolValues(pool.id, pools, sweepFeeData.data?.poolSnapshots);
+        const poolData = getPoolValues(pool.id, pools, feeData);
         const poolData24 = getPoolValues(pool.id, pools24);
         const poolData48 = getPoolValues(pool.id, pools48);
         const poolDataWeek = getPoolValues(pool.id, poolsWeek);
@@ -152,6 +148,22 @@ export function useBalancerPools(): PoolData[] {
             poolType: poolData.poolType + "",
         };
     });
+}
+
+export function useBalancerSwapFeePoolData() {
+    const [activeNetwork] = useActiveNetworkVersion();
+    const  { data }  = useBalancerPoolSwapFeeSnapshotQuery({
+        variables: { startTimestamp: Math.floor(today.getTime() / 1000) , endTimeStamp: Math.floor(prevThuDate.getTime() / 1000)},
+        context: {
+            uri: activeNetwork.clientUri,
+        }
+    }); 
+    if (!data ) {
+        return [];
+    }
+    const { poolSnapshots } = data;
+    return poolSnapshots;
+
 }
 
 export function useBalancerPoolData(poolId: string): PoolData | null {

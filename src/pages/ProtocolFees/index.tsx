@@ -16,10 +16,12 @@ import { VolumeWindow } from 'types';
 import { TYPE } from 'theme';
 import { SmallOptionButton } from 'components/Button';
 import ProtocolFeeTokenTable from 'components/tokens/ProtocolFeeTokenTable';
+import PoolFeeTable from 'components/pools/PoolFeeTable';
 import { DarkGreyCard, GreyBadge, GreyCard } from 'components/Card';
 import { useBalancerTokens } from '../../data/balancer/useTokens';
 import { GetAddressTokenBalances } from 'utils/getAddressTokenBalances';
 import { useBalancerProtocolData } from 'data/balancer/useProtocolData';
+import { useBalancerPools } from 'data/balancer/usePools';
 import { useActiveNetworkVersion } from 'state/application/hooks';
 import { useTransformedVolumeData } from 'hooks/chart';
 import BarChart from 'components/BarChart/alt';
@@ -72,6 +74,7 @@ export default function ProtocolFees() {
     const formattedTokens = useBalancerTokens();
     const walletTokenData = GetAddressTokenBalances(FEE_COLLECTOR_ADDRESS);
     const historicalCollectorData = useHistoricalWalletData(FEE_COLLECTOR_ADDRESS);
+    const poolData = useBalancerPools();
     const debankLink = 'https://debank.com/profile/0xce88686553686da562ce7cea497ce749da109f9f';
     let balAddress = '0xba100000625a3754423978a60c9317c58a424e3d';
     let usdcAddress = '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48';
@@ -355,6 +358,8 @@ export default function ProtocolFees() {
                 : null }
                 <TYPE.main> Tokens below weekly sweep threshold ({formatDollarAmount(sweepLimit, 0, true)}) </TYPE.main>
                 <ProtocolFeeTokenTable tokenDatas={formattedTokens} walletTokenDatas={walletTokenData} sweepLimitActive={false} />
+                <TYPE.main> Top performing Pools by Fee Collection </TYPE.main>
+                <PoolFeeTable poolDatas={poolData} />
             </AutoColumn>
         </PageWrapper>
     );

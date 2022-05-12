@@ -175,22 +175,22 @@ query BalancerPoolSwapFeeSnapshot($startTimestamp: Int!, $endTimeStamp: Int!) {
             orderDirection: desc
             where: { timestamp_in: [$startTimestamp, $endTimeStamp] }
         ) {
-          amounts
-          holdersCount
-          id
-          totalLiquidity
-          swapVolume
-          swapsCount
-          totalShares
-          totalSwapFee
-          totalSwapVolume
-            timestamp
-            pool {
-              id
-            }
-            swapFees
-          }
-    }
+           id
+        amounts
+        totalShares
+        swapVolume
+        swapFees
+        timestamp
+        totalSwapVolume
+        totalSwapFee
+        totalLiquidity
+        swapsCount
+        holdersCount
+        pool {
+            id
+        }
+        }
+}
 
 fragment LatestPrice on LatestPrice {
     asset

@@ -1,15 +1,15 @@
 {
-    "short_name": "Beethoven X",
-    "name": "Beethoven X",
+    "short_name": "BAL Analytics",
+    "name": "Balancer Analytics",
     "icons": [
         {
-            "src": "https://beethoven-assets.s3.eu-central-1.amazonaws.com/apple-touch-192.png",
+            "src": "https://balancer.fi/_nuxt/img/pool-bal-weth.c1c79eb.jpg",
             "sizes": "192x192",
             "type": "image/png",
             "purpose": "any maskable"
         },
         {
-            "src": "https://beethoven-assets.s3.eu-central-1.amazonaws.com/apple-touch-512.png",
+            "src": "https://balancer.fi/_nuxt/img/pool-bal-weth.c1c79eb.jpg",
             "sizes": "512x512",
             "type": "image/png",
             "purpose": "any maskable"
@@ -17,6 +17,6 @@
     ],
     "orientation": "portrait",
     "display": "standalone",
-    "theme_color": "#00E59D",
+    "theme_color": "#3E3F40",
     "background_color": "#fff"
 }

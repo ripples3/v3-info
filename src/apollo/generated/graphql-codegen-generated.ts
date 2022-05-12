@@ -4013,17 +4013,17 @@ export type BalancerPoolSwapFeeSnapshotQuery = {
     __typename: 'Query';
     poolSnapshots: Array<{
         __typename: 'PoolSnapshot';
-        amounts: Array<string>;
-        holdersCount: string;
         id: string;
-        totalLiquidity: string;
-        swapVolume: string;
-        swapsCount: string;
+        amounts: Array<string>;
         totalShares: string;
-        totalSwapFee: string;
-        totalSwapVolume: string;
-        timestamp: number;
+        swapVolume: string;
         swapFees: string;
+        timestamp: number;
+        totalSwapVolume: string;
+        totalSwapFee: string;
+        totalLiquidity: string;
+        swapsCount: string;
+        holdersCount: string;
         pool: { __typename: 'Pool'; id: string };
     }>;
 };
@@ -5440,20 +5440,20 @@ export const BalancerPoolSwapFeeSnapshotDocument = gql`
             orderDirection: desc
             where: { timestamp_in: [$startTimestamp, $endTimeStamp] }
         ) {
-            amounts
-            holdersCount
             id
-            totalLiquidity
-            swapVolume
-            swapsCount
+            amounts
             totalShares
-            totalSwapFee
-            totalSwapVolume
+            swapVolume
+            swapFees
             timestamp
+            totalSwapVolume
+            totalSwapFee
+            totalLiquidity
+            swapsCount
+            holdersCount
             pool {
                 id
             }
-            swapFees
         }
     }
 `;

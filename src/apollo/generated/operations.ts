@@ -375,20 +375,20 @@ export const BalancerPoolSwapFeeSnapshot = gql`
             orderDirection: desc
             where: { timestamp_in: [$startTimestamp, $endTimeStamp] }
         ) {
-            amounts
-            holdersCount
             id
-            totalLiquidity
-            swapVolume
-            swapsCount
+            amounts
             totalShares
-            totalSwapFee
-            totalSwapVolume
+            swapVolume
+            swapFees
             timestamp
+            totalSwapVolume
+            totalSwapFee
+            totalLiquidity
+            swapsCount
+            holdersCount
             pool {
                 id
             }
-            swapFees
         }
     }
 `;
