@@ -62,6 +62,15 @@ const ContentLayout = styled.div`
     }
 `;
 
+//TODO: create utils function to get timestamps
+//Poolsnapshots are taken OO:OO UTC. Generate previous snapshot date and previous Thu. Used to calculate weekly sweep fee generators
+const target = 3 // Wednesday
+const prevDate = new Date()
+prevDate.setDate(prevDate.getDate() - ( prevDate.getDay() == target ? 7 : (prevDate.getDay() + (7 - target)) % 7 ));
+prevDate.setUTCHours(0,0,0,0);
+const today = new Date();
+today.setUTCHours(0,0,0,0);
+
 export default function ProtocolFees() {
     useEffect(() => {
         window.scrollTo(0, 0);
@@ -171,7 +180,7 @@ export default function ProtocolFees() {
     return (
         <PageWrapper>
             <AutoColumn gap="lg">
-                <TYPE.largeHeader>Protocol Fee Collector Metrics </TYPE.largeHeader>
+                <TYPE.largeHeader>Protocol Fee Metrics </TYPE.largeHeader>
 
                 {protocolData?.feeData.length > 0 ?
                     <ResponsiveRow>
@@ -237,7 +246,7 @@ export default function ProtocolFees() {
                         <DarkGreyCard>
                             <AutoColumn gap="lg">
                             <AutoColumn gap="4px">
-                                    <TYPE.main fontWeight={400}>Upcoming Distribution worth</TYPE.main>
+                                    <TYPE.main fontWeight={400}>Upcoming Distribution Estimates</TYPE.main>
                                     <TYPE.label fontSize="24px">{formatDollarAmount(totalAmount)}</TYPE.label>
                                 </AutoColumn>
                                 <GreyCard padding="16px">
@@ -309,7 +318,7 @@ export default function ProtocolFees() {
                             setLabel={setLeftLabel}
                             topLeft={
                                 <AutoColumn gap="4px">
-                                    <TYPE.mediumHeader fontSize="16px">Historical Net Worth</TYPE.mediumHeader>
+                                    <TYPE.mediumHeader fontSize="16px">Historical Net Worth in Fee Collector</TYPE.mediumHeader>
                                     <TYPE.largeHeader fontSize="32px">
                                         <MonoSpace>{formatDollarAmount(liquidityHover, 2, true)} </MonoSpace>
                                     </TYPE.largeHeader>
@@ -358,7 +367,7 @@ export default function ProtocolFees() {
                 : null }
                 <TYPE.main> Tokens below weekly sweep threshold ({formatDollarAmount(sweepLimit, 0, true)}) </TYPE.main>
                 <ProtocolFeeTokenTable tokenDatas={formattedTokens} walletTokenDatas={walletTokenData} sweepLimitActive={false} />
-                <TYPE.main> Top performing Pools by Fee Collection </TYPE.main>
+                <TYPE.main> Top performing Pools by Fees Collected (Epoch: {prevDate.toLocaleDateString()} - {today.toLocaleDateString()}, 00:00 UTC) </TYPE.main>
                 <PoolFeeTable poolDatas={poolData} />
             </AutoColumn>
         </PageWrapper>

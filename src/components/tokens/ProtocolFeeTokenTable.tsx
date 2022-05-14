@@ -7,7 +7,7 @@ import { Link } from 'react-router-dom';
 import { AutoColumn } from 'components/Column';
 import CurrencyLogo from 'components/CurrencyLogo';
 import { RowFixed } from 'components/Row';
-import { formatDollarAmount } from 'utils/numbers';
+import { formatAmount, formatDollarAmount } from 'utils/numbers';
 import { Label, ClickableText } from '../Text';
 import { PageButtons, Arrow, Break } from 'components/shared';
 import HoverInlineText from '../HoverInlineText';
@@ -31,7 +31,7 @@ const ResponsiveGrid = styled.div`
     grid-gap: 1em;
     align-items: center;
 
-    grid-template-columns: 20px 3fr repeat(4, 1fr);
+    grid-template-columns: 20px 3fr repeat(3, 1fr);
 
     @media screen and (max-width: 900px) {
         grid-template-columns: 20px 1.5fr repeat(3, 1fr);
@@ -99,10 +99,7 @@ const DataRow = ({ tokenData, index }: { tokenData: TokenData; index: number }) 
                     {formatDollarAmount(tokenData.priceUSD)}
                 </Label>
                 <Label end={1} fontWeight={400}>
-                    {formatDollarAmount(tokenData.volumeUSD)}
-                </Label>
-                <Label end={1} fontWeight={400}>
-                    {formatDollarAmount(tokenData.volumeUSDWeek)}
+                    {formatAmount(tokenData.valueUSDCollected / tokenData.priceUSD, 3)}
                 </Label>
                 <Label end={1} fontWeight={400}>
                     {formatDollarAmount(tokenData.valueUSDCollected)}
@@ -115,10 +112,7 @@ const DataRow = ({ tokenData, index }: { tokenData: TokenData; index: number }) 
 const SORT_FIELD = {
     name: 'name',
     volumeUSD: 'volumeUSD',
-    volumeUSDWeek: 'volumeUSDWeek',
     priceUSD: 'priceUSD',
-    priceUSDChange: 'priceUSDChange',
-    priceUSDChangeWeek: 'priceUSDChangeWeek',
     valueUSDCollected: 'valueUSDCollected',
 };
 
@@ -221,17 +215,11 @@ export default function ProtocolFeeTokenTable({
                         <ClickableText color={theme.text2} end={1} onClick={() => handleSort(SORT_FIELD.priceUSD)}>
                             Avg Price 24H {arrow(SORT_FIELD.priceUSD)}
                         </ClickableText>
-                        <ClickableText color={theme.text2} end={1} onClick={() => handleSort(SORT_FIELD.volumeUSD)}>
-                            Volume 24H {arrow(SORT_FIELD.volumeUSD)}
-                        </ClickableText>
-                        <ClickableText color={theme.text2} end={1} onClick={() => handleSort(SORT_FIELD.volumeUSDWeek)}>
-                            Volume 7d {arrow(SORT_FIELD.volumeUSDWeek)}
-                        </ClickableText>
+                        <Label color={theme.text2} end={1}># of Tokens</Label>
                         <ClickableText color={theme.text2} end={1} onClick={() => handleSort(SORT_FIELD.valueUSDCollected)}>
                             Collected {arrow(SORT_FIELD.valueUSDCollected)}
                         </ClickableText>
                     </ResponsiveGrid>
-
                     <Break />
                     {sortedTokens.map((data, i) => {
                         if (data) {
