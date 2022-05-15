@@ -197,6 +197,7 @@ export default function PoolPage({
                                     <AutoColumn gap="md">
                                         <TYPE.main>Total Tokens Locked</TYPE.main>
                                         {poolData.tokens.map((token) => (
+                                            token.tvl < 1000000000 ?
                                             <RowBetween key={token.address}>
                                                 <RowFixed>
                                                     <CurrencyLogo address={token.address} size={'20px'} />
@@ -205,7 +206,7 @@ export default function PoolPage({
                                                     </TYPE.label>
                                                 </RowFixed>
                                                 <TYPE.label fontSize="14px">{formatAmount(token.tvl / token.price)}</TYPE.label>
-                                            </RowBetween>
+                                            </RowBetween> : null
                                         ))}
                                     </AutoColumn>
                                 </GreyCard>

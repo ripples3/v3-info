@@ -148,7 +148,7 @@ export default function TokenTable({
     const sortedTokens = useMemo(() => {
         return tokenDatas
             ? tokenDatas
-                  .filter((x) => !!x && !TOKEN_HIDE.includes(x.address))
+                  .filter((x) => !!x && !TOKEN_HIDE.includes(x.address) && x.volumeUSDChange > 0)
                   .sort((a, b) => {
                       if (a && b) {
                           return a[sortField as keyof TokenData] > b[sortField as keyof TokenData]

@@ -57,7 +57,6 @@ export function useBalancerToken(tokenAddress: string): BalancerTokenData {
 
         return Math.abs((item.low - item.high) / (Math.abs(item.low + item.high) / 2)) < 0.2;
     });
-
     return {
         chartData: orderBy(filtered, 'timestamp', 'asc'),
         loading,

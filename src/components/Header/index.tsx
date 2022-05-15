@@ -10,6 +10,7 @@ import { networkPrefix } from 'utils/networkPrefix';
 import { AutoColumn } from 'components/Column';
 import NetworkDropdown from 'components/Menu/NetworkDropdown';
 import { BALANCER_APP_LOGO } from '../../data/balancer/constants';
+import { isBrowser } from 'react-device-detect';
 
 const HeaderFrame = styled.div`
     display: grid;
@@ -165,6 +166,7 @@ export default function Header() {
                         <img width={'28px'} src={BALANCER_APP_LOGO} alt="logo" />
                     </UniIcon>
                 </Title>
+                { isBrowser ?
                 <HeaderLinks>
                     <StyledNavLink
                         id={`pool-nav-link`}
@@ -188,7 +190,7 @@ export default function Header() {
                     <StyledNavLink id={`stake-nav-link`} to={networkPrefix(activeNewtork) + 'treasury'}>
                         Treasury
                     </StyledNavLink>
-                </HeaderLinks>
+                </HeaderLinks> : null }
             </HeaderRow>
             <HeaderControls>
             <NetworkDropdown />

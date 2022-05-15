@@ -122,7 +122,7 @@ export default function PoolFeeTable({ poolDatas, maxItems = MAX_ITEMS }: { pool
     const sortedPools = useMemo(() => {
         return poolDatas
             ? poolDatas
-                  .filter((x) => !!x && !POOL_HIDE.includes(x.address))
+                  .filter((x) => !!x && !POOL_HIDE.includes(x.address) && x.poolType !== 'Element' )
                   .sort((a, b) => {
                       if (a && b) {
                           return a[sortField as keyof PoolData] > b[sortField as keyof PoolData]

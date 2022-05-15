@@ -124,8 +124,7 @@ export default function Home() {
                             setLabel={setLeftLabel}
                             topLeft={
                                 <AutoColumn gap="4px">
-                                    <TYPE.mediumHeader fontSize="16px">TVL*</TYPE.mediumHeader>
-                                    <TYPE.small fontSize="11px">* excluding boosted pools</TYPE.small>
+                                    <TYPE.mediumHeader fontSize="16px">TVL</TYPE.mediumHeader>
                                     <TYPE.largeHeader fontSize="32px">
                                         <MonoSpace>{formatDollarAmount(liquidityHover, 2, true)} </MonoSpace>
                                     </TYPE.largeHeader>
@@ -241,7 +240,7 @@ export default function Home() {
                                         <MonoSpace> {formatDollarAmount(swapsHover, 2)}</MonoSpace>
                                     </TYPE.largeHeader>
                                     <TYPE.main fontSize="12px" height="14px">
-                                        {swapsLabel ? <MonoSpace>{feesLabel} (UTC)</MonoSpace> : null}
+                                        {swapsLabel ? <MonoSpace>{swapsLabel} (UTC)</MonoSpace> : null}
                                     </TYPE.main>
                                 </AutoColumn>
                             }

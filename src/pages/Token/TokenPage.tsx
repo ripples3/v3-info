@@ -114,7 +114,7 @@ export default function TokenPage({
     const [savedTokens, addSavedToken] = useSavedTokens();
 
     //CandleChart Data
-    //const { chartData } = useBalancerToken(address);
+    const { chartData } = useBalancerToken(address);
 
     //console.log("chartData", chartData)
 
@@ -212,6 +212,7 @@ export default function TokenPage({
                                 )}
                             </ResponsiveRow>
                         </AutoColumn>
+                        {! tokenData.symbol.includes('bb-') ?
                         <ContentLayout>
                             <DarkGreyCard>
                                 <AutoColumn gap="lg">
@@ -358,7 +359,7 @@ export default function TokenPage({
                   </AutoRow>
                 </RowBetween> */}
                             </DarkGreyCard>
-                        </ContentLayout>
+                        </ContentLayout> : null }
                         <TYPE.main>Pools</TYPE.main>
                         <DarkGreyCard>
                             <PoolTable poolDatas={poolData} />

@@ -1,10 +1,17 @@
 import React, { useRef } from 'react';
+import { NavLink } from 'react-router-dom';
+import { isMobile } from 'react-device-detect';
+import { darken } from 'polished';
 import { BookOpen, Code, Info, MessageCircle } from 'react-feather';
 import styled from 'styled-components';
+import Row from '../Row';
 import { ReactComponent as MenuIcon } from '../../assets/images/menu.svg';
 import { useOnClickOutside } from '../../hooks/useOnClickOutside';
 import { ApplicationModal } from '../../state/application/actions';
 import { useModalOpen, useToggleModal } from '../../state/application/hooks';
+import { useActiveNetworkVersion } from '../../state/application/hooks';
+import { networkPrefix } from 'utils/networkPrefix';
+import Column from 'components/Column';
 
 import { ExternalLink } from '../../theme';
 
@@ -80,6 +87,44 @@ const MenuItem = styled(ExternalLink)`
     }
 `;
 
+const activeClassName = 'ACTIVE';
+
+const StyledNavLink = styled(NavLink).attrs({
+    activeClassName,
+})`
+    ${({ theme }) => theme.flexRowNoWrap}
+    align-items: left;
+    border-radius: 3rem;
+    outline: none;
+    cursor: pointer;
+    text-decoration: none;
+    color: ${({ theme }) => theme.text3};
+    font-size: 1rem;
+    width: fit-content;
+    margin: 0 6px;
+    padding: 8px 12px;
+    font-weight: 500;
+
+    &.${activeClassName} {
+        border-radius: 12px;
+        background-color: ${({ theme }) => theme.bg2};
+        color: ${({ theme }) => theme.text1};
+    }
+
+    :hover,
+    :focus {
+        color: ${({ theme }) => darken(0.1, theme.text1)};
+    }
+`;
+
+const HeaderLinks = styled(Row)`
+    justify-content: center;
+    @media (max-width: 1080px) {
+        padding: 0.5rem;
+        justify-content: flex-end;
+    } ;
+`;
+
 const CODE_LINK = 'https://github.com/Xeonus/v3-info';
 
 export default function Menu() {
@@ -87,6 +132,7 @@ export default function Menu() {
     const open = useModalOpen(ApplicationModal.MENU);
     const toggle = useToggleModal(ApplicationModal.MENU);
     useOnClickOutside(node, open ? toggle : undefined);
+    const [activeNewtork] = useActiveNetworkVersion();
 
     return (
         // https://github.com/DefinitelyTyped/DefinitelyTyped/issues/30451
@@ -97,6 +143,28 @@ export default function Menu() {
 
             {open && (
                 <MenuFlyout>
+                    { isMobile ?
+                    <Column>
+                    <StyledNavLink
+                        id={`pool-nav-link`}
+                        to={networkPrefix(activeNewtork)}
+                        isActive={(match, { pathname }) => pathname === '/'}
+                    >
+                        Overview
+                    </StyledNavLink>
+                    <StyledNavLink id={`stake-nav-link`} to={networkPrefix(activeNewtork) + 'pools'}>
+                        Pools
+                    </StyledNavLink>
+                    <StyledNavLink id={`stake-nav-link`} to={networkPrefix(activeNewtork) + 'tokens'}>
+                        Tokens
+                    </StyledNavLink>
+                    <StyledNavLink id={`stake-nav-link`} to={networkPrefix(activeNewtork) + 'protocolFees'}>
+                        Fees
+                    </StyledNavLink>
+                    <StyledNavLink id={`stake-nav-link`} to={networkPrefix(activeNewtork) + 'treasury'}>
+                        Treasury
+                    </StyledNavLink>
+                </Column> : null}
                     <MenuItem id="link" href="https://balancer.fi/">
                         <Info size={14} />
                         About
