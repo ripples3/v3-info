@@ -8,7 +8,6 @@ import { AutoColumn } from 'components/Column';
 import { RowFixed } from 'components/Row';
 import { formatDollarAmount } from 'utils/numbers';
 import PoolCurrencyLogo from 'components/PoolCurrencyLogo';
-import { feeTierPercent } from 'utils';
 import { Label, ClickableText } from 'components/Text';
 import { PageButtons, Arrow, Break } from 'components/shared';
 import { POOL_HIDE } from '../../constants/index';
@@ -122,7 +121,7 @@ export default function PoolFeeTable({ poolDatas, maxItems = MAX_ITEMS }: { pool
     const sortedPools = useMemo(() => {
         return poolDatas
             ? poolDatas
-                  .filter((x) => !!x && !POOL_HIDE.includes(x.address) && x.poolType !== 'Element' )
+                  .filter((x) => !!x && !POOL_HIDE.includes(x.address) && x.poolType !== 'Element')
                   .sort((a, b) => {
                       if (a && b) {
                           return a[sortField as keyof PoolData] > b[sortField as keyof PoolData]

@@ -18,7 +18,6 @@ import { useActiveNetworkVersion, useSubgraphStatus } from 'state/application/ho
 import { DarkGreyCard } from 'components/Card';
 import { SUPPORTED_NETWORK_VERSIONS, EthereumNetworkInfo, SupportedNetwork } from 'constants/networks';
 import { loadTokenListTokens } from '../state/token-lists/token-lists';
-import IncentivePage from './Incentives/IncentivePage';
 import ProtocolFees from './ProtocolFees';
 import Treasury from './Treasury';
 
@@ -162,7 +161,6 @@ export default function App() {
                             <Popups />
                             <Switch>
                                 <Route exact strict path="/:networkID?/pools/:poolId" component={PoolPage} />
-                                <Route exact strict path="/:networkID?/incentives" component={IncentivePage} />
                                 <Route exact strict path="/:networkID?/protocolFees" component={ProtocolFees} />
                                 <Route exact strict path="/:networkID?/treasury" component={Treasury} />
                                 <Route exact strict path="/:networkID?/pools" component={PoolsOverview} />

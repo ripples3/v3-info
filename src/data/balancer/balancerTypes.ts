@@ -72,7 +72,7 @@ export interface PoolData {
     tvlUSDChange: number;
 
     feesUSD: number;
-    feesEpochUSD?: number;
+    feesEpochUSD: number;
 
     //Pool Type info
     poolType: string;

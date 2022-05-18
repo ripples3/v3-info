@@ -4140,23 +4140,19 @@ export type BalancerChartTokenPricesQueryVariables = Exact<{
 
 export type BalancerChartTokenPricesQuery = {
     __typename: 'Query';
-    prices1: Array<{ __typename: 'TokenPrice'; id: string; timestamp: number; priceUSD: string; amount: string }>;
-    prices2: Array<{ __typename: 'TokenPrice'; id: string; timestamp: number; priceUSD: string; amount: string }>;
-    prices3: Array<{ __typename: 'TokenPrice'; id: string; timestamp: number; priceUSD: string; amount: string }>;
-    prices4: Array<{ __typename: 'TokenPrice'; id: string; timestamp: number; priceUSD: string; amount: string }>;
-    prices5: Array<{ __typename: 'TokenPrice'; id: string; timestamp: number; priceUSD: string; amount: string }>;
-    prices6: Array<{ __typename: 'TokenPrice'; id: string; timestamp: number; priceUSD: string; amount: string }>;
-    prices7: Array<{ __typename: 'TokenPrice'; id: string; timestamp: number; priceUSD: string; amount: string }>;
-    prices8: Array<{ __typename: 'TokenPrice'; id: string; timestamp: number; priceUSD: string; amount: string }>;
-    prices9: Array<{ __typename: 'TokenPrice'; id: string; timestamp: number; priceUSD: string; amount: string }>;
-    prices10: Array<{ __typename: 'TokenPrice'; id: string; timestamp: number; priceUSD: string; amount: string }>;
+    prices1: Array<{ __typename: 'TokenPrice'; id: string; timestamp: number; price: string; amount: string }>;
+    prices2: Array<{ __typename: 'TokenPrice'; id: string; timestamp: number; price: string; amount: string }>;
+    prices3: Array<{ __typename: 'TokenPrice'; id: string; timestamp: number; price: string; amount: string }>;
+    prices4: Array<{ __typename: 'TokenPrice'; id: string; timestamp: number; price: string; amount: string }>;
+    prices5: Array<{ __typename: 'TokenPrice'; id: string; timestamp: number; price: string; amount: string }>;
+    prices6: Array<{ __typename: 'TokenPrice'; id: string; timestamp: number; price: string; amount: string }>;
 };
 
 export type BalancerChartTokenPriceFragment = {
     __typename: 'TokenPrice';
     id: string;
     timestamp: number;
-    priceUSD: string;
+    price: string;
     amount: string;
 };
 
@@ -4887,7 +4883,7 @@ export const BalancerChartTokenPriceFragmentDoc = gql`
     fragment BalancerChartTokenPrice on TokenPrice {
         id
         timestamp
-        priceUSD
+        price
         amount
     }
 `;
@@ -5785,42 +5781,6 @@ export const BalancerChartTokenPricesDocument = gql`
         }
         prices6: tokenPrices(
             skip: 5000
-            first: 1000
-            orderBy: timestamp
-            orderDirection: desc
-            where: { asset: $asset }
-        ) {
-            ...BalancerChartTokenPrice
-        }
-        prices7: tokenPrices(
-            skip: 6000
-            first: 1000
-            orderBy: timestamp
-            orderDirection: desc
-            where: { asset: $asset }
-        ) {
-            ...BalancerChartTokenPrice
-        }
-        prices8: tokenPrices(
-            skip: 7000
-            first: 1000
-            orderBy: timestamp
-            orderDirection: desc
-            where: { asset: $asset }
-        ) {
-            ...BalancerChartTokenPrice
-        }
-        prices9: tokenPrices(
-            skip: 8000
-            first: 1000
-            orderBy: timestamp
-            orderDirection: desc
-            where: { asset: $asset }
-        ) {
-            ...BalancerChartTokenPrice
-        }
-        prices10: tokenPrices(
-            skip: 9000
             first: 1000
             orderBy: timestamp
             orderDirection: desc

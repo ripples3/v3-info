@@ -64,7 +64,7 @@ const ContentLayout = styled.div`
 
 //TODO: create utils function to get timestamps
 //Poolsnapshots are taken OO:OO UTC. Generate previous snapshot date and previous Thu. Used to calculate weekly sweep fee generators
-const target = 3 // Wednesday
+const target = 2 // Wednesday
 const prevDate = new Date()
 prevDate.setDate(prevDate.getDate() - ( prevDate.getDay() == target ? 7 : (prevDate.getDay() + (7 - target)) % 7 ));
 prevDate.setUTCHours(0,0,0,0);

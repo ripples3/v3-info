@@ -10,6 +10,7 @@ import { COVALENT_TOKEN_BLACKLIST } from './tokenBlackList';
 
 interface WalletHistoricalData {
     totalValueData: BalancerChartDataItem[];
+    tokenDatas: any[],
     tvl?: number;
 }
 
@@ -22,41 +23,52 @@ export function useHistoricalWalletData(address: string): WalletHistoricalData {
 
     function getWalletBalancerChartData(walletData: WalletHistoryData) {
         const chartData: BalancerDateChartItem[] = [];
+        const tokenDatas: any[] = [];
         if (walletData) {
             //Iterate through each timepoint, then obtain total value from all positions (no restrictions on position size)
             for (let holdingsIndex = 0; holdingsIndex <= 30; holdingsIndex++) {
                 //obtain timestamp from first element
                 const chartItem = {} as BalancerDateChartItem;
+                const tokenData = {} as any;
                 chartItem.value = 0;
                 chartItem.time = new Date(walletData.data.items[0].holdings[holdingsIndex].timestamp);
+                tokenData.time = new Date(walletData.data.items[0].holdings[holdingsIndex].timestamp);
                 //Sum up all token holdings
                 walletData.data.items.forEach((item) => {
                     if (!COVALENT_TOKEN_BLACKLIST.includes(item.contract_address)) {
                     if (item.holdings[holdingsIndex].close.quote && typeof item.holdings[holdingsIndex].close.quote === 'number') {
                             chartItem.value += Number(item.holdings[holdingsIndex].close.quote);
+                            tokenData[item.contract_ticker_symbol] = Number(item.holdings[holdingsIndex].close.quote);
+                            
                     }
                 }
 
                 })
                 chartData.push(chartItem);
+                tokenDatas.push(tokenData);
             }
         }
-        return chartData;
+        return [chartData, tokenDatas];
     }
 
     const walletHistoricalData = GetAddressHistoricalTokenData(address)
 
     if (!walletHistoricalData) {
         return { 
-            totalValueData: [], 
+            totalValueData: [],
+            tokenDatas: [], 
         };
     }
 
     //console.log("rawWalletData", walletHistoricalData);
-    const walletChartData = getWalletBalancerChartData(walletHistoricalData);
+    const [walletChartData, walletTokenChartDatas] = getWalletBalancerChartData(walletHistoricalData);
 
     //Sort data
     const sortedAsc = walletChartData.sort(
+        (objA, objB) => objA.time.getTime() - objB.time.getTime(),
+    );
+
+    const sortedWalletTokenChartDatas = walletTokenChartDatas.sort(
         (objA, objB) => objA.time.getTime() - objB.time.getTime(),
     );
 
@@ -71,6 +83,7 @@ export function useHistoricalWalletData(address: string): WalletHistoricalData {
 
     return {
         totalValueData: sortedWalletChartData,
+        tokenDatas: sortedWalletTokenChartDatas,
         tvl: sortedWalletChartData[sortedWalletChartData.length - 1].value,
     };
 }

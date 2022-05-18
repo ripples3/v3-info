@@ -24,15 +24,11 @@ export function useBalancerToken(tokenAddress: string): BalancerTokenData {
         ...(pricesData?.prices4 || []),
         ...(pricesData?.prices5 || []),
         ...(pricesData?.prices6 || []),
-        ...(pricesData?.prices7 || []),
-        ...(pricesData?.prices8 || []),
-        ...(pricesData?.prices9 || []),
-        ...(pricesData?.prices10 || []),
     ];
 
     const formatted = prices.map((price) => ({
         ...price,
-        priceUSD: parseFloat(price.priceUSD),
+        priceUSD: parseFloat(price.price),
         amount: parseFloat(price.amount),
     }));
     const grouped = groupBy(formatted, (price) => `${Math.ceil(price.timestamp / TIME_INTERVAL) * TIME_INTERVAL}`);
