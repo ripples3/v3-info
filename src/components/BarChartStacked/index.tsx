@@ -1,5 +1,5 @@
 import React, { Dispatch, SetStateAction, ReactNode } from 'react';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
+import { Bar, BarChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import styled from 'styled-components';
 import Card from 'components/Card';
 import { RowBetween } from 'components/Row';
@@ -26,17 +26,25 @@ const Wrapper = styled(Card)`
   }
 `;
 
-const modifyFormatter = (value: any, name : any, color: string) => {
-    const nameJSX = <span><span style={{
-      display: "inline-block",
-      marginRight: "5px",
-      borderRadius: "10px",
-      width: "10px",
-      height: "10px",
-      backgroundColor: color
-    }}></span>{name} : {value}</span>
-    return [nameJSX];
-  }
+const CustomBar = ({
+    x,
+    y,
+    width,
+    height,
+    fill,
+}: {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+    fill: string;
+}) => {
+    return (
+        <g>
+            <rect x={x} y={y} fill={fill} width={width} height={height} rx="2" />
+        </g>
+    );
+};
 
 export type LineChartProps = {
     data: any[];
@@ -54,7 +62,7 @@ export type LineChartProps = {
     bottomRight?: ReactNode | undefined;
 } & React.HTMLAttributes<HTMLDivElement>;
 
-const StackedAreaChart = ({
+const BarChartStacked = ({
     data,
     color = '#56B2A4',
     tokenSet,
@@ -79,7 +87,7 @@ const StackedAreaChart = ({
                 {topRight ?? null}
             </RowBetween>
             <ResponsiveContainer width="100%" height="100%">
-                <AreaChart
+                <BarChart
                     width={500}
                     height={300}
                     data={data}
@@ -122,7 +130,7 @@ const StackedAreaChart = ({
                    { tokenSet.map((el) => 
                     <Area key={el} stackId="1" dataKey={el} type="monotone" stroke={getChartColor(el, tokenSet.indexOf(el))} fill={"url(#" + getChartColor(el, tokenSet.indexOf(el)) + ")"} strokeWidth={2} />
                     )}
-                </AreaChart>
+                </BarChart>
             </ResponsiveContainer>
             <RowBetween>
                 {bottomLeft ?? null}
@@ -132,4 +140,4 @@ const StackedAreaChart = ({
     );
 };
 
-export default StackedAreaChart;
+export default BarChartStacked;

@@ -18,13 +18,10 @@ import { useActiveNetworkVersion } from 'state/application/hooks';
 import { VolumeWindow } from 'types';
 import { useBalancerTokens } from '../../data/balancer/useTokens';
 import { useBalancerProtocolData } from '../../data/balancer/useProtocolData';
-import { useProtocolData, useProtocolChartData } from 'state/protocol/hooks'
 import PoolTable from '../../components/pools/PoolTable';
 import { useBalancerPools } from '../../data/balancer/usePools';
-import numbro from 'numbro';
 import SwapsTable from '../../components/TransactionsTable/SwapsTable';
 import Loader, { LocalLoader } from '../../components/Loader';
-import { BALANCER_PROJECT_NAME } from '../../data/balancer/constants';
 import { useTransformedVolumeData } from 'hooks/chart';
 
 const ChartWrapper = styled.div`

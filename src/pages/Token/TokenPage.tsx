@@ -88,7 +88,7 @@ export default function TokenPage({
 
     address = address.toLowerCase();
     // theming
-    const backgroundColor = useColor(address);
+    const backgroundColor = useColor(address, activeNetwork.id);
 
     // scroll on page view
     useEffect(() => {
@@ -116,7 +116,7 @@ export default function TokenPage({
     //CandleChart Data
     const { chartData } = useBalancerToken(address);
 
-    //console.log("chartData", chartData)
+    console.log("token infos: ", tokenData?.address, ' ', tokenData?.symbol, ' ', backgroundColor);
 
     return (
         <PageWrapper>
@@ -212,7 +212,7 @@ export default function TokenPage({
                                 )}
                             </ResponsiveRow>
                         </AutoColumn>
-                        {! tokenData.symbol.includes('bb-') ?
+
                         <ContentLayout>
                             <DarkGreyCard>
                                 <AutoColumn gap="lg">
@@ -359,7 +359,7 @@ export default function TokenPage({
                   </AutoRow>
                 </RowBetween> */}
                             </DarkGreyCard>
-                        </ContentLayout> : null }
+                        </ContentLayout>
                         <TYPE.main>Pools</TYPE.main>
                         <DarkGreyCard>
                             <PoolTable poolDatas={poolData} />

@@ -35,6 +35,7 @@ import curateTokenDatas from 'utils/curateTokenDatas';
 import { TokenData } from 'data/balancer/balancerTypes';
 import { COVALENT_TOKEN_BLACKLIST } from 'data/covalent/tokenBlackList';
 import { FEE_COLLECTOR_ADDRESS } from 'constants/wallets';
+import StackedAreaChart from 'components/StackedAreaChart';
 
 const ChartWrapper = styled.div`
     width: 49%;
@@ -129,6 +130,7 @@ export default function ProtocolFees() {
         return newData;
     }
 
+    const tokenSet :string[] = [];
     const [volumeWindow, setVolumeWindow] = useState(VolumeWindow.daily);
     const weeklyVolumeData = useTransformedVolumeData(adjustFees(protocolData?.feeData), 'week');
     const monthlyVolumeData = useTransformedVolumeData(adjustFees(protocolData?.feeData), 'month');
@@ -155,6 +157,10 @@ export default function ProtocolFees() {
         curatedTokenDatas = curateTokenDatas(formattedTokens, walletTokenData, sweepLimit, true);
         curatedTokenDatas = curatedTokenDatas.filter((x) => !!x && !COVALENT_TOKEN_BLACKLIST.includes(x.address));
         curatedTokenDatas.forEach ((item) => {
+            const token = walletTokenData.data.items.find(x => x.contract_address == item.address)
+            if (token && token.contract_ticker_symbol) {
+                tokenSet.push(token?.contract_ticker_symbol)
+            }
             if (item.address === balAddress) {
                 balAmount = item.valueUSDCollected;
             } else {
@@ -181,10 +187,8 @@ export default function ProtocolFees() {
         <PageWrapper>
             <AutoColumn gap="lg">
                 <TYPE.largeHeader>Protocol Fee Metrics </TYPE.largeHeader>
-
                 {protocolData?.feeData.length > 0 ?
                     <ResponsiveRow>
-
                         <BarChart
                             height={220}
                             minHeight={332}
@@ -238,8 +242,6 @@ export default function ProtocolFees() {
                                 </AutoColumn>
                             }
                         />
-
-
                     </ResponsiveRow> : <Loader />}
                 <ContentLayout>
                     {totalAmount > 0 && historicalCollectorData?.tvl ?
@@ -307,9 +309,10 @@ export default function ProtocolFees() {
                                 </DarkGreyCard> )}
                     </ AutoColumn>}
                     {historicalCollectorData?.tvl ?
-                        <LineChart
-                            data={historicalCollectorData?.totalValueData}
+                        <StackedAreaChart
+                            data={historicalCollectorData?.tokenDatas}
                             height={220}
+                            tokenSet={tokenSet}
                             minHeight={475}
                             color={activeNetwork.primaryColor}
                             value={liquidityHover}

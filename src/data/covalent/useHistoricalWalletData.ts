@@ -60,7 +60,6 @@ export function useHistoricalWalletData(address: string): WalletHistoricalData {
         };
     }
 
-    //console.log("rawWalletData", walletHistoricalData);
     const [walletChartData, walletTokenChartDatas] = getWalletBalancerChartData(walletHistoricalData);
 
     //Sort data
@@ -79,7 +78,7 @@ export function useHistoricalWalletData(address: string): WalletHistoricalData {
             time: item.time.toString(),
         }
     }
-    )
+    );
 
     return {
         totalValueData: sortedWalletChartData,

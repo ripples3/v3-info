@@ -126,7 +126,6 @@ export function useBalancerTokenPageData(address: string): {
 
     const tvlData = snapshots.map((snapshot) => {
         const value = parseFloat(snapshot.totalBalanceUSD);
-
         return {
             value: value > 0 ? value : 0,
             time: unixToDate(snapshot.timestamp),

@@ -7,6 +7,7 @@ import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import useTheme from 'hooks/useTheme';
 import { formatDollarAmount } from '../../utils/numbers';
+import getChartColor from '../../utils/getChartColor';
 
 dayjs.extend(utc);
 
@@ -28,6 +29,7 @@ const Wrapper = styled(Card)`
 export type PieChartProps = {
     data: any[];
     color?: string | undefined;
+    tokenSet: string[],
     height?: number | undefined;
     minHeight?: number;
     setValue?: Dispatch<SetStateAction<number | undefined>>; // used for value on hover
@@ -40,11 +42,10 @@ export type PieChartProps = {
     bottomRight?: ReactNode | undefined;
 } & React.HTMLAttributes<HTMLDivElement>;
 
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
-
 export const BalPieChart = ({
     data,
     color = '#56B2A4',
+    tokenSet,
     value,
     label,
     setValue,
@@ -76,9 +77,6 @@ export const BalPieChart = ({
                         outerRadius={80}
                         //fill="#8884d8"
                     >
-                        {data.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                        ))}
                     </Pie>
                     <Tooltip
                         cursor={{ stroke: theme.bg2 }}
@@ -96,6 +94,9 @@ export const BalPieChart = ({
                             return formatDollarAmount(value);
                         }}
                     />
+                    {data.map((entry, index) => (
+              <Cell key={`cell-${index}`} fill={getChartColor(entry.name, index)} />
+            ))}
                 </PieChart>
             </ResponsiveContainer>
             <RowBetween>

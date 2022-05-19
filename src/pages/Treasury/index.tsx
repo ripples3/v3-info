@@ -33,7 +33,10 @@ import { TREASURY_ADDRESS } from 'constants/wallets';
 import TreasuryTokenPortfolioTable from 'components/tokens/TreasuryTokenPortfolioTable';
 import CurrencyLogo from 'components/CurrencyLogo';
 import StackedAreaChart from 'components/StackedAreaChart';
-import { useColor } from 'hooks/useColor';
+import { BalPieChart } from 'components/PieChart/BalPieChart';
+
+
+
 const ChartWrapper = styled.div`
     width: 49%;
 
@@ -143,10 +146,8 @@ export default function Treasury() {
     }
 
 
-      const addressSet :string[] = [];
-      const tokenSet :string[] = [];
 
-
+    const tokenSet :string[] = [];
     const [volumeWindow, setVolumeWindow] = useState(VolumeWindow.daily);
     const weeklyVolumeData = useTransformedVolumeData(adjustFees(protocolData?.feeData), 'week');
     const monthlyVolumeData = useTransformedVolumeData(adjustFees(protocolData?.feeData), 'month');
@@ -180,9 +181,6 @@ export default function Treasury() {
         curatedProjectionData = curateTokenDatas(formattedTokens, walletTokenData, sweepLimit, true);
         curatedProjectionData = curatedProjectionData.filter((x) => !!x && !COVALENT_TOKEN_BLACKLIST.includes(x.address));
         curatedProjectionData.forEach ((item) => {
-            if (item.address) {
-                addressSet.push(item.address);
-            }
             const token = walletTokenData.data.items.find(x => x.contract_address == item.address)
             if (token && token.contract_ticker_symbol) {
                 tokenSet.push(token?.contract_ticker_symbol)
@@ -190,24 +188,6 @@ export default function Treasury() {
             totalAmount += item.valueUSDCollected;
         });
     }
-
-    //console.log("addressSet", addressSet);
-    //console.log("tokenSet", tokenSet)
-
-    const tokenColors :string[] = [];
-    //addressSet.forEach ((el) => {
-    //    const color = useColor(el);
-    //    tokenColors.push(color);
-    //});
-
-    const color1 = useColor(addressSet[0]);
-    const color2 = useColor(addressSet[1]);
-    const color3 = useColor(addressSet[2]);
-    const color4 = useColor(addressSet[3]);
-    tokenColors.push(color1);
-    tokenColors.push(color2);
-    tokenColors.push(color3);
-    tokenColors.push(color4);
 
     const balAssets = curatedProjectionData.find((x) => x.address == balAddress);
 
@@ -218,6 +198,20 @@ export default function Treasury() {
            isEmptySet = true;
        }
    }
+
+   const rawData = historicalCollectorData.tokenDatas[historicalCollectorData.tokenDatas.length -1];
+   if (rawData && rawData.time)  {
+    delete rawData['time'];
+   }
+   const pieChartData: any[] = [];
+   for (const key in rawData) {
+       const entry:any = {};
+       entry.name = key;
+       entry.value = rawData[key];
+       pieChartData.push(entry);
+
+   }
+
 
     //------------------------------------------------
 
@@ -396,7 +390,6 @@ export default function Treasury() {
                     {totalAmount > 0 && historicalCollectorData?.tvl ?
                         <StackedAreaChart
                             data={historicalCollectorData.tokenDatas}
-                            colorSet = {tokenColors}
                             tokenSet={tokenSet}
                             height={220}
                             minHeight={500}
@@ -407,6 +400,18 @@ export default function Treasury() {
                             </DarkGreyCard>
                         </ AutoColumn>}
                 </ContentLayout>
+                {pieChartData && historicalCollectorData?.tvl ?
+                        <BalPieChart
+                            data={pieChartData}
+                            tokenSet={tokenSet}
+                            height={220}
+                            minHeight={500}
+                        /> : <AutoColumn gap="lg" justify='flex-start'>
+                            <DarkGreyCard>
+                                <TYPE.main fontSize="18px">Fetching historical token data...</TYPE.main>
+                                <LocalLoader fill={false} />
+                            </DarkGreyCard>
+                        </ AutoColumn>}
                 <TYPE.main> Tokens in treasury wallet </TYPE.main>
                 <TreasuryTokenPortfolioTable tokenDatas={curatedTokenDatas} />
                 <TYPE.main> Liquidity Pools </TYPE.main>

@@ -20,6 +20,7 @@ import { SUPPORTED_NETWORK_VERSIONS, EthereumNetworkInfo, SupportedNetwork } fro
 import { loadTokenListTokens } from '../state/token-lists/token-lists';
 import ProtocolFees from './ProtocolFees';
 import Treasury from './Treasury';
+import Protocol from './Protocol';
 
 const AppWrapper = styled.div`
     display: flex;
@@ -162,6 +163,7 @@ export default function App() {
                             <Switch>
                                 <Route exact strict path="/:networkID?/pools/:poolId" component={PoolPage} />
                                 <Route exact strict path="/:networkID?/protocolFees" component={ProtocolFees} />
+                                <Route exact strict path="/protocol" component={Protocol} />
                                 <Route exact strict path="/:networkID?/treasury" component={Treasury} />
                                 <Route exact strict path="/:networkID?/pools" component={PoolsOverview} />
                                 <Route
