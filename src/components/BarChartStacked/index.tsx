@@ -128,7 +128,25 @@ const BarChartStacked = ({
                     labelFormatter={(time) => dayjs(time).format('DD.MM.YY')}
                     />
                    { tokenSet.map((el) => 
-                    <Area key={el} stackId="1" dataKey={el} type="monotone" stroke={getChartColor(el, tokenSet.indexOf(el))} fill={"url(#" + getChartColor(el, tokenSet.indexOf(el)) + ")"} strokeWidth={2} />
+                    <Bar 
+                    key={el} 
+                    dataKey={el} 
+                    stackId="a" 
+                    stroke={getChartColor(el, tokenSet.indexOf(el))} 
+                    fill={"url(#" + getChartColor(el, tokenSet.indexOf(el)) + ")"} 
+                    strokeWidth={2}
+                    shape={(props) => {
+                        return (
+                            <CustomBar
+                                height={props.height}
+                                width={props.width}
+                                x={props.x}
+                                y={props.y}
+                                fill={getChartColor(el, tokenSet.indexOf(el))}
+                            />
+                        );
+                    }} 
+                    />
                     )}
                 </BarChart>
             </ResponsiveContainer>

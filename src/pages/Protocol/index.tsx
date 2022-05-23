@@ -26,6 +26,9 @@ import { useTransformedVolumeData } from 'hooks/chart';
 import { useBalancerChainProtocolData } from 'data/balancer/useAggregatedProtocolData';
 import { ArbitrumNetworkInfo, EthereumNetworkInfo, PolygonNetworkInfo} from 'constants/networks';
 import { CHAIN_COLORS } from 'constants/tokenColorList';
+import { client, arbitrumClient, arbitrumBlockClient, polygonClient, polygonBlockClient } from 'apollo/client';
+import StackedAreaChart from 'components/StackedAreaChart';
+import BarChartStacked from 'components/BarChartStacked';
 
 const ChartWrapper = styled.div`
     width: 49%;
@@ -44,15 +47,16 @@ export default function Protocol() {
 
     const [activeNetwork] = useActiveNetworkVersion();
 
-    const protocolData = useBalancerChainProtocolData(EthereumNetworkInfo.clientUri, EthereumNetworkInfo.startTimeStamp);
-    const protocolArbitrumData = useBalancerChainProtocolData(ArbitrumNetworkInfo.clientUri, ArbitrumNetworkInfo.startTimeStamp);
-    const protocolPolygonData = useBalancerChainProtocolData(PolygonNetworkInfo.clientUri, PolygonNetworkInfo.startTimeStamp);
 
-    console.log("mainnet: ", protocolData);
-    console.log("arbitrum", protocolArbitrumData);
+    const protocolData = useBalancerChainProtocolData(EthereumNetworkInfo.clientUri, EthereumNetworkInfo.startTimeStamp);
+    const protocolArbitrumData = useBalancerChainProtocolData(ArbitrumNetworkInfo.clientUri, ArbitrumNetworkInfo.startTimeStamp, arbitrumBlockClient, arbitrumClient);
+    const protocolPolygonData = useBalancerChainProtocolData(PolygonNetworkInfo.clientUri, PolygonNetworkInfo.startTimeStamp, polygonBlockClient, polygonClient);
+
+
 
     //Looping through protocol data, as this one has the longest chain
     const aggregatedTVL:any[] = [];
+    let  protocolTVL = 0;
     //Create aggregate / stitched together TVL test:
     if (protocolData.tvlData && protocolArbitrumData.tvlData && protocolPolygonData.tvlData) {
         //time, value, chainId
@@ -62,11 +66,10 @@ export default function Protocol() {
             const aggregatedEntry = {
                 time: el.time,
                 Mainnet: el.value,
-                Arbitrum: 0,
-                Polygon: 0,
+                Arbitrum: NaN,
+                Polygon: NaN,
             }
             const arbitrumEntry = protocolArbitrumData.tvlData.find((arbItem) => arbItem.time === el.time);
-            //console.log("arbitrumEntry", arbitrumEntry, ' mainnetEntry: ', el)
             const polygonEntry = protocolPolygonData.tvlData.find((polyItem) => polyItem.time === el.time);
             if (arbitrumEntry?.time) {
                 aggregatedEntry['Arbitrum'] = arbitrumEntry.value;
@@ -77,9 +80,72 @@ export default function Protocol() {
 
             aggregatedTVL.push(aggregatedEntry);
         })
+        if (protocolData.tvl && protocolArbitrumData.tvl && protocolPolygonData.tvl) {
+            protocolTVL = protocolData.tvl + protocolArbitrumData.tvl + protocolPolygonData.tvl;
+        }
     }
 
-    console.log("aggregatedData", aggregatedTVL);
+    //Create aggregate volume & fee data
+    const aggregatedVolume:any[] = [];
+    let  protocolVolume = 0;
+
+
+
+    if (protocolData.volumeData && protocolArbitrumData.volumeData && protocolPolygonData.volumeData) {
+        //time, value, chainId
+        
+        protocolData.volumeData.forEach((el) => {
+            //add chain info
+            const aggregatedEntry = {
+                time: el.time,
+                Mainnet: el.value,
+                Arbitrum: 0,
+                Polygon: 0,
+            }
+            const arbitrumEntry = protocolArbitrumData.volumeData.find((arbItem) => arbItem.time === el.time);
+            const polygonEntry = protocolPolygonData.volumeData.find((polyItem) => polyItem.time === el.time);
+            if (arbitrumEntry?.time) {
+                aggregatedEntry['Arbitrum'] = arbitrumEntry.value;
+            }
+            if (polygonEntry?.time) {
+                aggregatedEntry['Polygon'] = polygonEntry.value;
+            }
+
+            aggregatedVolume.push(aggregatedEntry);
+        })
+        if (protocolData.volume24 && protocolArbitrumData.volume24 && protocolPolygonData.volume24) {
+            protocolVolume = protocolData.volume24 + protocolArbitrumData.volume24 + protocolPolygonData.volume24;
+        }
+    }
+
+    const aggregatedWeeklyVolume:any[] = [];
+    const weeklyVolumeData = useTransformedVolumeData(protocolData?.volumeData, 'week');
+    const weeklyArbitrumVolumeData = useTransformedVolumeData(protocolArbitrumData?.volumeData, 'week');
+    const weeklyPolygonVolumeData = useTransformedVolumeData(protocolPolygonData?.volumeData, 'week');
+
+    if (weeklyVolumeData && weeklyArbitrumVolumeData && weeklyPolygonVolumeData) {
+        //time, value, chainId
+        
+        weeklyVolumeData.forEach((el) => {
+            //add chain info
+            const aggregatedEntry = {
+                time: el.time,
+                Mainnet: el.value,
+                Arbitrum: 0,
+                Polygon: 0,
+            }
+            const arbitrumEntry = weeklyArbitrumVolumeData.find((arbItem) => arbItem.time === el.time);
+            const polygonEntry = weeklyPolygonVolumeData.find((polyItem) => polyItem.time === el.time);
+            if (arbitrumEntry?.time) {
+                aggregatedEntry['Arbitrum'] = arbitrumEntry.value;
+            }
+            if (polygonEntry?.time) {
+                aggregatedEntry['Polygon'] = polygonEntry.value;
+            }
+
+            aggregatedWeeklyVolume.push(aggregatedEntry);
+        })
+    }
 
     const [volumeHover, setVolumeHover] = useState<number | undefined>();
     const [liquidityHover, setLiquidityHover] = useState<number | undefined>();
@@ -91,11 +157,11 @@ export default function Protocol() {
     const [feesLabel, setFeesLabel] = useState<string | undefined>();
     
     useEffect(() => {
-        setLiquidityHover(undefined);
-        setVolumeHover(undefined);
+        setLiquidityHover(protocolTVL);
+        setVolumeHover(protocolVolume);
         setFeesHover(undefined);
         setSwapsHover(undefined);
-    }, [activeNetwork]);
+    }, [activeNetwork, protocolTVL]);
 
     const [volumeWindow, setVolumeWindow] = useState(VolumeWindow.weekly);
     const [feeWindow, setFeeWindow] = useState(VolumeWindow.weekly);
@@ -105,13 +171,13 @@ export default function Protocol() {
     // if hover value undefined, reset to current day value
     useEffect(() => {
         if (!volumeHover && protocolData) {
-            setVolumeHover(protocolData.volume24);
+            setVolumeHover(protocolVolume);
         }
     }, [volumeHover, protocolData]);
 
     useEffect(() => {
-        if (liquidityHover === undefined && protocolData) {
-          setLiquidityHover(protocolData.tvl)
+        if (liquidityHover === undefined && protocolTVL > 0) {
+          setLiquidityHover(protocolTVL)
         }
       }, [liquidityHover, protocolData])
 
@@ -129,7 +195,7 @@ export default function Protocol() {
 
 
     //Sorted by time-window
-    const weeklyVolumeData = useTransformedVolumeData(protocolData?.volumeData, 'week');
+    
     const monthlyVolumeData = useTransformedVolumeData(protocolData?.volumeData, 'month');
 
     const weeklyFeeData = useTransformedVolumeData(protocolData?.feeData, 'week');
@@ -143,11 +209,12 @@ export default function Protocol() {
             <ThemedBackgroundGlobal backgroundColor={activeNetwork.bgColor} />
             <AutoColumn gap="16px">
                 <TYPE.largeHeader>Protocol Overview</TYPE.largeHeader>
-                {protocolData?.volumeData.length > 0 ?
+                {protocolData.tvlData && protocolArbitrumData.tvlData && protocolPolygonData.tvlData ?
                 <ResponsiveRow>
                     <ChartWrapper>
-                        <LineChart
-                            data={protocolData?.tvlData}
+                        <StackedAreaChart
+                            data={aggregatedTVL}
+                            tokenSet={['Mainnet', 'Arbitrum', 'Polygon']}
                             height={220}
                             minHeight={332}
                             color={activeNetwork.primaryColor}
@@ -168,47 +235,18 @@ export default function Protocol() {
                             }
                         />
                     </ChartWrapper>
+                    {protocolData.volumeData && protocolArbitrumData.volumeData && protocolPolygonData.volumeData ?
                     <ChartWrapper>
-                    <BarChart
+                    <BarChartStacked
                             height={220}
                             minHeight={332}
-                            data={
-                                volumeWindow === VolumeWindow.monthly
-                                  ? monthlyVolumeData
-                                  : volumeWindow === VolumeWindow.weekly
-                                  ? weeklyVolumeData
-                                  : protocolData.volumeData
-                              }
+                            data={aggregatedWeeklyVolume}
                             color={activeNetwork.primaryColor}
+                            tokenSet={['Mainnet', 'Arbitrum', 'Polygon']}
                             setValue={setVolumeHover}
                             setLabel={setRightLabel}
                             value={volumeHover}
                             label={rightLabel}
-                            activeWindow={volumeWindow}
-                            topRight={
-                                <RowFixed style={{ marginLeft: '-40px', marginTop: '8px' }}>
-                                    <SmallOptionButton
-                                        active={volumeWindow === VolumeWindow.daily}
-                                        onClick={() => setVolumeWindow(VolumeWindow.daily)}
-                                    >
-                                        D
-                                    </SmallOptionButton>
-                                    <SmallOptionButton
-                                        active={volumeWindow === VolumeWindow.weekly}
-                                        style={{ marginLeft: '8px' }}
-                                        onClick={() => setVolumeWindow(VolumeWindow.weekly)}
-                                    >
-                                        W
-                                    </SmallOptionButton>
-                                    <SmallOptionButton
-                                        active={volumeWindow === VolumeWindow.monthly}
-                                        style={{ marginLeft: '8px' }}
-                                        onClick={() => setVolumeWindow(VolumeWindow.monthly)}
-                                    >
-                                        M
-                                    </SmallOptionButton>
-                                </RowFixed>
-                            }
                             topLeft={
                                 <AutoColumn gap="4px">
                                     <TYPE.mediumHeader fontSize="16px">Trading Volume</TYPE.mediumHeader>
@@ -221,7 +259,7 @@ export default function Protocol() {
                                 </AutoColumn>
                             }
                         />
-                    </ChartWrapper>
+                    </ChartWrapper> : null }
                 </ResponsiveRow> : null }
                 {protocolData?.swapData?.length?
                 <ResponsiveRow>

@@ -122,15 +122,18 @@ export const ALTERNATIVE_COLORS = [
 
 export const CHAIN_COLORS = [
     {
+        name: 'Mainnet',
         chainId: 1,
         color: '#0095E5'
     },
     {
+        name: 'Polygon',
         chainId: 137,
         color: '#8247e5'
     },
     {
+        name: 'Arbitrum',
         chainId: 42161,
-        color: '#0A294B'
+        color: '#00bfe5'
     }
 ]

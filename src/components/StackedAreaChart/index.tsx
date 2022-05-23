@@ -7,6 +7,7 @@ import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import useTheme from 'hooks/useTheme';
 import { darken } from 'polished';
+import { VolumeWindow } from 'types';
 import { formatAmount, formatDollarAmount } from 'utils/numbers';
 import getChartColor from '../../utils/getChartColor';
 dayjs.extend(utc);
@@ -44,6 +45,7 @@ export type LineChartProps = {
     tokenSet: string[],
     height?: number | undefined;
     minHeight?: number;
+    activeWindow?: VolumeWindow;
     setValue?: Dispatch<SetStateAction<number | undefined>>; // used for value on hover
     setLabel?: Dispatch<SetStateAction<string | undefined>>; // used for label of valye
     value?: number;
@@ -62,6 +64,7 @@ const StackedAreaChart = ({
     label,
     setValue,
     setLabel,
+    activeWindow,
     topLeft,
     topRight,
     bottomLeft,
@@ -86,7 +89,7 @@ const StackedAreaChart = ({
                     margin={{
                         top: 5,
                         right: 30,
-                        left: 20,
+                        left: 25,
                         bottom: 5,
                     }}
                     onMouseLeave={() => {
@@ -111,7 +114,7 @@ const StackedAreaChart = ({
                     />
                     <YAxis 
                     allowDataOverflow={true} 
-                    tickFormatter={(BAL) => formatDollarAmount(BAL)}
+                    tickFormatter={(el) => formatDollarAmount(el, 1, true)}
                     />
                     <Legend />
                     <Tooltip
@@ -120,7 +123,7 @@ const StackedAreaChart = ({
                     labelFormatter={(time) => dayjs(time).format('DD.MM.YY')}
                     />
                    { tokenSet.map((el) => 
-                    <Area key={el} stackId="1" dataKey={el} type="monotone" stroke={getChartColor(el, tokenSet.indexOf(el))} fill={"url(#" + getChartColor(el, tokenSet.indexOf(el)) + ")"} strokeWidth={2} />
+                    <Area key={el} fillOpacity={1} stackId="a" dataKey={el} type="monotone" stroke={getChartColor(el, tokenSet.indexOf(el))} fill={"url(#" + getChartColor(el, tokenSet.indexOf(el)) + ")"} strokeWidth={2} />
                     )}
                 </AreaChart>
             </ResponsiveContainer>
