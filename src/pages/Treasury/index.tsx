@@ -323,6 +323,7 @@ export default function Treasury() {
                             </DarkGreyCard>
                         </ AutoColumn>}
                 </ContentLayout>
+                {/*
                 <ContentLayout>
                     {totalAmount > 0 && historicalCollectorData?.tvl ?
                         <DarkGreyCard>
@@ -399,7 +400,7 @@ export default function Treasury() {
                                 <LocalLoader fill={false} />
                             </DarkGreyCard>
                         </ AutoColumn>}
-                </ContentLayout>
+                    </ContentLayout> 
                 {pieChartData && historicalCollectorData?.tvl ?
                         <BalPieChart
                             data={pieChartData}
@@ -411,7 +412,7 @@ export default function Treasury() {
                                 <TYPE.main fontSize="18px">Fetching historical token data...</TYPE.main>
                                 <LocalLoader fill={false} />
                             </DarkGreyCard>
-                        </ AutoColumn>}
+                        </ AutoColumn>} */}
                 <TYPE.main> Tokens in treasury wallet </TYPE.main>
                 <TreasuryTokenPortfolioTable tokenDatas={curatedTokenDatas} />
                 <TYPE.main> Liquidity Pools </TYPE.main>

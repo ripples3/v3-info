@@ -46,8 +46,6 @@ export type LineChartProps = {
     height?: number | undefined;
     minHeight?: number;
     activeWindow?: VolumeWindow;
-    setValue?: Dispatch<SetStateAction<number | undefined>>; // used for value on hover
-    setLabel?: Dispatch<SetStateAction<string | undefined>>; // used for label of valye
     value?: number;
     label?: string;
     topLeft?: ReactNode | undefined;
@@ -62,8 +60,6 @@ const StackedAreaChart = ({
     tokenSet,
     value,
     label,
-    setValue,
-    setLabel,
     activeWindow,
     topLeft,
     topRight,
@@ -92,10 +88,6 @@ const StackedAreaChart = ({
                         left: 25,
                         bottom: 5,
                     }}
-                    onMouseLeave={() => {
-                        setLabel && setLabel(undefined);
-                        setValue && setValue(undefined);
-                    }}
                 >
                     <defs>
                         {tokenSet.map((el) => 
@@ -114,7 +106,7 @@ const StackedAreaChart = ({
                     />
                     <YAxis 
                     allowDataOverflow={true} 
-                    tickFormatter={(el) => formatDollarAmount(el, 1, true)}
+                    tickFormatter={(el) => formatDollarAmount(el, 2, true)}
                     />
                     <Legend />
                     <Tooltip

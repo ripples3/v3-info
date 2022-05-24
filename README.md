@@ -2,7 +2,7 @@
 
 An open sourced interface for Balancer V2 analytics - forked from Uniswap v3 analytics.
 
-Info URL: https://info.uniswap.org/#/
+Info URL: https://info.balancer.xeonus.io/#/
 
 ## Development
 

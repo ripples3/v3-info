@@ -6,7 +6,7 @@ import { ResponsiveRow, RowBetween, RowFixed } from 'components/Row';
 import LineChart from 'components/LineChart/alt';
 import useTheme from 'hooks/useTheme';
 import { DarkGreyCard } from 'components/Card';
-import { formatDollarAmount } from 'utils/numbers';
+import { formatAmount, formatDollarAmount } from 'utils/numbers';
 import Percent from 'components/Percent';
 import { HideMedium, HideSmall, StyledInternalLink } from '../../theme';
 import TokenTable from 'components/tokens/TokenTable';
@@ -29,6 +29,7 @@ import { CHAIN_COLORS } from 'constants/tokenColorList';
 import { client, arbitrumClient, arbitrumBlockClient, polygonClient, polygonBlockClient } from 'apollo/client';
 import StackedAreaChart from 'components/StackedAreaChart';
 import BarChartStacked from 'components/BarChartStacked';
+import getAggregatedProtocolChartData from 'utils/getAggregatedProtocolChartData';
 
 const ChartWrapper = styled.div`
     width: 49%;
@@ -46,106 +47,95 @@ export default function Protocol() {
     const theme = useTheme();
 
     const [activeNetwork] = useActiveNetworkVersion();
-
-
     const protocolData = useBalancerChainProtocolData(EthereumNetworkInfo.clientUri, EthereumNetworkInfo.startTimeStamp);
     const protocolArbitrumData = useBalancerChainProtocolData(ArbitrumNetworkInfo.clientUri, ArbitrumNetworkInfo.startTimeStamp, arbitrumBlockClient, arbitrumClient);
     const protocolPolygonData = useBalancerChainProtocolData(PolygonNetworkInfo.clientUri, PolygonNetworkInfo.startTimeStamp, polygonBlockClient, polygonClient);
 
 
-
-    //Looping through protocol data, as this one has the longest chain
-    const aggregatedTVL:any[] = [];
+    //---Aggregated TVL Data---
+    let aggregatedTVL:any[] = [];
     let  protocolTVL = 0;
+    let protocolTVLChange = 0;
     //Create aggregate / stitched together TVL test:
     if (protocolData.tvlData && protocolArbitrumData.tvlData && protocolPolygonData.tvlData) {
-        //time, value, chainId
-        
-        protocolData.tvlData.forEach((el) => {
-            //add chain info
-            const aggregatedEntry = {
-                time: el.time,
-                Mainnet: el.value,
-                Arbitrum: NaN,
-                Polygon: NaN,
-            }
-            const arbitrumEntry = protocolArbitrumData.tvlData.find((arbItem) => arbItem.time === el.time);
-            const polygonEntry = protocolPolygonData.tvlData.find((polyItem) => polyItem.time === el.time);
-            if (arbitrumEntry?.time) {
-                aggregatedEntry['Arbitrum'] = arbitrumEntry.value;
-            }
-            if (polygonEntry?.time) {
-                aggregatedEntry['Polygon'] = polygonEntry.value;
-            }
-
-            aggregatedTVL.push(aggregatedEntry);
-        })
+        aggregatedTVL = getAggregatedProtocolChartData(protocolData.tvlData, protocolArbitrumData.tvlData, protocolPolygonData.tvlData, NaN)
         if (protocolData.tvl && protocolArbitrumData.tvl && protocolPolygonData.tvl) {
             protocolTVL = protocolData.tvl + protocolArbitrumData.tvl + protocolPolygonData.tvl;
         }
-    }
-
-    //Create aggregate volume & fee data
-    const aggregatedVolume:any[] = [];
-    let  protocolVolume = 0;
-
-
-
-    if (protocolData.volumeData && protocolArbitrumData.volumeData && protocolPolygonData.volumeData) {
-        //time, value, chainId
-        
-        protocolData.volumeData.forEach((el) => {
-            //add chain info
-            const aggregatedEntry = {
-                time: el.time,
-                Mainnet: el.value,
-                Arbitrum: 0,
-                Polygon: 0,
-            }
-            const arbitrumEntry = protocolArbitrumData.volumeData.find((arbItem) => arbItem.time === el.time);
-            const polygonEntry = protocolPolygonData.volumeData.find((polyItem) => polyItem.time === el.time);
-            if (arbitrumEntry?.time) {
-                aggregatedEntry['Arbitrum'] = arbitrumEntry.value;
-            }
-            if (polygonEntry?.time) {
-                aggregatedEntry['Polygon'] = polygonEntry.value;
-            }
-
-            aggregatedVolume.push(aggregatedEntry);
-        })
-        if (protocolData.volume24 && protocolArbitrumData.volume24 && protocolPolygonData.volume24) {
-            protocolVolume = protocolData.volume24 + protocolArbitrumData.volume24 + protocolPolygonData.volume24;
+        if (protocolData.tvlChange && protocolArbitrumData.tvlChange && protocolPolygonData.tvlChange) {
+            protocolTVLChange = protocolData.tvlChange + protocolArbitrumData.tvlChange + protocolPolygonData.tvlChange;
         }
     }
 
-    const aggregatedWeeklyVolume:any[] = [];
+    //---Aggregated Trading volume data---
+    let aggregatedVolume:any[] = [];
+    let  protocolVolume = 0;
+    let protocolVolumeChange = 0
+    if (protocolData.volumeData && protocolArbitrumData.volumeData && protocolPolygonData.volumeData) {
+        aggregatedVolume = getAggregatedProtocolChartData(protocolData.volumeData, protocolArbitrumData.volumeData, protocolPolygonData.volumeData, 0)
+        if (protocolData.volume24 && protocolArbitrumData.volume24 && protocolPolygonData.volume24) {
+            protocolVolume = protocolData.volume24 + protocolArbitrumData.volume24 + protocolPolygonData.volume24;
+        }
+        if (protocolData.volumeChange && protocolArbitrumData.volumeChange && protocolPolygonData.volumeChange) {
+            protocolVolumeChange = protocolData.volumeChange + protocolArbitrumData.volumeChange + protocolPolygonData.volumeChange;
+        }
+    }
+    let aggregatedWeeklyVolume:any[] = [];
     const weeklyVolumeData = useTransformedVolumeData(protocolData?.volumeData, 'week');
     const weeklyArbitrumVolumeData = useTransformedVolumeData(protocolArbitrumData?.volumeData, 'week');
     const weeklyPolygonVolumeData = useTransformedVolumeData(protocolPolygonData?.volumeData, 'week');
 
     if (weeklyVolumeData && weeklyArbitrumVolumeData && weeklyPolygonVolumeData) {
         //time, value, chainId
-        
-        weeklyVolumeData.forEach((el) => {
-            //add chain info
-            const aggregatedEntry = {
-                time: el.time,
-                Mainnet: el.value,
-                Arbitrum: 0,
-                Polygon: 0,
-            }
-            const arbitrumEntry = weeklyArbitrumVolumeData.find((arbItem) => arbItem.time === el.time);
-            const polygonEntry = weeklyPolygonVolumeData.find((polyItem) => polyItem.time === el.time);
-            if (arbitrumEntry?.time) {
-                aggregatedEntry['Arbitrum'] = arbitrumEntry.value;
-            }
-            if (polygonEntry?.time) {
-                aggregatedEntry['Polygon'] = polygonEntry.value;
-            }
-
-            aggregatedWeeklyVolume.push(aggregatedEntry);
-        })
+        aggregatedWeeklyVolume = getAggregatedProtocolChartData(weeklyVolumeData, weeklyArbitrumVolumeData, weeklyPolygonVolumeData, 0)
     }
+
+    //---Aggregated Swaps data---
+    let aggregatedSwaps:any[] = [];
+    let  protocolSwaps = 0;
+    if (protocolData.swapData && protocolArbitrumData.swapData && protocolPolygonData.swapData) {
+        aggregatedSwaps = getAggregatedProtocolChartData(protocolData.swapData, protocolArbitrumData.swapData, protocolPolygonData.swapData, 0)
+        if (protocolData.swaps24 && protocolArbitrumData.swaps24 && protocolPolygonData.swaps24) {
+            protocolSwaps = protocolData.swaps24 + protocolArbitrumData.swaps24 + protocolPolygonData.swaps24;
+        }
+        if (protocolData.swaps24 && protocolArbitrumData.swaps24 && protocolPolygonData.swaps24) {
+            protocolSwaps = protocolData.swaps24 + protocolArbitrumData.swaps24 + protocolPolygonData.swaps24;
+        }
+    }
+    let aggregatedWeeklySwaps:any[] = [];
+    const weeklySwapData = useTransformedVolumeData(protocolData?.swapData, 'week');
+    const weeklyArbitrumSwapData = useTransformedVolumeData(protocolArbitrumData?.swapData, 'week');
+    const weeklyPolygonSwapData = useTransformedVolumeData(protocolPolygonData?.swapData, 'week');
+
+    if (weeklySwapData && weeklyArbitrumSwapData && weeklyPolygonSwapData) {
+        //time, value, chainId
+        aggregatedWeeklySwaps = getAggregatedProtocolChartData(weeklySwapData, weeklyArbitrumSwapData, weeklyPolygonSwapData, 0)
+    }
+
+    //---Aggregated fee data
+        //---Aggregated Swaps data---
+        let aggregatedFees:any[] = [];
+        let  protocolFees = 0;
+        let protocolFeesChange = 0;
+        if (protocolData.feeData && protocolArbitrumData.feeData && protocolPolygonData.feeData) {
+            aggregatedFees = getAggregatedProtocolChartData(protocolData.feeData, protocolArbitrumData.feeData, protocolPolygonData.feeData, 0)
+            if (protocolData.fees24 && protocolArbitrumData.fees24 && protocolPolygonData.fees24) {
+                protocolFees = protocolData.fees24 + protocolArbitrumData.fees24 + protocolPolygonData.fees24;
+            }
+            if (protocolData.feesChange && protocolArbitrumData.feesChange && protocolPolygonData.feesChange) {
+                protocolFeesChange = protocolData.feesChange + protocolArbitrumData.feesChange + protocolPolygonData.feesChange;
+            }
+        }
+        let aggregatedWeeklyFees:any[] = [];
+        const weeklyFeeData = useTransformedVolumeData(protocolData?.feeData, 'week');
+        const weeklyArbitrumFeeData = useTransformedVolumeData(protocolArbitrumData?.feeData, 'week');
+        const weeklyPolygonFeeData = useTransformedVolumeData(protocolPolygonData?.feeData, 'week');
+    
+        if (weeklySwapData && weeklyArbitrumSwapData && weeklyPolygonSwapData) {
+            //time, value, chainId
+            aggregatedWeeklyFees = getAggregatedProtocolChartData(weeklyFeeData, weeklyArbitrumFeeData, weeklyPolygonFeeData, 0)
+        }
+    
 
     const [volumeHover, setVolumeHover] = useState<number | undefined>();
     const [liquidityHover, setLiquidityHover] = useState<number | undefined>();
@@ -159,14 +149,9 @@ export default function Protocol() {
     useEffect(() => {
         setLiquidityHover(protocolTVL);
         setVolumeHover(protocolVolume);
-        setFeesHover(undefined);
-        setSwapsHover(undefined);
+        setFeesHover(protocolFees);
+        setSwapsHover(protocolSwaps);
     }, [activeNetwork, protocolTVL]);
-
-    const [volumeWindow, setVolumeWindow] = useState(VolumeWindow.weekly);
-    const [feeWindow, setFeeWindow] = useState(VolumeWindow.weekly);
-    const [swapWindow, setSwapWindow] = useState(VolumeWindow.weekly);
-
 
     // if hover value undefined, reset to current day value
     useEffect(() => {
@@ -183,33 +168,22 @@ export default function Protocol() {
 
     useEffect(() => {
         if (!feesHover && protocolData) {
-            setFeesHover(protocolData.fees24);
+            setFeesHover(protocolFees);
         }
     }, [feesHover, protocolData]);
 
     useEffect(() => {
         if (!swapsHover && protocolData?.swaps24) {
-            setSwapsHover(protocolData.swaps24);
+            setSwapsHover(protocolSwaps);
         }
     }, [swapsHover, protocolData]);
 
-
-    //Sorted by time-window
-    
-    const monthlyVolumeData = useTransformedVolumeData(protocolData?.volumeData, 'month');
-
-    const weeklyFeeData = useTransformedVolumeData(protocolData?.feeData, 'week');
-    const monthlyFeeData = useTransformedVolumeData(protocolData?.feeData, 'month');
-
-    const weeklySwapData = useTransformedVolumeData(protocolData?.swapData, 'week');
-    const monthlySwapData = useTransformedVolumeData(protocolData?.swapData, 'month');
-
     return (
         <PageWrapper>
-            <ThemedBackgroundGlobal backgroundColor={activeNetwork.bgColor} />
+            <ThemedBackgroundGlobal backgroundColor={'#7f7f7f'} />
             <AutoColumn gap="16px">
-                <TYPE.largeHeader>Protocol Overview</TYPE.largeHeader>
-                {protocolData.tvlData && protocolArbitrumData.tvlData && protocolPolygonData.tvlData ?
+                <TYPE.largeHeader>Balancer V2: Protocol Overview</TYPE.largeHeader>
+                {weeklyVolumeData.length > 0 && weeklyArbitrumVolumeData.length > 0 && weeklyPolygonVolumeData.length > 0 ?
                 <ResponsiveRow>
                     <ChartWrapper>
                         <StackedAreaChart
@@ -220,8 +194,6 @@ export default function Protocol() {
                             color={activeNetwork.primaryColor}
                             value={liquidityHover}
                             label={leftLabel}
-                            setValue={setLiquidityHover}
-                            setLabel={setLeftLabel}
                             topLeft={
                                 <AutoColumn gap="4px">
                                     <TYPE.mediumHeader fontSize="16px">TVL</TYPE.mediumHeader>
@@ -243,13 +215,12 @@ export default function Protocol() {
                             data={aggregatedWeeklyVolume}
                             color={activeNetwork.primaryColor}
                             tokenSet={['Mainnet', 'Arbitrum', 'Polygon']}
-                            setValue={setVolumeHover}
-                            setLabel={setRightLabel}
+                            isDollarAmount={true}
                             value={volumeHover}
                             label={rightLabel}
                             topLeft={
                                 <AutoColumn gap="4px">
-                                    <TYPE.mediumHeader fontSize="16px">Trading Volume</TYPE.mediumHeader>
+                                    <TYPE.mediumHeader fontSize="16px">Weekly Trading Volume</TYPE.mediumHeader>
                                     <TYPE.largeHeader fontSize="32px">
                                         <MonoSpace> {formatDollarAmount(volumeHover, 2)}</MonoSpace>
                                     </TYPE.largeHeader>
@@ -260,55 +231,23 @@ export default function Protocol() {
                             }
                         />
                     </ChartWrapper> : null }
-                </ResponsiveRow> : null }
-                {protocolData?.swapData?.length?
+                </ResponsiveRow> : <Loader/> }
+                {weeklySwapData.length > 0 && weeklyArbitrumSwapData.length > 0 && weeklyPolygonSwapData.length > 0 ?
                 <ResponsiveRow>
                 <ChartWrapper>
-                <BarChart
+                <BarChartStacked
                             height={220}
                             minHeight={332}
-                            data={
-                                swapWindow === VolumeWindow.monthly
-                                  ? monthlySwapData
-                                  : swapWindow === VolumeWindow.weekly
-                                  ? weeklySwapData
-                                  : protocolData.swapData
-                              }
+                            data={aggregatedWeeklySwaps}
                             color={activeNetwork.primaryColor}
-                            setValue={setSwapsHover}
-                            setLabel={setSwapsLabel}
+                            tokenSet={['Mainnet', 'Arbitrum', 'Polygon']}
                             value={swapsHover}
                             label={swapsLabel}
-                            activeWindow={swapWindow}
-                            topRight={
-                                <RowFixed style={{ marginLeft: '-40px', marginTop: '8px' }}>
-                                    <SmallOptionButton
-                                        active={swapWindow === VolumeWindow.daily}
-                                        onClick={() => setSwapWindow(VolumeWindow.daily)}
-                                    >
-                                        D
-                                    </SmallOptionButton>
-                                    <SmallOptionButton
-                                        active={swapWindow === VolumeWindow.weekly}
-                                        style={{ marginLeft: '8px' }}
-                                        onClick={() => setSwapWindow(VolumeWindow.weekly)}
-                                    >
-                                        W
-                                    </SmallOptionButton>
-                                    <SmallOptionButton
-                                        active={swapWindow === VolumeWindow.monthly}
-                                        style={{ marginLeft: '8px' }}
-                                        onClick={() => setSwapWindow(VolumeWindow.monthly)}
-                                    >
-                                        M
-                                    </SmallOptionButton>
-                                </RowFixed>
-                            }
                             topLeft={
                                 <AutoColumn gap="4px">
-                                    <TYPE.mediumHeader fontSize="16px">Swaps</TYPE.mediumHeader>
+                                    <TYPE.mediumHeader fontSize="16px">Weekly Swaps</TYPE.mediumHeader>
                                     <TYPE.largeHeader fontSize="32px">
-                                        <MonoSpace> {formatDollarAmount(swapsHover, 2)}</MonoSpace>
+                                        <MonoSpace> {formatAmount(swapsHover, 2)}</MonoSpace>
                                     </TYPE.largeHeader>
                                     <TYPE.main fontSize="12px" height="14px">
                                         {swapsLabel ? <MonoSpace>{swapsLabel} (UTC)</MonoSpace> : null}
@@ -318,50 +257,18 @@ export default function Protocol() {
                         />
                 </ChartWrapper>
                 <ChartWrapper>
-                        <BarChart
+                        <BarChartStacked
                             height={220}
                             minHeight={332}
-                            data={
-                                feeWindow === VolumeWindow.monthly
-                                  ? monthlyFeeData
-                                  : feeWindow === VolumeWindow.weekly
-                                  ? weeklyFeeData
-                                  : protocolData.feeData
-                            
+                            data={aggregatedWeeklyFees
                             }
                             color={activeNetwork.primaryColor}
-                            setValue={setFeesHover}
-                            setLabel={setFeesLabel}
+                            tokenSet={['Mainnet', 'Arbitrum', 'Polygon']}
                             value={feesHover}
                             label={feesLabel}
-                            activeWindow={feeWindow}
-                            topRight={
-                                <RowFixed style={{ marginLeft: '-40px', marginTop: '8px' }}>
-                                    <SmallOptionButton
-                                        active={feeWindow === VolumeWindow.daily}
-                                        onClick={() => setFeeWindow(VolumeWindow.daily)}
-                                    >
-                                        D
-                                    </SmallOptionButton>
-                                    <SmallOptionButton
-                                        active={feeWindow === VolumeWindow.weekly}
-                                        style={{ marginLeft: '8px' }}
-                                        onClick={() => setFeeWindow(VolumeWindow.weekly)}
-                                    >
-                                        W
-                                    </SmallOptionButton>
-                                    <SmallOptionButton
-                                        active={feeWindow === VolumeWindow.monthly}
-                                        style={{ marginLeft: '8px' }}
-                                        onClick={() => setFeeWindow(VolumeWindow.monthly)}
-                                    >
-                                        M
-                                    </SmallOptionButton>
-                                </RowFixed>
-                            }
                             topLeft={
                                 <AutoColumn gap="4px">
-                                    <TYPE.mediumHeader fontSize="16px">Collected fees</TYPE.mediumHeader>
+                                    <TYPE.mediumHeader fontSize="16px">Weekly Collected fees</TYPE.mediumHeader>
                                     <TYPE.largeHeader fontSize="32px">
                                         <MonoSpace> {formatDollarAmount(feesHover, 2)}</MonoSpace>
                                     </TYPE.largeHeader>
@@ -372,28 +279,28 @@ export default function Protocol() {
                             }
                         />
                     </ChartWrapper>
-            </ResponsiveRow> : <Loader/> }
-                {protocolData?.volumeChange?
+            </ResponsiveRow> : null }
+                {protocolVolume > 0 && protocolFees > 0 && protocolTVL > 0 ?
                 <HideSmall>
                     <DarkGreyCard>
                         <RowBetween>
-                            <RowFixed>
+                            <RowFixed align="center" justify="center">
                                 <RowFixed mr="20px">
-                                    <TYPE.main mr="4px">Volume 24H: </TYPE.main>
-                                    <TYPE.label mr="4px">{formatDollarAmount(protocolData.volume24)}</TYPE.label>
-                                    <Percent value={protocolData.volumeChange} wrap={true} />
+                                    <TYPE.main mr="4px">Weekly volume: </TYPE.main>
+                                    <TYPE.label mr="4px">{formatDollarAmount(protocolVolume)}</TYPE.label>
+                                    <Percent value={protocolVolumeChange} wrap={true} />
                                 </RowFixed>
                                 <RowFixed mr="20px">
-                                    <TYPE.main mr="4px">Fees 24H: </TYPE.main>
-                                    <TYPE.label mr="4px">{formatDollarAmount(protocolData.fees24)}</TYPE.label>
-                                    <Percent value={protocolData.feesChange} wrap={true} />
+                                    <TYPE.main mr="4px">Weekly fees: </TYPE.main>
+                                    <TYPE.label mr="4px">{formatDollarAmount(protocolFees)}</TYPE.label>
+                                    <Percent value={protocolFeesChange} wrap={true} />
                                 </RowFixed>
                                 <HideMedium>
                                     <RowFixed mr="20px">
                                         <TYPE.main mr="4px">TVL: </TYPE.main>
-                                        <TYPE.label mr="4px">{formatDollarAmount(protocolData.tvl)}</TYPE.label>
+                                        <TYPE.label mr="4px">{formatDollarAmount(protocolTVL)}</TYPE.label>
                                         <TYPE.main></TYPE.main>
-                                        <Percent value={protocolData.tvlChange} wrap={true} />
+                                        <Percent value={protocolTVLChange} wrap={true} />
                                     </RowFixed>
                                 </HideMedium>
                             </RowFixed>

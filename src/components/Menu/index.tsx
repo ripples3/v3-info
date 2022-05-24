@@ -150,7 +150,10 @@ export default function Menu() {
                         to={networkPrefix(activeNewtork)}
                         isActive={(match, { pathname }) => pathname === '/'}
                     >
-                        Overview
+                        Protocol
+                    </StyledNavLink>
+                    <StyledNavLink id={`stake-nav-link`} to={networkPrefix(activeNewtork) + 'chain'}>
+                        Chain
                     </StyledNavLink>
                     <StyledNavLink id={`stake-nav-link`} to={networkPrefix(activeNewtork) + 'pools'}>
                         Pools

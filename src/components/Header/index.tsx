@@ -168,14 +168,15 @@ export default function Header() {
                 </Title>
                 { isBrowser ?
                 <HeaderLinks>
-                    <StyledNavLink id={`stake-nav-link`} to={networkPrefix(activeNewtork) + 'protocol'}>
-                        Protocol
-                    </StyledNavLink>
+                   
                     <StyledNavLink
                         id={`pool-nav-link`}
                         to={networkPrefix(activeNewtork)}
                         isActive={(match, { pathname }) => pathname === '/'}
                     >
+                        Protocol
+                    </StyledNavLink>
+                    <StyledNavLink id={`stake-nav-link`} to={networkPrefix(activeNewtork) + 'chain'}>
                         Chain
                     </StyledNavLink>
                     {/*<StyledNavLink id={`stake-nav-link`} to={networkPrefix(activeNewtork) + 'incentives'}>

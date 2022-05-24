@@ -50,10 +50,9 @@ export type LineChartProps = {
     data: any[];
     color?: string | undefined;
     tokenSet: string[],
+    isDollarAmount?: boolean,
     height?: number | undefined;
     minHeight?: number;
-    setValue?: Dispatch<SetStateAction<number | undefined>>; // used for value on hover
-    setLabel?: Dispatch<SetStateAction<string | undefined>>; // used for label of valye
     value?: number;
     label?: string;
     topLeft?: ReactNode | undefined;
@@ -66,10 +65,9 @@ const BarChartStacked = ({
     data,
     color = '#56B2A4',
     tokenSet,
+    isDollarAmount,
     value,
     label,
-    setValue,
-    setLabel,
     topLeft,
     topRight,
     bottomLeft,
@@ -79,6 +77,7 @@ const BarChartStacked = ({
 }: LineChartProps) => {
     const theme = useTheme();
     const parsedValue = value;
+    const now = dayjs();
 
     return (
         <Wrapper minHeight={minHeight} {...rest}>
@@ -94,22 +93,10 @@ const BarChartStacked = ({
                     margin={{
                         top: 5,
                         right: 30,
-                        left: 20,
+                        left: 25,
                         bottom: 5,
                     }}
-                    onMouseLeave={() => {
-                        setLabel && setLabel(undefined);
-                        setValue && setValue(undefined);
-                    }}
                 >
-                    <defs>
-                        {tokenSet.map((el) => 
-                        <linearGradient key={el + getChartColor(el, tokenSet.indexOf(el))} id={getChartColor(el, tokenSet.indexOf(el))} x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="5%" stopColor={darken(0.36, getChartColor(el, tokenSet.indexOf(el)))} stopOpacity={0.5} />
-                            <stop offset="100%" stopColor={getChartColor(el, tokenSet.indexOf(el))} stopOpacity={0} />
-                        </linearGradient>
-                        )}
-                    </defs>
                     <XAxis
                         dataKey="time"
                         axisLine={false}
@@ -119,13 +106,15 @@ const BarChartStacked = ({
                     />
                     <YAxis 
                     allowDataOverflow={true} 
-                    tickFormatter={(BAL) => formatDollarAmount(BAL)}
+                    tickFormatter={(entry) => isDollarAmount ? formatDollarAmount(entry): formatAmount(entry)}
                     />
                     <Legend />
                     <Tooltip
                     contentStyle={{ backgroundColor: "#191B1F" }}
-                    formatter={(value:number) => formatDollarAmount(value)}
-                    labelFormatter={(time) => dayjs(time).format('DD.MM.YY')}
+                    formatter={(value:number) => isDollarAmount ?formatDollarAmount(value) : formatAmount(value)}
+                    labelFormatter={(time) => {
+                        const isCurrent = dayjs(time).add(1, 'week').isAfter(now);
+                        return dayjs(time).format('DD.MM.YY') + ' - ' + (isCurrent ? 'today' : dayjs(time).add(1, 'week').format('DD.MM.YY'))}}
                     />
                    { tokenSet.map((el) => 
                     <Bar 
@@ -133,7 +122,7 @@ const BarChartStacked = ({
                     dataKey={el} 
                     stackId="a" 
                     stroke={getChartColor(el, tokenSet.indexOf(el))} 
-                    fill={"url(#" + getChartColor(el, tokenSet.indexOf(el)) + ")"} 
+                    fill={getChartColor(el, tokenSet.indexOf(el))} 
                     strokeWidth={2}
                     shape={(props) => {
                         return (

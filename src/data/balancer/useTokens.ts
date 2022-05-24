@@ -87,7 +87,7 @@ export function useBalancerTokens(): TokenData[] {
             txCount: parseFloat(token.totalSwapCount),
             feesUSD: 0,
             tvlToken: tokenData.tvlToken,
-            tvlUSD: tokenData.tvl,
+            tvlUSD: (token.symbol?.includes('bb-') ? 0 : tokenData.tvl),
             valueUSDCollected: valueUSDCollected,
             tvlUSDChange: (tokenData.tvl - tokenData24.tvl) / tokenData24.tvl,
             priceUSD: priceData.price,

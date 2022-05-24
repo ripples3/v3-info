@@ -308,7 +308,7 @@ export default function ProtocolFees() {
                                 <TYPE.main>No fees to distribute</TYPE.main>
                                 </DarkGreyCard> )}
                     </ AutoColumn>}
-                    {historicalCollectorData?.tvl ?
+                    {totalAmount > 0 && historicalCollectorData?.tvl ?
                         <StackedAreaChart
                             data={historicalCollectorData?.tokenDatas}
                             height={220}
@@ -317,8 +317,6 @@ export default function ProtocolFees() {
                             color={activeNetwork.primaryColor}
                             value={liquidityHover}
                             label={leftLabel}
-                            setValue={setLiquidityHover}
-                            setLabel={setLeftLabel}
                             topLeft={
                                 <AutoColumn gap="4px">
                                     <TYPE.mediumHeader fontSize="16px">Historical Net Worth in Fee Collector</TYPE.mediumHeader>

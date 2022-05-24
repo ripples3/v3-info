@@ -193,8 +193,8 @@ export default function TokenPage({
                                         )}
                                     </RowFixed>
                                     <RowFlat style={{ marginTop: '8px' }}>
-                                        <PriceText mr="10px"> {formatDollarAmount(tokenData.priceUSD)}</PriceText>
-                                        (<Percent value={tokenData.priceUSDChange} />)
+                                        <PriceText mr="10px"> {formatDollarAmount(priceData[priceData.length-1].value)}</PriceText>
+                                        (<Percent value={(priceData[priceData.length-1].value - priceData[priceData.length-2].value) / priceData[priceData.length-1].value * 100} />)
                                     </RowFlat>
                                 </AutoColumn>
                                 {activeNetwork !== EthereumNetworkInfo ? null : (

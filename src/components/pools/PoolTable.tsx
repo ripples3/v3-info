@@ -77,10 +77,10 @@ const DataRow = ({ poolData, index }: { poolData: PoolData; index: number }) => 
                 <Label fontWeight={400}>{index + 1}</Label>
                 <Label fontWeight={400}>
                     <RowFixed>
-                        <TYPE.label mr="8px">{getShortPoolName(poolData)}</TYPE.label>
-                        <PoolCurrencyLogo tokens={poolData.tokens} />
-                        <GreyBadge ml="10px" fontSize="14px">
-                            {(poolData.swapFee * 100).toFixed(2)}%
+                    <PoolCurrencyLogo tokens={poolData.tokens} />
+                        <TYPE.label mr="5px">{getShortPoolName(poolData)}</TYPE.label>
+                        <GreyBadge ml="5px" fontSize="14px">
+                            {(poolData.swapFee * 100) < 0.01 ? (poolData.swapFee * 100).toFixed(3) : (poolData.swapFee * 100).toFixed(2)}%
                         </GreyBadge>
                     </RowFixed>
                 </Label>
@@ -122,7 +122,7 @@ export default function PoolTable({ poolDatas, maxItems = MAX_ITEMS }: { poolDat
     const sortedPools = useMemo(() => {
         return poolDatas
             ? poolDatas
-                  .filter((x) => !!x && !POOL_HIDE.includes(x.address))
+                  .filter((x) => !!x && !POOL_HIDE.includes(x.id))
                   .sort((a, b) => {
                       if (a && b) {
                           return a[sortField as keyof PoolData] > b[sortField as keyof PoolData]

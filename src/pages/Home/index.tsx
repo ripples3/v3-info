@@ -6,7 +6,7 @@ import { ResponsiveRow, RowBetween, RowFixed } from 'components/Row';
 import LineChart from 'components/LineChart/alt';
 import useTheme from 'hooks/useTheme';
 import { DarkGreyCard } from 'components/Card';
-import { formatDollarAmount } from 'utils/numbers';
+import { formatAmount, formatDollarAmount } from 'utils/numbers';
 import Percent from 'components/Percent';
 import { HideMedium, HideSmall, StyledInternalLink } from '../../theme';
 import TokenTable from 'components/tokens/TokenTable';
@@ -106,7 +106,7 @@ export default function Home() {
         <PageWrapper>
             <ThemedBackgroundGlobal backgroundColor={activeNetwork.bgColor} />
             <AutoColumn gap="16px">
-                <TYPE.largeHeader>Chain Overview</TYPE.largeHeader>
+                <TYPE.largeHeader>{activeNetwork.name} Overview</TYPE.largeHeader>
                 {protocolData?.volumeData.length > 0 ?
                 <ResponsiveRow>
                     <ChartWrapper>
@@ -234,7 +234,7 @@ export default function Home() {
                                 <AutoColumn gap="4px">
                                     <TYPE.mediumHeader fontSize="16px">Swaps</TYPE.mediumHeader>
                                     <TYPE.largeHeader fontSize="32px">
-                                        <MonoSpace> {formatDollarAmount(swapsHover, 2)}</MonoSpace>
+                                        <MonoSpace> {formatAmount(swapsHover, 2)}</MonoSpace>
                                     </TYPE.largeHeader>
                                     <TYPE.main fontSize="12px" height="14px">
                                         {swapsLabel ? <MonoSpace>{swapsLabel} (UTC)</MonoSpace> : null}

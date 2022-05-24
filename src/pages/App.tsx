@@ -7,6 +7,8 @@ import URLWarning from '../components/Header/URLWarning';
 import Popups from '../components/Popups';
 import DarkModeQueryParamReader from '../theme/DarkModeQueryParamReader';
 import Home from './Home';
+import Treasury from './Treasury';
+import Protocol from './Protocol';
 import PoolsOverview from './Pool/PoolsOverview';
 import TokensOverview from './Token/TokensOverview';
 import TopBar from 'components/Header/TopBar';
@@ -19,8 +21,7 @@ import { DarkGreyCard } from 'components/Card';
 import { SUPPORTED_NETWORK_VERSIONS, EthereumNetworkInfo, SupportedNetwork } from 'constants/networks';
 import { loadTokenListTokens } from '../state/token-lists/token-lists';
 import ProtocolFees from './ProtocolFees';
-import Treasury from './Treasury';
-import Protocol from './Protocol';
+
 
 const AppWrapper = styled.div`
     display: flex;
@@ -56,7 +57,7 @@ const BodyWrapper = styled.div<{ warningActive?: boolean }>`
 
     @media (max-width: 1080px) {
         padding-top: 2rem;
-        margin-top: 140px;
+        margin-top: ${({ warningActive }) => (warningActive ? '100px' : '50px')};
     }
 `;
 
@@ -163,7 +164,7 @@ export default function App() {
                             <Switch>
                                 <Route exact strict path="/:networkID?/pools/:poolId" component={PoolPage} />
                                 <Route exact strict path="/:networkID?/protocolFees" component={ProtocolFees} />
-                                <Route exact strict path="/protocol" component={Protocol} />
+                                <Route exact strict path="/:networkID?/chain" component={Home} />
                                 <Route exact strict path="/:networkID?/treasury" component={Treasury} />
                                 <Route exact strict path="/:networkID?/pools" component={PoolsOverview} />
                                 <Route
@@ -173,7 +174,7 @@ export default function App() {
                                     component={RedirectInvalidToken}
                                 />
                                 <Route exact strict path="/:networkID?/tokens" component={TokensOverview} />
-                                <Route exact path="/:networkID?" component={Home} />
+                                <Route exact path="/:networkID?" component={Protocol} />
                             </Switch>
                             <Marginer />
                         </BodyWrapper>

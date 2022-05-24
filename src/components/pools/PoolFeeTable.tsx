@@ -76,10 +76,10 @@ const DataRow = ({ poolData, index }: { poolData: PoolData; index: number }) => 
                 <Label fontWeight={400}>{index + 1}</Label>
                 <Label fontWeight={400}>
                     <RowFixed>
+                    <PoolCurrencyLogo tokens={poolData.tokens} />
                         <TYPE.label mr="8px">{getShortPoolName(poolData)}</TYPE.label>
-                        <PoolCurrencyLogo tokens={poolData.tokens} />
                         <GreyBadge ml="10px" fontSize="14px">
-                            {(poolData.swapFee * 100).toFixed(2)}%
+                        {(poolData.swapFee * 100) < 0.01 ? (poolData.swapFee * 100).toFixed(3) : (poolData.swapFee * 100).toFixed(2)}%
                         </GreyBadge>
                     </RowFixed>
                 </Label>
