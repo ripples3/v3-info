@@ -78,6 +78,27 @@ export interface PoolData {
     poolType: string;
 }
 
+//Not extending PoolData as we do not need all fields
+export interface PoolDataUser {
+
+    id: string;
+    name: string;
+    symbol: string;
+    
+    // basic token info
+    address: string;
+    feeTier: number;
+    swapFee: number;
+
+    tokens: PoolTokenData[];
+
+    userTVL: number;
+    userRelativeTVL: number,
+    tokenSet: TokenSet[],
+    dailyFees: number,
+
+}
+
 
 //----Incentives Interface----
 export interface Incentives {

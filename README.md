@@ -1,4 +1,4 @@
-## Uniswap Info V3
+## Balancer V2 Analytics
 
 An open sourced interface for Balancer V2 analytics - forked from Uniswap v3 analytics.
 

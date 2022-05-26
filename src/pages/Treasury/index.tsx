@@ -34,6 +34,9 @@ import TreasuryTokenPortfolioTable from 'components/tokens/TreasuryTokenPortfoli
 import CurrencyLogo from 'components/CurrencyLogo';
 import StackedAreaChart from 'components/StackedAreaChart';
 import { BalPieChart } from 'components/PieChart/BalPieChart';
+import useUserPools from 'data/balancer/useUserPools';
+import { PoolDataUser} from 'data/balancer/balancerTypes';
+import { useBalancerPools } from 'data/balancer/usePools';
 
 
 
@@ -76,9 +79,12 @@ export default function Treasury() {
 
     const theme = useTheme();
 
+
     const [activeNetwork] = useActiveNetworkVersion();
     const protocolData = useBalancerProtocolData();
+    const poolData = useBalancerPools();
     const formattedTokens = useBalancerTokens();
+    const userPools = useUserPools(TREASURY_ADDRESS);
     const walletTokenData = GetAddressTokenBalances(TREASURY_ADDRESS);
     const historicalCollectorData = useHistoricalWalletData(TREASURY_ADDRESS);
     const debankLink = 'https://debank.com/profile/' + TREASURY_ADDRESS;
@@ -126,6 +132,25 @@ export default function Treasury() {
         }
         return newData;
     }
+
+
+    //Balancer Pool position data
+    console.log("userPoolData", userPools);
+    const poolDatasUser:PoolDataUser[] = [];
+    if (poolData.length > 0) {
+        userPools.forEach((pool) => {
+            const poolDataUser = {} as PoolDataUser;
+            const userPool = poolData.find((x) => x.id == pool.poolId)
+            //Populate data
+            if (userPool) {
+            poolDataUser.address = userPool?.address;
+            poolDataUser.userTVL = userPool?.tvlUSD * pool.relativeShare;
+            }
+            poolDatasUser.push(poolDataUser);
+        })
+    }
+
+    console.log("poolDatasUser", poolDatasUser)
 
     //Monthly metrics
     let monthlyHigh = 0;
