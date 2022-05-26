@@ -148,6 +148,16 @@ query GetPoolData($block24: Block_height!, $block48: Block_height!, $blockWeek: 
     }
 }
 
+query GetUserWalletPoolData($userAddress: String!, $block: Int!) {
+    poolShares(block: {number: $block}, first: 1000, where: {userAddress: $userAddress, balance_gt: 0}) {
+    balance
+    poolId {
+      id
+      totalLiquidity,
+      totalShares
+    }
+  }
+}
 
 query GetPoolChartData($poolId: String!, $startTimestamp: Int!) {
     poolSnapshots(first: 1000, orderBy: timestamp, orderDirection: asc, where: {pool: $poolId, timestamp_gte: $startTimestamp}) {

@@ -3980,6 +3980,20 @@ export type GetPoolDataQuery = {
     }>;
 };
 
+export type GetUserWalletPoolDataQueryVariables = Exact<{
+    userAddress: Scalars['String'];
+    block: Scalars['Int'];
+}>;
+
+export type GetUserWalletPoolDataQuery = {
+    __typename: 'Query';
+    poolShares: Array<{
+        __typename: 'PoolShare';
+        balance: string;
+        poolId: { __typename: 'Pool'; id: string; totalLiquidity: string; totalShares: string };
+    }>;
+};
+
 export type GetPoolChartDataQueryVariables = Exact<{
     poolId: Scalars['String'];
     startTimestamp: Scalars['Int'];
@@ -5367,6 +5381,60 @@ export function useGetPoolDataLazyQuery(
 export type GetPoolDataQueryHookResult = ReturnType<typeof useGetPoolDataQuery>;
 export type GetPoolDataLazyQueryHookResult = ReturnType<typeof useGetPoolDataLazyQuery>;
 export type GetPoolDataQueryResult = Apollo.QueryResult<GetPoolDataQuery, GetPoolDataQueryVariables>;
+export const GetUserWalletPoolDataDocument = gql`
+    query GetUserWalletPoolData($userAddress: String!, $block: Int!) {
+        poolShares(block: { number: $block }, first: 1000, where: { userAddress: $userAddress, balance_gt: 0 }) {
+            balance
+            poolId {
+                id
+                totalLiquidity
+                totalShares
+            }
+        }
+    }
+`;
+
+/**
+ * __useGetUserWalletPoolDataQuery__
+ *
+ * To run a query within a React component, call `useGetUserWalletPoolDataQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetUserWalletPoolDataQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetUserWalletPoolDataQuery({
+ *   variables: {
+ *      userAddress: // value for 'userAddress'
+ *      block: // value for 'block'
+ *   },
+ * });
+ */
+export function useGetUserWalletPoolDataQuery(
+    baseOptions: Apollo.QueryHookOptions<GetUserWalletPoolDataQuery, GetUserWalletPoolDataQueryVariables>,
+) {
+    const options = { ...defaultOptions, ...baseOptions };
+    return Apollo.useQuery<GetUserWalletPoolDataQuery, GetUserWalletPoolDataQueryVariables>(
+        GetUserWalletPoolDataDocument,
+        options,
+    );
+}
+export function useGetUserWalletPoolDataLazyQuery(
+    baseOptions?: Apollo.LazyQueryHookOptions<GetUserWalletPoolDataQuery, GetUserWalletPoolDataQueryVariables>,
+) {
+    const options = { ...defaultOptions, ...baseOptions };
+    return Apollo.useLazyQuery<GetUserWalletPoolDataQuery, GetUserWalletPoolDataQueryVariables>(
+        GetUserWalletPoolDataDocument,
+        options,
+    );
+}
+export type GetUserWalletPoolDataQueryHookResult = ReturnType<typeof useGetUserWalletPoolDataQuery>;
+export type GetUserWalletPoolDataLazyQueryHookResult = ReturnType<typeof useGetUserWalletPoolDataLazyQuery>;
+export type GetUserWalletPoolDataQueryResult = Apollo.QueryResult<
+    GetUserWalletPoolDataQuery,
+    GetUserWalletPoolDataQueryVariables
+>;
 export const GetPoolChartDataDocument = gql`
     query GetPoolChartData($poolId: String!, $startTimestamp: Int!) {
         poolSnapshots(

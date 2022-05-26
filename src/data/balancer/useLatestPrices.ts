@@ -1,6 +1,6 @@
-import { LatestPrice, useGetLatestPricesQuery } from '../../apollo/generated/graphql-codegen-generated';
 import { useActiveNetworkVersion } from 'state/application/hooks';
 import { SupportedNetwork } from 'constants/networks';
+import { useBalancerTokenPageData } from './useTokens';
 
 //TODO: Network dependent address fetching!
 const WETH_ADDRESS = '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2';
@@ -37,36 +37,20 @@ export const getBalTokenAddress = (networkId: SupportedNetwork) => {
 const reducer = (previousValue: number, currentValue: number) => previousValue + currentValue;
 
 export function useLatestPrices(): { eth?: number; bal?: number } {
-    // eslint-disable-next-line
-    const [activeNetwork] = useActiveNetworkVersion();
-    const { data } = useGetLatestPricesQuery({ 
-        variables: { where: { asset_in: [getWethTokenAddress(activeNetwork.id), getBalTokenAddress(activeNetwork.id)] } },
-        context: {
-            uri: activeNetwork.clientUri,
-        },
-    });
-    const prices = data?.latestPrices || [];
 
-    //Calculate average price from multi-pool Info explicitly (as we have complex type otherwise for reduce function)
-    let balSum = 0;
-    let balCounter = 0;
-    let ethSum = 0;
-    let ethCounter = 0;
-    for (const price of prices) {
-        if (price.asset ===  getBalTokenAddress(activeNetwork.id)) {
-            balSum += Number(price.priceUSD);
-            balCounter +=1;
-        }
-        else if (price.asset === getWethTokenAddress(activeNetwork.id)){
-            ethSum += Number(price.priceUSD);
-            ethCounter +=1;
-        }
+    const [activeNetwork] = useActiveNetworkVersion();
+    //V2: latest price is not reliable, therefore get chartdata that has the correct USD value:
+    const balTokenData = useBalancerTokenPageData(getBalTokenAddress(activeNetwork.id)).priceData;
+    const wethTokenData = useBalancerTokenPageData(getWethTokenAddress(activeNetwork.id)).priceData;
+
+    //const wethChartData = chartData;
+    let bal = 0;
+    let eth = 0;
+
+    if (balTokenData.length >0 && wethTokenData.length > 0) {
+      bal = balTokenData[balTokenData.length -1].value;
+      eth = wethTokenData[wethTokenData.length-1].value;
     }
-    const bal = balSum / balCounter;
-    const eth = ethSum / ethCounter;
-    //var avg = prices.reduce((price.,b) => a + b, 0) / prices.length
-    //const eth = prices.find((price) => price.asset === WETH_ADDRESS);
-    //const bal = prices.find((price) => price.asset === BAL_ADDRESS);
 
     return {
         eth: eth ? eth : undefined,

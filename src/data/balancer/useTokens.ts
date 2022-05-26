@@ -8,7 +8,6 @@ import {
 } from '../../apollo/generated/graphql-codegen-generated';
 import { useEffect } from 'react';
 import { unixToDate } from '../../utils/date';
-import { BALANCER_SUBGRAPH_START_TIMESTAMP } from './constants';
 import { BalancerChartDataItem, TokenData } from './balancerTypes';
 import { useActiveNetworkVersion } from 'state/application/hooks';
 

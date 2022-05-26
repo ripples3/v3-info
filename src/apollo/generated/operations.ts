@@ -342,6 +342,18 @@ export const GetPoolData = gql`
     ${BalancerPool}
     ${LatestPrice}
 `;
+export const GetUserWalletPoolData = gql`
+    query GetUserWalletPoolData($userAddress: String!, $block: Int!) {
+        poolShares(block: { number: $block }, first: 1000, where: { userAddress: $userAddress, balance_gt: 0 }) {
+            balance
+            poolId {
+                id
+                totalLiquidity
+                totalShares
+            }
+        }
+    }
+`;
 export const GetPoolChartData = gql`
     query GetPoolChartData($poolId: String!, $startTimestamp: Int!) {
         poolSnapshots(
