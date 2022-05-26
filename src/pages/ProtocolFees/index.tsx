@@ -178,7 +178,9 @@ export default function ProtocolFees() {
     //TODO: fix edge case redundancy code here ( this happens right after a sweep):
     let isEmptySet = false;
     if (formattedTokens && walletTokenData) {
-        if (formattedTokens.length > 0 && curateTokenDatas(formattedTokens, walletTokenData, sweepLimit, true).length == 0) {
+        //Temp fix for blacklisted tokens!
+        const curatedTokens = curatedTokenDatas.filter((x) => !!x && !COVALENT_TOKEN_BLACKLIST.includes(x.address));
+        if (formattedTokens.length > 0 && curateTokenDatas(formattedTokens, walletTokenData, sweepLimit, true).filter((x) => !!x && !COVALENT_TOKEN_BLACKLIST.includes(x.address)).length == 0) {
             isEmptySet = true;
         }
     }
@@ -354,10 +356,14 @@ export default function ProtocolFees() {
                                 </RowFixed>
                             }
                         /> : <AutoColumn gap="lg" justify='flex-start'>
+                            {! isEmptySet ?
                         <DarkGreyCard>
                             <TYPE.main fontSize="18px">Fetching historical data...</TYPE.main>
                             <LocalLoader fill={false} />
-                        </DarkGreyCard>
+                        </DarkGreyCard> : (
+                                <DarkGreyCard>
+                                <TYPE.main>No tokens above threshold</TYPE.main>
+                                </DarkGreyCard> )}
                     </ AutoColumn>}
                 </ContentLayout>
                 {! isEmptySet ? 
