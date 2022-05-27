@@ -1,9 +1,7 @@
 import { useEffect } from 'react';
 import dayjs from 'dayjs';
 import { useBlocksFromTimestamps } from '../../hooks/useBlocksFromTimestamps';
-import { TREASURY_ADDRESS } from 'constants/wallets';
 import {
-    useGetUserWalletPoolDataQuery,
     useGetUserWalletPoolDataLazyQuery
 } from '../../apollo/generated/graphql-codegen-generated';
 import { useActiveNetworkVersion } from 'state/application/hooks';
@@ -43,8 +41,8 @@ export default function useUserPools (address: string, timeStamps?: number[]) {
     const myBlocks = useBlocksFromTimestamps(timeStampSet)
     //Get current block
     let currentBlock = 0;
-    console.log("currentTimeStamp", currentTimeStamps)
-    console.log("blocks24", block24);
+    //console.log("currentTimeStamp", currentTimeStamps)
+    //console.log("blocks24", block24);
     if (myBlocks.blocks && myBlocks.error !== false) {
         currentBlock = myBlocks.blocks[0].number;
     }

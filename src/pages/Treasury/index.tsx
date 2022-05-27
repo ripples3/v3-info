@@ -37,6 +37,7 @@ import { BalPieChart } from 'components/PieChart/BalPieChart';
 import useUserPools from 'data/balancer/useUserPools';
 import { PoolDataUser} from 'data/balancer/balancerTypes';
 import { useBalancerPools } from 'data/balancer/usePools';
+import UserPoolTable from 'components/pools/UserPoolTable';
 
 
 
@@ -135,7 +136,9 @@ export default function Treasury() {
 
 
     //Balancer Pool position data
-    console.log("userPoolData", userPools);
+    //TODO: encapsulate in own function after view is done
+    //TODO: introduce constant for protocol wide fee cut!
+    //console.log("userPoolData", userPools);
     const poolDatasUser:PoolDataUser[] = [];
     if (poolData.length > 0) {
         userPools.forEach((pool) => {
@@ -144,13 +147,23 @@ export default function Treasury() {
             //Populate data
             if (userPool) {
             poolDataUser.address = userPool?.address;
+            poolDataUser.feeTier = userPool.feeTier;
+            poolDataUser.id = userPool.id;
+            poolDataUser.name = userPool.name;
+            poolDataUser.swapFee = userPool.swapFee;
+            poolDataUser.symbol = userPool.symbol;
+            poolDataUser.tokens = userPool.tokens;
+            poolDataUser.userRelativeTVL = pool.relativeShare;
             poolDataUser.userTVL = userPool?.tvlUSD * pool.relativeShare;
+            poolDataUser.dailyFees = userPool.feesUSD * pool.relativeShare * 0.5;
+            poolDataUser.tvlUSD = userPool.tvlUSD;
+            poolDataUser.volumeUSD = userPool.volumeUSD * pool.relativeShare
             }
             poolDatasUser.push(poolDataUser);
         })
     }
 
-    console.log("poolDatasUser", poolDatasUser)
+    //console.log("poolDatasUser", poolDatasUser)
 
     //Monthly metrics
     let monthlyHigh = 0;
@@ -299,7 +312,7 @@ export default function Treasury() {
                         <LineChart
                             data={historicalCollectorData?.totalValueData}
                             height={220}
-                            minHeight={400}
+                            minHeight={420}
                             color={activeNetwork.primaryColor}
                             value={liquidityHover}
                             label={leftLabel}
@@ -348,7 +361,6 @@ export default function Treasury() {
                             </DarkGreyCard>
                         </ AutoColumn>}
                 </ContentLayout>
-                {/*
                 <ContentLayout>
                     {totalAmount > 0 && historicalCollectorData?.tvl ?
                         <DarkGreyCard>
@@ -437,11 +449,11 @@ export default function Treasury() {
                                 <TYPE.main fontSize="18px">Fetching historical token data...</TYPE.main>
                                 <LocalLoader fill={false} />
                             </DarkGreyCard>
-                        </ AutoColumn>} */}
+                        </ AutoColumn>}
                 <TYPE.main> Tokens in treasury wallet </TYPE.main>
                 <TreasuryTokenPortfolioTable tokenDatas={curatedTokenDatas} />
-                <TYPE.main> Liquidity Pools </TYPE.main>
-                <TYPE.white> Coming soon... </TYPE.white>
+                <TYPE.main> Investments </TYPE.main>
+                <UserPoolTable poolDatas={poolDatasUser} />
             </AutoColumn>
         </PageWrapper>
     );

@@ -17,6 +17,7 @@ import { networkPrefix } from 'utils/networkPrefix';
 import { useActiveNetworkVersion } from 'state/application/hooks';
 import { PoolData } from '../../data/balancer/balancerTypes';
 import { getShortPoolName } from 'utils/getShortPoolName';
+import { PoolDataUser } from '../../data/balancer/balancerTypes';
 
 const Wrapper = styled(DarkGreyCard)`
     width: 100%;
@@ -70,11 +71,15 @@ const SORT_FIELD = {
     volumeUSD: 'volumeUSD',
     volumeUSDWeek: 'volumeUSDWeek',
     tvlUSD: 'tvlUSD',
+    userRelativeTVL: 'userRelativeTVL',
+    userTVL: 'userTVL',
+    dailyFees: 'dailyFees',
+    
 };
 
 
 
-const DataRow = ({ poolData, index }: { poolData: PoolData; index: number }) => {
+const DataRow = ({ poolData, index }: { poolData: PoolDataUser; index: number }) => {
     const [activeNetwork] = useActiveNetworkVersion();
 
     return (
@@ -95,10 +100,10 @@ const DataRow = ({ poolData, index }: { poolData: PoolData; index: number }) => 
                     {formatDollarAmount(poolData.volumeUSD)}
                 </Label>
                 <Label end={1} fontWeight={400}>
-                    {formatDollarAmount(poolData.volumeUSDWeek)}
+                    {formatDollarAmount(poolData.dailyFees)}
                 </Label>
                 <Label end={1} fontWeight={400}>
-                    {formatDollarAmount(poolData.tvlUSD)}
+                    {formatDollarAmount(poolData.userTVL)}
                 </Label>
             </ResponsiveGrid>
         </LinkWrapper>
@@ -107,12 +112,12 @@ const DataRow = ({ poolData, index }: { poolData: PoolData; index: number }) => 
 
 const MAX_ITEMS = 10;
 
-export default function UserPoolTable({ poolDatas, maxItems = MAX_ITEMS }: { poolDatas: PoolData[]; maxItems?: number }) {
+export default function UserPoolTable({ poolDatas, maxItems = MAX_ITEMS }: { poolDatas: PoolDataUser[]; maxItems?: number }) {
     // theming
     const theme = useTheme();
 
     // for sorting
-    const [sortField, setSortField] = useState(SORT_FIELD.tvlUSD);
+    const [sortField, setSortField] = useState(SORT_FIELD.userTVL);
     const [sortDirection, setSortDirection] = useState<boolean>(true);
 
     // pagination
@@ -129,10 +134,9 @@ export default function UserPoolTable({ poolDatas, maxItems = MAX_ITEMS }: { poo
     const sortedPools = useMemo(() => {
         return poolDatas
             ? poolDatas
-                  .filter((x) => !!x && !POOL_HIDE.includes(x.id))
                   .sort((a, b) => {
                       if (a && b) {
-                          return a[sortField as keyof PoolData] > b[sortField as keyof PoolData]
+                          return a[sortField as keyof PoolDataUser] > b[sortField as keyof PoolDataUser]
                               ? (sortDirection ? -1 : 1) * 1
                               : (sortDirection ? -1 : 1) * -1;
                       } else {
@@ -174,11 +178,11 @@ export default function UserPoolTable({ poolDatas, maxItems = MAX_ITEMS }: { poo
                         <ClickableText color={theme.text2} end={1} onClick={() => handleSort(SORT_FIELD.volumeUSD)}>
                         Volume 24H  {arrow(SORT_FIELD.volumeUSD)}
                         </ClickableText>
-                        <ClickableText color={theme.text2} end={1} onClick={() => handleSort(SORT_FIELD.volumeUSDWeek)}>
-                        Volume 7D {arrow(SORT_FIELD.volumeUSDWeek)}
+                        <ClickableText color={theme.text2} end={1} onClick={() => handleSort(SORT_FIELD.dailyFees)}>
+                        Earned Fees 24H {arrow(SORT_FIELD.dailyFees)}
                         </ClickableText>
-                        <ClickableText color={theme.text2} end={1} onClick={() => handleSort(SORT_FIELD.tvlUSD)}>
-                             TVL{arrow(SORT_FIELD.tvlUSD)}
+                        <ClickableText color={theme.text2} end={1} onClick={() => handleSort(SORT_FIELD.userTVL)}>
+                             TVL{arrow(SORT_FIELD.userTVL)}
                         </ClickableText>
                     </ResponsiveGrid>
                     <Break />
