@@ -38,6 +38,9 @@ import useUserPools from 'data/balancer/useUserPools';
 import { PoolDataUser} from 'data/balancer/balancerTypes';
 import { useBalancerPools } from 'data/balancer/usePools';
 import UserPoolTable from 'components/pools/UserPoolTable';
+import { useAddressTransactionData } from 'data/covalent/useAddressTransactionData';
+import BarChartStacked from 'components/BarChartStacked';
+import getChartColor from 'utils/getChartColor';
 
 
 
@@ -189,6 +192,9 @@ export default function Treasury() {
     const [volumeWindow, setVolumeWindow] = useState(VolumeWindow.daily);
     const weeklyVolumeData = useTransformedVolumeData(adjustFees(protocolData?.feeData), 'week');
     const monthlyVolumeData = useTransformedVolumeData(adjustFees(protocolData?.feeData), 'month');
+    const userTxs = useAddressTransactionData(TREASURY_ADDRESS);
+
+    //console.log("userTxs", userTxs);
 
     //Get curated token dataset to calcuate BAL and bb-a-USD distribution values
     let curatedTokenDatas: TokenData[] = [];
@@ -243,10 +249,13 @@ export default function Treasury() {
    }
    const pieChartData: any[] = [];
    for (const key in rawData) {
+       if (rawData[key] > 1) {
        const entry:any = {};
        entry.name = key;
        entry.value = rawData[key];
+       entry.fill = getChartColor(key, 1);
        pieChartData.push(entry);
+       }
 
    }
 
@@ -281,18 +290,18 @@ export default function Treasury() {
                                             </RowFixed>
                                             <TYPE.label fontSize="14px">{formatAmount(balAssets.valueUSDCollected / balAssets.priceUSD)}</TYPE.label>
                                         </RowBetween>
-                                    </AutoColumn>
+                            </AutoColumn>
                                 </GreyCard>
                             <AutoColumn gap="lg">
                                 <AutoColumn gap="4px">
                                     <TYPE.main fontWeight={400}>30d High</TYPE.main>
                                     <TYPE.label fontSize="24px">{formatDollarAmount(monthlyHigh)}</TYPE.label>
-                                    <Percent value={100 / historicalCollectorData?.tvl * monthlyHigh - 100} />
+                                    <Percent value={100 / monthlyHigh * historicalCollectorData?.tvl - 100} />
                                 </AutoColumn>
                                 <AutoColumn gap="4px">
                                     <TYPE.main fontWeight={400}>30d Low</TYPE.main>
                                     <TYPE.label fontSize="24px">{formatDollarAmount(monthlyLow)}</TYPE.label>
-                                    <Percent value={100 / historicalCollectorData?.tvl * monthlyLow - 100} />
+                                    <Percent value={100 / monthlyLow * historicalCollectorData?.tvl - 100} />
                                 </AutoColumn>
                                 <AutoColumn gap="4px">
                                     <TYPE.main fontWeight={400}>24h Change</TYPE.main>
@@ -354,6 +363,18 @@ export default function Treasury() {
                                     </StyledExternalLink>
                                 </RowFixed>
                             }
+                        /> : <AutoColumn gap="lg" justify='flex-start'>
+                            <DarkGreyCard>
+                                <TYPE.main fontSize="18px">Fetching historical token data...</TYPE.main>
+                                <LocalLoader fill={false} />
+                            </DarkGreyCard>
+                        </ AutoColumn>}
+                        {tokenSet.length > 0 && pieChartData && historicalCollectorData?.tvl ?
+                        <BalPieChart
+                            data={pieChartData}
+                            tokenSet={tokenSet}
+                            height={150}
+                            minHeight={150}
                         /> : <AutoColumn gap="lg" justify='flex-start'>
                             <DarkGreyCard>
                                 <TYPE.main fontSize="18px">Fetching historical token data...</TYPE.main>
@@ -437,19 +458,45 @@ export default function Treasury() {
                                 <LocalLoader fill={false} />
                             </DarkGreyCard>
                         </ AutoColumn>}
-                    </ContentLayout> 
-                {pieChartData && historicalCollectorData?.tvl ?
-                        <BalPieChart
-                            data={pieChartData}
-                            tokenSet={tokenSet}
+                    </ContentLayout>
+                        <ResponsiveRow>
+                        {userTxs.tokenDatas ?
+                        <ChartWrapper> 
+                        <BarChartStacked
+                            data={userTxs.tokenDatas}
+                            tokenSet={['copper', 'feeCollector']}
                             height={220}
-                            minHeight={500}
-                        /> : <AutoColumn gap="lg" justify='flex-start'>
-                            <DarkGreyCard>
-                                <TYPE.main fontSize="18px">Fetching historical token data...</TYPE.main>
-                                <LocalLoader fill={false} />
-                            </DarkGreyCard>
-                        </ AutoColumn>}
+                            minHeight={332}
+                            color={activeNetwork.primaryColor}
+                            value={liquidityHover}
+                            label={leftLabel}
+                            topLeft={
+                                <AutoColumn gap="4px">
+                                    <TYPE.mediumHeader fontSize="16px">Fee Income</TYPE.mediumHeader>
+                                  
+                                </AutoColumn>
+                            }
+                        />
+                    </ChartWrapper> : null }
+                    {userTxs.cumulativeTokenDatas ?
+                        <ChartWrapper> 
+                        <StackedAreaChart
+                            data={userTxs.cumulativeTokenDatas}
+                            tokenSet={['copper', 'feeCollector']}
+                            height={220}
+                            minHeight={332}
+                            color={activeNetwork.primaryColor}
+                            value={liquidityHover}
+                            label={leftLabel}
+                            topLeft={
+                                <AutoColumn gap="4px">
+                                    <TYPE.mediumHeader fontSize="16px">Cumulative Income</TYPE.mediumHeader>
+                                  
+                                </AutoColumn>
+                            }
+                        />
+                    </ChartWrapper> : null }
+                    </ResponsiveRow> 
                 <TYPE.main> Tokens in treasury wallet </TYPE.main>
                 <TreasuryTokenPortfolioTable tokenDatas={curatedTokenDatas} />
                 <TYPE.main> Investments </TYPE.main>

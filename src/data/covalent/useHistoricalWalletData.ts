@@ -8,13 +8,13 @@ import { useActiveNetworkVersion } from 'state/application/hooks';
 import { GetAddressHistoricalTokenData, WalletHistoryData } from '../../utils/getAddressHistoricalTokenData';
 import { COVALENT_TOKEN_BLACKLIST } from './tokenBlackList';
 
-interface WalletHistoricalData {
+export interface WalletHistoricalData {
     totalValueData: BalancerChartDataItem[];
     tokenDatas: any[],
     tvl?: number;
 }
 
-interface BalancerDateChartItem {
+export interface BalancerDateChartItem {
     value: number;
     time: Date;
 }

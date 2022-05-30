@@ -6,4 +6,5 @@ export const COVALENT_TOKEN_BLACKLIST = [
     '0xc229cc41f523f165436f2d52c62b80602cd76f51',
     '0xfe18be6b3bd88a2d2a7f928d00292e7a9963cfc6',
     '0xc011a73ee8576fb46f5e1c5751ca3b9fe0af2a6f',
+    '0x467bccd9d29f223bce8043b84e8c8b282827790f',
 ]

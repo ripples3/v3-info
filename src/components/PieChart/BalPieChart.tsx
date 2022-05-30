@@ -8,6 +8,7 @@ import utc from 'dayjs/plugin/utc';
 import useTheme from 'hooks/useTheme';
 import { formatDollarAmount } from '../../utils/numbers';
 import getChartColor from '../../utils/getChartColor';
+import { ALTERNATIVE_COLORS } from "constants/tokenColorList";
 
 dayjs.extend(utc);
 
@@ -67,10 +68,10 @@ export const BalPieChart = ({
                 {topRight ?? null}
             </RowBetween>
             <ResponsiveContainer width="100%" height="100%">
-                <PieChart width={400} height={400}>
+                <PieChart width={minHeight} height={minHeight}>
                     <Pie
                         dataKey="value"
-                        isAnimationActive={false}
+                        isAnimationActive={true}
                         data={data}
                         cx="50%"
                         cy="50%"
@@ -94,9 +95,6 @@ export const BalPieChart = ({
                             return formatDollarAmount(value);
                         }}
                     />
-                    {data.map((entry, index) => (
-              <Cell key={`cell-${index}`} fill={getChartColor(entry.name, index)} />
-            ))}
                 </PieChart>
             </ResponsiveContainer>
             <RowBetween>

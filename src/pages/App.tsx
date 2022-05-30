@@ -129,7 +129,6 @@ export default function App() {
                 <LocalLoader fill={true} />
             ) : (
                 <AppWrapper>
-                    <URLWarning />
                     <HeaderWrapper>
                         {activeNetwork.id === SupportedNetwork.POLYGON && (
                             <WarningWrapper>
@@ -176,7 +175,7 @@ export default function App() {
                                 <Route exact strict path="/:networkID?/tokens" component={TokensOverview} />
                                 <Route exact path="/:networkID?" component={Protocol} />
                             </Switch>
-                            <Marginer />
+                            {location.pathname !== '/' ? <Marginer /> : null }
                         </BodyWrapper>
                     )}
                 </AppWrapper>

@@ -10,7 +10,7 @@ import { networkPrefix } from 'utils/networkPrefix';
 import { AutoColumn } from 'components/Column';
 import NetworkDropdown from 'components/Menu/NetworkDropdown';
 import { BALANCER_APP_LOGO } from '../../data/balancer/constants';
-import { isBrowser } from 'react-device-detect';
+import { isBrowser, isMobile } from 'react-device-detect';
 
 const HeaderFrame = styled.div`
     display: grid;
@@ -168,7 +168,6 @@ export default function Header() {
                 </Title>
                 { isBrowser ?
                 <HeaderLinks>
-                   
                     <StyledNavLink
                         id={`pool-nav-link`}
                         to={networkPrefix(activeNewtork)}
@@ -195,12 +194,13 @@ export default function Header() {
                         Treasury
                     </StyledNavLink>
                 </HeaderLinks> : null }
-            </HeaderRow>
+                { isMobile ?
             <HeaderControls>
             <NetworkDropdown />
                 {/*<SearchSmall />*/}
                 <Menu />
-            </HeaderControls>
+            </HeaderControls> : null }
+            {isMobile ?
             <SmallContentGrouping>
                 <AutoColumn gap="sm">
                     <RowBetween>
@@ -209,7 +209,24 @@ export default function Header() {
                         <Menu />
                     </RowBetween>
                 </AutoColumn>
-            </SmallContentGrouping>
+            </SmallContentGrouping> : null }
+            </HeaderRow>
+            { isBrowser ?
+            <HeaderControls>
+            <NetworkDropdown />
+                {/*<SearchSmall />*/}
+                <Menu />
+            </HeaderControls> : null }
+            {isBrowser ?
+            <SmallContentGrouping>
+                <AutoColumn gap="sm">
+                    <RowBetween>
+                        <NetworkDropdown />
+                        <div />
+                        <Menu />
+                    </RowBetween>
+                </AutoColumn>
+            </SmallContentGrouping> : null }
         </HeaderFrame>
     );
 }

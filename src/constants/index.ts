@@ -101,7 +101,7 @@ export const NETWORK_ONLY = {
 };
 
 // temporary! fixing USD accounting on subgraph - open issue if urgent
-export const TOKEN_HIDE = ['0xd46ba6d942050d489dbd938a2c909a5d5039a161', '0x7dfb72a2aad08c937706f21421b15bfc34cba9ca'];
+export const TOKEN_HIDE = ['0xd46ba6d942050d489dbd938a2c909a5d5039a161', '0x7dfb72a2aad08c937706f21421b15bfc34cba9ca', '0xf8fd466f12e236f4c96f7cce6c79eadb819abf58'];
 export const POOL_HIDE = [
     '0x9210f1204b5a24742eba12f710636d76240df3d00000000000000000000000fc',
     '0x10a2f8bd81ee2898d7ed18fb8f114034a549fa59000200000000000000000090',
@@ -124,6 +124,24 @@ export const PINNED_PAIRS: { readonly [chainId in ChainId]?: [Token, Token][] } 
         [DAI, USDT],
     ],
 };
+
+//Tokens to be included in the fee collector view even if they are below sweep threshold:
+export const DEFAULT_FEE_TOKENS = [
+    '0x7f39c581f595b53c5cb19bd0b3f8da6c935e2ca0',
+    '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
+    '0x82af49447d8a07e3bd95bd0d56f35241523fbab1',
+    '0x040d1edc9569d4bab2d15287dc5a4f10f56a56b8',
+    '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
+    '0xff970a61a04b1ca14834a43f5de4533ebddb5cc8',
+]
+
+export const DEFAULT_FEE_SYMBOLS = [
+    'BAL',
+    'USDC',
+    'wstETH',
+    'WETH',
+    'YFI',
+]
 
 export interface WalletInfo {
     connector?: AbstractConnector;

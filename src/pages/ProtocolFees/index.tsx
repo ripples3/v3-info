@@ -36,6 +36,8 @@ import { TokenData } from 'data/balancer/balancerTypes';
 import { COVALENT_TOKEN_BLACKLIST } from 'data/covalent/tokenBlackList';
 import { FEE_COLLECTOR_ADDRESS } from 'constants/wallets';
 import StackedAreaChart from 'components/StackedAreaChart';
+import { DEFAULT_FEE_SYMBOLS } from 'constants/index';
+import { AreaChart } from 'recharts';
 
 const ChartWrapper = styled.div`
     width: 49%;
@@ -67,10 +69,10 @@ const ContentLayout = styled.div`
 //Poolsnapshots are taken OO:OO UTC. Generate previous snapshot date and previous Thu. Used to calculate weekly sweep fee generators
 const target = 2 // Wednesday
 const prevDate = new Date()
-prevDate.setDate(prevDate.getDate() - ( prevDate.getDay() == target ? 7 : (prevDate.getDay() + (7 - target)) % 7 ));
-prevDate.setUTCHours(0,0,0,0);
+prevDate.setDate(prevDate.getDate() - (prevDate.getDay() == target ? 7 : (prevDate.getDay() + (7 - target)) % 7));
+prevDate.setUTCHours(0, 0, 0, 0);
 const today = new Date();
-today.setUTCHours(0,0,0,0);
+today.setUTCHours(0, 0, 0, 0);
 
 export default function ProtocolFees() {
     useEffect(() => {
@@ -89,15 +91,17 @@ export default function ProtocolFees() {
     let balAddress = '0xba100000625a3754423978a60c9317c58a424e3d';
     let usdcAddress = '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48';
     const bbaUsdAddress = '0x7b50775383d3d6f0215a8f290f2c9e2eebbeceb2';
-    
+
     const [feesHover, setFeesHover] = useState<number | undefined>();
     const [feesLabel, setFeesLabel] = useState<string | undefined>();
     const [liquidityHover, setLiquidityHover] = useState<number | undefined>();
     const [leftLabel, setLeftLabel] = useState<string | undefined>();
+    const [totalView, setTotalView] = useState<boolean | undefined>();
 
     useEffect(() => {
         setFeesHover(undefined);
         setLiquidityHover(undefined);
+        setTotalView(false);
     }, [activeNetwork]);
 
     useEffect(() => {
@@ -130,7 +134,7 @@ export default function ProtocolFees() {
         return newData;
     }
 
-    const tokenSet :string[] = [];
+    const tokenSet = DEFAULT_FEE_SYMBOLS;
     const [volumeWindow, setVolumeWindow] = useState(VolumeWindow.daily);
     const weeklyVolumeData = useTransformedVolumeData(adjustFees(protocolData?.feeData), 'week');
     const monthlyVolumeData = useTransformedVolumeData(adjustFees(protocolData?.feeData), 'month');
@@ -156,9 +160,9 @@ export default function ProtocolFees() {
     if (formattedTokens && walletTokenData) {
         curatedTokenDatas = curateTokenDatas(formattedTokens, walletTokenData, sweepLimit, true);
         curatedTokenDatas = curatedTokenDatas.filter((x) => !!x && !COVALENT_TOKEN_BLACKLIST.includes(x.address));
-        curatedTokenDatas.forEach ((item) => {
+        curatedTokenDatas.forEach((item) => {
             const token = walletTokenData.data.items.find(x => x.contract_address == item.address)
-            if (token && token.contract_ticker_symbol) {
+            if (token && token.contract_ticker_symbol && !tokenSet.includes(token.contract_ticker_symbol)) {
                 tokenSet.push(token?.contract_ticker_symbol)
             }
             if (item.address === balAddress) {
@@ -184,7 +188,7 @@ export default function ProtocolFees() {
             isEmptySet = true;
         }
     }
-    
+
     return (
         <PageWrapper>
             <AutoColumn gap="lg">
@@ -249,7 +253,7 @@ export default function ProtocolFees() {
                     {totalAmount > 0 && historicalCollectorData?.tvl ?
                         <DarkGreyCard>
                             <AutoColumn gap="lg">
-                            <AutoColumn gap="4px">
+                                <AutoColumn gap="4px">
                                     <TYPE.main fontWeight={400}>Upcoming Distribution Estimates</TYPE.main>
                                     <TYPE.label fontSize="24px">{formatDollarAmount(totalAmount)}</TYPE.label>
                                 </AutoColumn>
@@ -289,89 +293,153 @@ export default function ProtocolFees() {
                                             <TYPE.label fontSize="14px">{formatDollarAmount(bbaUsdAmount * 0.25 + balAmount * 0.25)}</TYPE.label>
                                         </RowBetween>
                                     </AutoColumn>
-                                    
+
                                 </GreyCard>
                                 <AutoColumn gap="4px">
                                     <TYPE.main fontWeight={400}>24h Change</TYPE.main>
                                     <TYPE.label fontSize="24px">{formatDollarAmount(Math.abs(dailyChange))}</TYPE.label>
                                     <Percent value={100 / historicalCollectorData?.tvl * dailyChange} />
-                                </AutoColumn> 
+                                </AutoColumn>
                             </AutoColumn>
                         </DarkGreyCard>
-                        : 
+                        :
                         <AutoColumn gap="lg" justify='flex-start'>
-                            {! isEmptySet ? 
-                        <DarkGreyCard>
-                        
-                            <TYPE.main fontSize="18px">Fetching distribution estimates...</TYPE.main>
-                            <LocalLoader fill={false} /> 
-                        </DarkGreyCard> : (
+                            {!isEmptySet ?
                                 <DarkGreyCard>
-                                <TYPE.main>No fees to distribute</TYPE.main>
-                                </DarkGreyCard> )}
-                    </ AutoColumn>}
-                    {totalAmount > 0 && historicalCollectorData?.tvl ?
-                        <StackedAreaChart
-                            data={historicalCollectorData?.tokenDatas}
-                            height={220}
-                            tokenSet={tokenSet}
-                            minHeight={475}
-                            color={activeNetwork.primaryColor}
-                            value={liquidityHover}
-                            label={leftLabel}
-                            topLeft={
-                                <AutoColumn gap="4px">
-                                    <TYPE.mediumHeader fontSize="16px">Historical Net Worth in Fee Collector</TYPE.mediumHeader>
-                                    <TYPE.largeHeader fontSize="32px">
-                                        <MonoSpace>{formatDollarAmount(liquidityHover, 2, true)} </MonoSpace>
-                                    </TYPE.largeHeader>
-                                    <TYPE.main fontSize="12px" height="14px">
-                                        {leftLabel ? <MonoSpace>{leftLabel} (UTC)</MonoSpace> : null}
-                                    </TYPE.main>
-                                </AutoColumn>
-                            }
-                            topRight={
-                                <RowFixed align="top" justify="center">
-                                    {debankLink && (
-                                        <StyledExternalLink
-                                            href={debankLink}
-                                            style={{ marginLeft: '12px' }}
-                                            onClickCapture={() => {
-                                                ReactGA.event({
-                                                    category: 'Debank',
-                                                    action: 'Debank portfolio page click',
-                                                });
-                                            }}
+
+                                    <TYPE.main fontSize="18px">Fetching distribution estimates...</TYPE.main>
+                                    <LocalLoader fill={false} />
+                                </DarkGreyCard> : (
+                                    <DarkGreyCard>
+                                        <TYPE.main>No fees to distribute</TYPE.main>
+                                    </DarkGreyCard>)}
+                        </ AutoColumn>}
+
+                    {totalView ?
+                        totalAmount > 0 && historicalCollectorData?.tvl ?
+                            <LineChart
+                                data={historicalCollectorData?.totalValueData}
+                                height={220}
+                                minHeight={475}
+                                color={activeNetwork.primaryColor}
+                                value={liquidityHover}
+                                label={leftLabel}
+                                setValue={setLiquidityHover}
+                                setLabel={setLeftLabel}
+                                topLeft={
+                                    <AutoColumn gap="4px">
+                                        <TYPE.mediumHeader fontSize="16px">Total Fees Accumulated</TYPE.mediumHeader>
+                                        <TYPE.largeHeader fontSize="32px">
+                                            <MonoSpace>{formatDollarAmount(liquidityHover, 2, true)} </MonoSpace>
+                                        </TYPE.largeHeader>
+                                        <TYPE.main fontSize="12px" height="14px">
+                                            {leftLabel ? <MonoSpace>{leftLabel} (UTC)</MonoSpace> : null}
+                                        </TYPE.main>
+                                    </AutoColumn>
+                                }
+                                topRight={
+                                    <RowFixed align="center" justify="center" align-items="center">
+                                        <SmallOptionButton
+                                            active={totalView === true}
+                                            onClick={() => setTotalView(false)}
                                         >
-                                            <StyledDebankLogo src={DebankLogo} />
+                                            Show token breakdown
+                                        </SmallOptionButton>
+                                        {debankLink && (
+                                            <StyledExternalLink
+                                                href={debankLink}
+                                                style={{ marginLeft: '12px' }}
+                                                onClickCapture={() => {
+                                                    ReactGA.event({
+                                                        category: 'Debank',
+                                                        action: 'Debank portfolio page click',
+                                                    });
+                                                }}
+                                            >
+                                                <StyledDebankLogo src={DebankLogo} />
+                                            </StyledExternalLink>
+                                        )}
+                                        <StyledExternalLink href={getEtherscanLink(1, '0xce88686553686da562ce7cea497ce749da109f9f', 'address', activeNetwork)}>
+                                            <ExternalLink
+                                                stroke={theme.text2}
+                                                size={'17px'}
+                                                style={{ marginLeft: '12px' }}
+                                            />
                                         </StyledExternalLink>
-                                    )}
-                                    <StyledExternalLink href={getEtherscanLink(1, '0xce88686553686da562ce7cea497ce749da109f9f', 'address', activeNetwork)}>
-                                        <ExternalLink
-                                            stroke={theme.text2}
-                                            size={'17px'}
-                                            style={{ marginLeft: '12px' }}
-                                        />
-                                    </StyledExternalLink>
-                                </RowFixed>
-                            }
-                        /> : <AutoColumn gap="lg" justify='flex-start'>
-                            {! isEmptySet ?
-                        <DarkGreyCard>
-                            <TYPE.main fontSize="18px">Fetching historical data...</TYPE.main>
-                            <LocalLoader fill={false} />
-                        </DarkGreyCard> : (
-                                <DarkGreyCard>
-                                <TYPE.main>No tokens above threshold</TYPE.main>
-                                </DarkGreyCard> )}
-                    </ AutoColumn>}
+                                    </RowFixed>
+                                }
+                            /> : <AutoColumn gap="lg" justify='flex-start'>
+                                {!isEmptySet ?
+                                    <DarkGreyCard>
+                                        <TYPE.main fontSize="18px">Fetching fee collector historical data...</TYPE.main>
+                                        <LocalLoader fill={false} />
+                                    </DarkGreyCard> : (
+                                        <DarkGreyCard>
+                                            <TYPE.main>No historical data available</TYPE.main>
+                                        </DarkGreyCard>)}
+                            </ AutoColumn> : (
+                            totalAmount > 0 && historicalCollectorData?.tvl ?
+                                <StackedAreaChart
+                                    data={historicalCollectorData?.tokenDatas}
+                                    height={220}
+                                    tokenSet={tokenSet}
+                                    minHeight={475}
+                                    color={activeNetwork.primaryColor}
+                                    value={liquidityHover}
+                                    label={leftLabel}
+                                    topLeft={
+                                        <AutoColumn gap="4px">
+                                            <TYPE.mediumHeader fontSize="16px">Historical accumulation of tokens to be swept</TYPE.mediumHeader>
+                                        </AutoColumn>
+                                    }
+                                    topRight={
+                                        <RowFixed align="center" justify="center" align-items="center">
+                                            <SmallOptionButton
+                                                active={totalView === false}
+                                                onClick={() => setTotalView(true)}
+                                            >
+                                                Show totals
+                                            </SmallOptionButton>
+                                            {debankLink && (
+                                                <StyledExternalLink
+                                                    href={debankLink}
+                                                    style={{ marginLeft: '12px' }}
+                                                    onClickCapture={() => {
+                                                        ReactGA.event({
+                                                            category: 'Debank',
+                                                            action: 'Debank portfolio page click',
+                                                        });
+                                                    }}
+                                                >
+                                                    <StyledDebankLogo src={DebankLogo} />
+                                                </StyledExternalLink>
+                                            )}
+                                            <StyledExternalLink href={getEtherscanLink(1, '0xce88686553686da562ce7cea497ce749da109f9f', 'address', activeNetwork)}>
+                                                <ExternalLink
+                                                    stroke={theme.text2}
+                                                    size={'17px'}
+                                                    style={{ marginLeft: '12px' }}
+                                                />
+                                            </StyledExternalLink>
+                                        </RowFixed>
+                                    }
+                                /> : <AutoColumn gap="lg" justify='flex-start'>
+                                    {!isEmptySet ?
+                                        <DarkGreyCard>
+                                            <TYPE.main fontSize="18px">Fetching historical data...</TYPE.main>
+                                            <LocalLoader fill={false} />
+                                        </DarkGreyCard> : (
+                                            <DarkGreyCard>
+                                                <TYPE.main>No tokens above threshold</TYPE.main>
+                                            </DarkGreyCard>)}
+                                </ AutoColumn>)}
                 </ContentLayout>
-                {! isEmptySet ? 
-                <TYPE.main>Tokens to be swept</TYPE.main>
-                : null }
-                {! isEmptySet ? 
-                <ProtocolFeeTokenTable tokenDatas={formattedTokens} walletTokenDatas={walletTokenData} sweepLimitActive={true} />
-                : null }
+                {!isEmptySet ?
+                    <TYPE.main>Tokens to be swept</TYPE.main>
+                    : null}
+                {!isEmptySet ?
+                    <ProtocolFeeTokenTable tokenDatas={formattedTokens} walletTokenDatas={walletTokenData} sweepLimitActive={true} />
+                    : null}
                 <TYPE.main> Tokens below weekly sweep threshold ({formatDollarAmount(sweepLimit, 0, true)}) </TYPE.main>
                 <ProtocolFeeTokenTable tokenDatas={formattedTokens} walletTokenDatas={walletTokenData} sweepLimitActive={false} />
                 <TYPE.main> Top performing Pools by Fees Collected (Epoch: {prevDate.toLocaleDateString()} - {today.toLocaleDateString()}, 00:00 UTC) </TYPE.main>
