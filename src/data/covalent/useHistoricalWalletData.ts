@@ -19,7 +19,7 @@ export interface BalancerDateChartItem {
     time: Date;
 }
 
-export function useHistoricalWalletData(address: string): WalletHistoricalData {
+export function useHistoricalWalletData(address: string, tokenFilterList?: string[]): WalletHistoricalData {
 
     function getWalletBalancerChartData(walletData: WalletHistoryData) {
         const chartData: BalancerDateChartItem[] = [];
@@ -35,7 +35,7 @@ export function useHistoricalWalletData(address: string): WalletHistoricalData {
                 tokenData.time = new Date(walletData.data.items[0].holdings[holdingsIndex].timestamp);
                 //Sum up all token holdings
                 walletData.data.items.forEach((item) => {
-                    if (!COVALENT_TOKEN_BLACKLIST.includes(item.contract_address)) {
+                    if (!COVALENT_TOKEN_BLACKLIST.includes(item.contract_address) && !tokenFilterList?.includes(item.contract_address)) {
                     if (item.holdings[holdingsIndex].close.quote && typeof item.holdings[holdingsIndex].close.quote === 'number') {
                             chartItem.value += Number(item.holdings[holdingsIndex].close.quote);
                             tokenData[item.contract_ticker_symbol] = Number(item.holdings[holdingsIndex].close.quote);

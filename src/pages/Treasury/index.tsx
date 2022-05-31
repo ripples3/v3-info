@@ -6,7 +6,7 @@ import useTheme from 'hooks/useTheme';
 import { AutoColumn } from 'components/Column';
 import { ResponsiveRow, RowBetween, RowFixed } from 'components/Row';
 import { getEtherscanLink, shortenAddress } from 'utils';
-import { ExternalLink } from 'react-feather';
+import { ExternalLink, Type } from 'react-feather';
 import { MonoSpace } from 'components/shared';
 import { formatAmount, formatDollarAmount } from 'utils/numbers';
 import Loader, { LocalLoader } from 'components/Loader';
@@ -35,14 +35,17 @@ import CurrencyLogo from 'components/CurrencyLogo';
 import StackedAreaChart from 'components/StackedAreaChart';
 import { BalPieChart } from 'components/PieChart/BalPieChart';
 import useUserPools from 'data/balancer/useUserPools';
-import { PoolDataUser} from 'data/balancer/balancerTypes';
+import { PoolDataUser } from 'data/balancer/balancerTypes';
 import { useBalancerPools } from 'data/balancer/usePools';
 import UserPoolTable from 'components/pools/UserPoolTable';
 import { useAddressTransactionData } from 'data/covalent/useAddressTransactionData';
 import BarChartStacked from 'components/BarChartStacked';
 import getChartColor from 'utils/getChartColor';
+import relativeTime from 'dayjs/plugin/relativeTime';
+import dayjs from 'dayjs';
 
 
+dayjs.extend(relativeTime);
 
 const ChartWrapper = styled.div`
     width: 49%;
@@ -84,17 +87,29 @@ export default function Treasury() {
     const theme = useTheme();
 
 
+    //Timestamps for calcuations
+    const daysSinceFirstIncomeTx = dayjs().diff(dayjs('2022-03-26'), 'days');
+    const firstDayOfMonth = dayjs().startOf("month").toDate();
+    //dayjs January == 0!
+    const firstDayOfPreviousMonth = dayjs(dayjs().year().toString() + '-' + String(dayjs().month()) + '-' + '1').startOf("month").toDate();
+    const avgDays = 30;
+    const startDate = dayjs().subtract(avgDays, 'day').toDate();
+    
+
+    const bbaUsdAddress = '0x7b50775383d3d6f0215a8f290f2c9e2eebbeceb2';
+    let usdcAddress = '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48';
+    let balAddress = '0xba100000625a3754423978a60c9317c58a424e3d';
     const [activeNetwork] = useActiveNetworkVersion();
     const protocolData = useBalancerProtocolData();
     const poolData = useBalancerPools();
     const formattedTokens = useBalancerTokens();
     const userPools = useUserPools(TREASURY_ADDRESS);
     const walletTokenData = GetAddressTokenBalances(TREASURY_ADDRESS);
-    const historicalCollectorData = useHistoricalWalletData(TREASURY_ADDRESS);
+    const historicalCollectorData = useHistoricalWalletData(TREASURY_ADDRESS, [bbaUsdAddress]);
+    const userTxs = useAddressTransactionData(TREASURY_ADDRESS);
     const debankLink = 'https://debank.com/profile/' + TREASURY_ADDRESS;
-    const bbaUsdAddress = '0x7b50775383d3d6f0215a8f290f2c9e2eebbeceb2';
-    let usdcAddress = '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48';
-    let balAddress = '0xba100000625a3754423978a60c9317c58a424e3d';
+    const [totalView, setTotalView] = useState<boolean | undefined>();
+
 
 
     const [feesHover, setFeesHover] = useState<number | undefined>();
@@ -105,6 +120,7 @@ export default function Treasury() {
     useEffect(() => {
         setFeesHover(undefined);
         setLiquidityHover(undefined);
+        setTotalView(false);
     }, [activeNetwork]);
 
     useEffect(() => {
@@ -141,38 +157,35 @@ export default function Treasury() {
     //Balancer Pool position data
     //TODO: encapsulate in own function after view is done
     //TODO: introduce constant for protocol wide fee cut!
-    //console.log("userPoolData", userPools);
-    const poolDatasUser:PoolDataUser[] = [];
+    const poolDatasUser: PoolDataUser[] = [];
     if (poolData.length > 0) {
         userPools.forEach((pool) => {
             const poolDataUser = {} as PoolDataUser;
             const userPool = poolData.find((x) => x.id == pool.poolId)
             //Populate data
             if (userPool) {
-            poolDataUser.address = userPool?.address;
-            poolDataUser.feeTier = userPool.feeTier;
-            poolDataUser.id = userPool.id;
-            poolDataUser.name = userPool.name;
-            poolDataUser.swapFee = userPool.swapFee;
-            poolDataUser.symbol = userPool.symbol;
-            poolDataUser.tokens = userPool.tokens;
-            poolDataUser.userRelativeTVL = pool.relativeShare;
-            poolDataUser.userTVL = userPool?.tvlUSD * pool.relativeShare;
-            poolDataUser.dailyFees = userPool.feesUSD * pool.relativeShare * 0.5;
-            poolDataUser.tvlUSD = userPool.tvlUSD;
-            poolDataUser.volumeUSD = userPool.volumeUSD * pool.relativeShare
+                poolDataUser.address = userPool?.address;
+                poolDataUser.feeTier = userPool.feeTier;
+                poolDataUser.id = userPool.id;
+                poolDataUser.name = userPool.name;
+                poolDataUser.swapFee = userPool.swapFee;
+                poolDataUser.symbol = userPool.symbol;
+                poolDataUser.tokens = userPool.tokens;
+                poolDataUser.userRelativeTVL = pool.relativeShare;
+                poolDataUser.userTVL = userPool?.tvlUSD * pool.relativeShare;
+                poolDataUser.dailyFees = userPool.feesUSD * pool.relativeShare * 0.5;
+                poolDataUser.tvlUSD = userPool.tvlUSD;
+                poolDataUser.volumeUSD = userPool.volumeUSD * pool.relativeShare
             }
             poolDatasUser.push(poolDataUser);
         })
     }
 
-    //console.log("poolDatasUser", poolDatasUser)
-
     //Monthly metrics
     let monthlyHigh = 0;
     let monthlyLow = 0;
     let dailyChange = 0;
-    if(historicalCollectorData.totalValueData) { 
+    if (historicalCollectorData.totalValueData) {
         historicalCollectorData?.totalValueData.forEach((entry) => {
             if (monthlyHigh < entry.value) {
                 monthlyHigh = entry.value;
@@ -188,19 +201,20 @@ export default function Treasury() {
 
 
 
-    const tokenSet :string[] = [];
+    const tokenSet: string[] = [];
     const [volumeWindow, setVolumeWindow] = useState(VolumeWindow.daily);
     const weeklyVolumeData = useTransformedVolumeData(adjustFees(protocolData?.feeData), 'week');
     const monthlyVolumeData = useTransformedVolumeData(adjustFees(protocolData?.feeData), 'month');
-    const userTxs = useAddressTransactionData(TREASURY_ADDRESS);
+    
 
-    //console.log("userTxs", userTxs);
+
+
 
     //Get curated token dataset to calcuate BAL and bb-a-USD distribution values
     let curatedTokenDatas: TokenData[] = [];
     if (formattedTokens && walletTokenData) {
         curatedTokenDatas = curateTokenDatas(formattedTokens, walletTokenData, 10000, true);
-        curatedTokenDatas = curatedTokenDatas.filter((x) => !!x && !COVALENT_TOKEN_BLACKLIST.includes(x.address));
+        curatedTokenDatas = curatedTokenDatas.filter((x) => !!x && !COVALENT_TOKEN_BLACKLIST.includes(x.address) && ! x.symbol.includes('bb-'));
     }
 
     //
@@ -224,43 +238,95 @@ export default function Treasury() {
     if (formattedTokens && walletTokenData) {
         curatedProjectionData = curateTokenDatas(formattedTokens, walletTokenData, sweepLimit, true);
         curatedProjectionData = curatedProjectionData.filter((x) => !!x && !COVALENT_TOKEN_BLACKLIST.includes(x.address));
-        curatedProjectionData.forEach ((item) => {
+        curatedProjectionData.forEach((item) => {
             const token = walletTokenData.data.items.find(x => x.contract_address == item.address)
-            if (token && token.contract_ticker_symbol) {
+            if (token && token.contract_ticker_symbol && ! token.contract_ticker_symbol.includes('bb-')) {
                 tokenSet.push(token?.contract_ticker_symbol)
             }
             totalAmount += item.valueUSDCollected;
         });
     }
-
     const balAssets = curatedProjectionData.find((x) => x.address == balAddress);
 
-   //TODO: fix edge case redundancy code here ( this happens right after a sweep):
-   let isEmptySet = false;
-   if (formattedTokens && walletTokenData) {
-       if (formattedTokens.length > 0 && curateTokenDatas(formattedTokens, walletTokenData, sweepLimit, true).length == 0) {
-           isEmptySet = true;
-       }
-   }
+    //TODO: fix edge case redundancy code here ( this happens right after a sweep):
+    let isEmptySet = false;
+    if (formattedTokens && walletTokenData) {
+        if (formattedTokens.length > 0 && curateTokenDatas(formattedTokens, walletTokenData, sweepLimit, true).length == 0) {
+            isEmptySet = true;
+        }
+    }
 
-   const rawData = historicalCollectorData.tokenDatas[historicalCollectorData.tokenDatas.length -1];
-   if (rawData && rawData.time)  {
-    delete rawData['time'];
-   }
-   const pieChartData: any[] = [];
-   for (const key in rawData) {
-       if (rawData[key] > 1) {
-       const entry:any = {};
-       entry.name = key;
-       entry.value = rawData[key];
-       entry.fill = getChartColor(key, 1);
-       pieChartData.push(entry);
-       }
+    //Token holdings
+    const rawData = historicalCollectorData.tokenDatas[historicalCollectorData.tokenDatas.length - 1];
+    if (rawData && rawData.time) {
+        delete rawData['time'];
+    }
+    const pieChartData: any[] = [];
+    for (const key in rawData) {
+        if (rawData[key] > 1 && !key.includes('bb-')) {
+            const entry: any = {};
+            entry.name = key;
+            entry.value = rawData[key];
+            entry.fill = getChartColor(key, 1);
+            pieChartData.push(entry);
+        }
 
-   }
-
-
+    }
     //------------------------------------------------
+
+        //---REVENUE STREAM estimates
+        let dailyRevenue = 0;
+        let dailyCopperIncome = 0;
+        let dailyFeeIncome = 0
+        let totalIncome = 0
+        let netIncomeRunningMonth = 0;
+        let percentageChangePrevious = 0;
+        if (userTxs.cumulativeTokenDatas.length > 0) {
+            //Current month
+            const startMonthEntry = userTxs.cumulativeTokenDatas.find((x) => dayjs(x.time).diff(firstDayOfMonth, 'day') == 0 );
+            const rangeEntry = userTxs.cumulativeTokenDatas.find((x) => dayjs(x.time).isAfter(firstDayOfMonth));
+            //Previous month
+            const previousStartMonthEntry = userTxs.cumulativeTokenDatas.find((x) => dayjs(x.time).diff(firstDayOfPreviousMonth, 'day') == 0 );
+            const previousRangeEntry = userTxs.cumulativeTokenDatas.find((x) => dayjs(x.time).isAfter(firstDayOfPreviousMonth));
+
+            dailyCopperIncome = (userTxs.cumulativeTokenDatas[userTxs.cumulativeTokenDatas.length-1].copper ) / daysSinceFirstIncomeTx;
+            dailyFeeIncome = (userTxs.cumulativeTokenDatas[userTxs.cumulativeTokenDatas.length-1].feeCollector) / daysSinceFirstIncomeTx;
+            dailyRevenue = dailyCopperIncome + dailyFeeIncome;
+            totalIncome = (userTxs.cumulativeTokenDatas[userTxs.cumulativeTokenDatas.length-1].copper) + (userTxs.cumulativeTokenDatas[userTxs.cumulativeTokenDatas.length-1].feeCollector);
+            //Income for the running month
+            if (startMonthEntry) {
+                netIncomeRunningMonth = totalIncome - startMonthEntry.copper - startMonthEntry.feeCollector;
+            } else if (rangeEntry) {
+                netIncomeRunningMonth = totalIncome - rangeEntry.copper - rangeEntry.feeCollector;
+            }
+            if (previousStartMonthEntry) {
+                percentageChangePrevious = 100 / (netIncomeRunningMonth - previousStartMonthEntry.copper - previousStartMonthEntry.feeCollector) * netIncomeRunningMonth;
+            } else if (previousRangeEntry) {
+                percentageChangePrevious = 100 / (netIncomeRunningMonth - previousRangeEntry.copper - previousRangeEntry.feeCollector) * netIncomeRunningMonth;
+            }
+        }
+
+        //Rolling window average
+        let avgDailyRevenue = 0;
+        let avgDailyCopperIncome = 0;
+        let avgDailyFeeIncome = 0
+        if (userTxs.cumulativeTokenDatas.length > 0) {
+            const startWindowEntry = userTxs.cumulativeTokenDatas.find((x) => dayjs(x.time).diff(startDate, 'day') == 0 );
+            const startWindowRangeEntry = userTxs.cumulativeTokenDatas.find((x) => dayjs(x.time).isAfter(startDate));
+            if (startWindowEntry) {
+                avgDailyCopperIncome = (userTxs.cumulativeTokenDatas[userTxs.cumulativeTokenDatas.length-1].copper - startWindowEntry.copper) / avgDays;
+                avgDailyFeeIncome = (userTxs.cumulativeTokenDatas[userTxs.cumulativeTokenDatas.length-1].feeCollector - startWindowEntry.feeCollector) / avgDays;
+                avgDailyRevenue = dailyCopperIncome + dailyFeeIncome;
+
+            } else if (startWindowRangeEntry)
+                avgDailyCopperIncome = (userTxs.cumulativeTokenDatas[userTxs.cumulativeTokenDatas.length-1].copper - startWindowRangeEntry.copper) / avgDays;
+                avgDailyFeeIncome = (userTxs.cumulativeTokenDatas[userTxs.cumulativeTokenDatas.length-1].feeCollector - startWindowRangeEntry.feeCollector) / avgDays;
+                avgDailyRevenue = avgDailyCopperIncome + avgDailyFeeIncome;
+        }
+
+
+
+
 
     if (activeNetwork.id !== SupportedNetwork.ETHEREUM) {
         return (
@@ -273,13 +339,93 @@ export default function Treasury() {
         <PageWrapper>
             <AutoColumn gap="lg">
                 <TYPE.largeHeader>Balancer DAO Treasury</TYPE.largeHeader>
+                <TYPE.main> Revenue streams </TYPE.main>
                 <ContentLayout>
-                    {historicalCollectorData?.tvl && balAssets ?
-                    
+                    {avgDailyRevenue > 0 && historicalCollectorData?.tvl ?
                         <DarkGreyCard>
                             <AutoColumn gap="lg">
-                            <GreyCard padding="16px">
-                            <AutoColumn gap="4px">
+                                <AutoColumn gap="4px">
+                                    <TYPE.main fontWeight={400}>Daily Revenue (30d average)</TYPE.main>
+                                    <TYPE.label fontSize="24px">{formatDollarAmount(avgDailyRevenue)}</TYPE.label>
+                                </AutoColumn>
+                                <GreyCard padding="16px">
+                                <AutoColumn gap="md">
+                                        <TYPE.main>Daily Copper Revenue</TYPE.main>
+                                        <RowBetween key={usdcAddress}>
+                                            <RowFixed>
+                                                <CurrencyLogo address={usdcAddress} size={'20px'} />
+                                                <TYPE.label fontSize="14px" ml="8px">
+                                                    {'USDC'}
+                                                </TYPE.label>
+                                            </RowFixed>
+                                            <TYPE.label fontSize="14px">{formatDollarAmount(avgDailyCopperIncome)}</TYPE.label>
+                                        </RowBetween>
+                                    </AutoColumn>
+                                </GreyCard>
+                                <GreyCard padding="16px">
+                                    <AutoColumn gap="md">
+                                        <TYPE.main>Daily Protocol Fee Revenue</TYPE.main>
+                                        <RowBetween key={usdcAddress}>
+                                            <RowFixed>
+                                                <CurrencyLogo address={usdcAddress} size={'20px'} />
+                                                <TYPE.label fontSize="14px" ml="8px">
+                                                    {'USDC'}
+                                                </TYPE.label>
+                                            </RowFixed>
+                                            <TYPE.label fontSize="14px">{formatDollarAmount(avgDailyFeeIncome)}</TYPE.label>
+                                        </RowBetween>
+                                    </AutoColumn>
+
+                                </GreyCard>
+                                <AutoColumn gap="4px">
+                                    <TYPE.main fontWeight={400}>Net Income running Month</TYPE.main>
+                                    <TYPE.label fontSize="24px">{formatDollarAmount(Math.abs(netIncomeRunningMonth))}</TYPE.label>
+                                    <Percent value={percentageChangePrevious} />
+                                </AutoColumn>
+                            </AutoColumn>
+                        </DarkGreyCard>
+                        :
+                        <AutoColumn gap="lg" justify='flex-start'>
+                            {!isEmptySet ?
+                                <DarkGreyCard>
+                                    <TYPE.main fontSize="18px">Fetching distribution estimates...</TYPE.main>
+                                    <LocalLoader fill={false} />
+                                </DarkGreyCard> : (
+                                    <DarkGreyCard>
+                                        <TYPE.main>No fees to distribute</TYPE.main>
+                                    </DarkGreyCard>)}
+                        </ AutoColumn>}
+                        {userTxs.cumulativeTokenDatas.length > 0 ?
+                            <StackedAreaChart
+                                data={userTxs.cumulativeTokenDatas}
+                                tokenSet={['copper', 'feeCollector']}
+                                labelSet={['Copper', 'Protocol fees']}
+                                height={220}
+                                minHeight={450}
+                                color={activeNetwork.primaryColor}
+                                value={liquidityHover}
+                                label={leftLabel}
+                                topLeft={
+                                    <AutoColumn gap="4px">
+                                        <TYPE.mediumHeader fontSize="16px">Cumulative Gross Income by Source</TYPE.mediumHeader>
+                                    </AutoColumn>
+                                }
+                            /> :
+                            <AutoColumn gap="lg" justify='flex-start'>
+                            <DarkGreyCard>
+                                <TYPE.main fontSize="18px">Fetching treasury wallet taxations...</TYPE.main>
+                                <LocalLoader fill={false} />
+                            </DarkGreyCard>
+                        </ AutoColumn>}
+                </ContentLayout>
+                <TYPE.main> Tokens in treasury wallet </TYPE.main>
+                <ContentLayout>
+                    {historicalCollectorData?.tvl && balAssets ?
+                        <DarkGreyCard>
+
+                            <AutoColumn gap="lg">
+                                <GreyCard padding="8x">
+                                    <AutoColumn gap="4px">
                                         <TYPE.main>BAL reserves</TYPE.main>
                                         <RowBetween key={'balReserves'}>
                                             <RowFixed>
@@ -290,217 +436,175 @@ export default function Treasury() {
                                             </RowFixed>
                                             <TYPE.label fontSize="14px">{formatAmount(balAssets.valueUSDCollected / balAssets.priceUSD)}</TYPE.label>
                                         </RowBetween>
-                            </AutoColumn>
+                                    </AutoColumn>
                                 </GreyCard>
-                            <AutoColumn gap="lg">
                                 <AutoColumn gap="4px">
-                                    <TYPE.main fontWeight={400}>30d High</TYPE.main>
-                                    <TYPE.label fontSize="24px">{formatDollarAmount(monthlyHigh)}</TYPE.label>
-                                    <Percent value={100 / monthlyHigh * historicalCollectorData?.tvl - 100} />
+                                <TYPE.main>Treasury wallet trends</TYPE.main>
                                 </AutoColumn>
-                                <AutoColumn gap="4px">
-                                    <TYPE.main fontWeight={400}>30d Low</TYPE.main>
-                                    <TYPE.label fontSize="24px">{formatDollarAmount(monthlyLow)}</TYPE.label>
-                                    <Percent value={100 / monthlyLow * historicalCollectorData?.tvl - 100} />
+                                <GreyCard padding="8x">
+                                <AutoColumn gap="lg">
+                                    <AutoColumn gap="4px">
+                                        <TYPE.main fontWeight={400}>30d High</TYPE.main>
+                                        <TYPE.label fontSize="24px">{formatDollarAmount(monthlyHigh)}</TYPE.label>
+                                        <Percent value={100 / monthlyHigh * historicalCollectorData?.tvl - 100} />
+                                    </AutoColumn>
+                                    <AutoColumn gap="4px">
+                                        <TYPE.main fontWeight={400}>30d Low</TYPE.main>
+                                        <TYPE.label fontSize="24px">{formatDollarAmount(monthlyLow)}</TYPE.label>
+                                        <Percent value={100 / monthlyLow * historicalCollectorData?.tvl - 100} />
+                                    </AutoColumn>
+                                    <AutoColumn gap="4px">
+                                        <TYPE.main fontWeight={400}>24h Change</TYPE.main>
+                                        <TYPE.label fontSize="24px">{formatDollarAmount(Math.abs(dailyChange))}</TYPE.label>
+                                        <Percent value={100 / historicalCollectorData?.tvl * dailyChange} />
+                                    </AutoColumn>
                                 </AutoColumn>
-                                <AutoColumn gap="4px">
-                                    <TYPE.main fontWeight={400}>24h Change</TYPE.main>
-                                    <TYPE.label fontSize="24px">{formatDollarAmount(Math.abs(dailyChange))}</TYPE.label>
-                                    <Percent value={100 / historicalCollectorData?.tvl * dailyChange} />
-                                </AutoColumn>
-                            </AutoColumn>
+                                </GreyCard>
                             </AutoColumn>
                         </DarkGreyCard>
                         : <AutoColumn gap="lg" justify='flex-start'>
                             <DarkGreyCard>
-                                <TYPE.main fontSize="18px">Fetching historical data...</TYPE.main>
+                                <TYPE.main fontSize="18px">Fetching token data...</TYPE.main>
                                 <LocalLoader fill={false} />
                             </DarkGreyCard>
                         </ AutoColumn>}
-                    {historicalCollectorData?.tvl ?
-                        <LineChart
-                            data={historicalCollectorData?.totalValueData}
-                            height={220}
-                            minHeight={420}
-                            color={activeNetwork.primaryColor}
-                            value={liquidityHover}
-                            label={leftLabel}
-                            setValue={setLiquidityHover}
-                            setLabel={setLeftLabel}
-                            topLeft={
-                                <AutoColumn gap="4px">
-                                    <TYPE.mediumHeader fontSize="16px">Token Holding Reserve</TYPE.mediumHeader>
-                                    <TYPE.largeHeader fontSize="32px">
-                                        <MonoSpace>{formatDollarAmount(liquidityHover, 2, true)} </MonoSpace>
-                                    </TYPE.largeHeader>
-                                    <TYPE.main fontSize="12px" height="14px">
-                                        {leftLabel ? <MonoSpace>{leftLabel} (UTC)</MonoSpace> : null}
-                                    </TYPE.main>
-                                </AutoColumn>
-                            }
-                            topRight={
-                                <RowFixed align="top" justify="center">
-                                    {debankLink && (
-                                        <StyledExternalLink
-                                            href={debankLink}
-                                            style={{ marginLeft: '12px' }}
-                                            onClickCapture={() => {
-                                                ReactGA.event({
-                                                    category: 'Debank',
-                                                    action: 'Debank portfolio page click',
-                                                });
-                                            }}
+                    {totalView ?
+                        totalAmount > 0 && historicalCollectorData?.tvl ?
+                            <LineChart
+                                data={historicalCollectorData?.totalValueData}
+                                height={220}
+                                minHeight={500}
+                                color={activeNetwork.primaryColor}
+                                value={liquidityHover}
+                                label={leftLabel}
+                                setValue={setLiquidityHover}
+                                setLabel={setLeftLabel}
+                                topLeft={
+                                    <AutoColumn gap="4px">
+                                        <TYPE.mediumHeader fontSize="16px">Historical Token Net Worth in Treasury Wallet</TYPE.mediumHeader>
+                                        <TYPE.largeHeader fontSize="32px">
+                                            <MonoSpace>{formatDollarAmount(liquidityHover, 2, true)} </MonoSpace>
+                                        </TYPE.largeHeader>
+                                        <TYPE.main fontSize="12px" height="14px">
+                                            {leftLabel ? <MonoSpace>{leftLabel} (UTC)</MonoSpace> : null}
+                                        </TYPE.main>
+                                    </AutoColumn>
+                                }
+                                topRight={
+                                    <RowFixed align="center" justify="center" align-items="center">
+                                        <SmallOptionButton
+                                            active={totalView === true}
+                                            onClick={() => setTotalView(false)}
                                         >
-                                            <StyledDebankLogo src={DebankLogo} />
+                                            Show token breakdown
+                                        </SmallOptionButton>
+                                        {debankLink && (
+                                            <StyledExternalLink
+                                                href={debankLink}
+                                                style={{ marginLeft: '12px' }}
+                                                onClickCapture={() => {
+                                                    ReactGA.event({
+                                                        category: 'Debank',
+                                                        action: 'Debank portfolio page click',
+                                                    });
+                                                }}
+                                            >
+                                                <StyledDebankLogo src={DebankLogo} />
+                                            </StyledExternalLink>
+                                        )}
+                                        <StyledExternalLink href={getEtherscanLink(1, TREASURY_ADDRESS, 'address', activeNetwork)}>
+                                            <ExternalLink
+                                                stroke={theme.text2}
+                                                size={'17px'}
+                                                style={{ marginLeft: '12px' }}
+                                            />
                                         </StyledExternalLink>
-                                    )}
-                                    <StyledExternalLink href={getEtherscanLink(1, TREASURY_ADDRESS, 'address', activeNetwork)}>
-                                        <ExternalLink
-                                            stroke={theme.text2}
-                                            size={'17px'}
-                                            style={{ marginLeft: '12px' }}
-                                        />
-                                    </StyledExternalLink>
-                                </RowFixed>
-                            }
-                        /> : <AutoColumn gap="lg" justify='flex-start'>
-                            <DarkGreyCard>
-                                <TYPE.main fontSize="18px">Fetching historical token data...</TYPE.main>
-                                <LocalLoader fill={false} />
-                            </DarkGreyCard>
-                        </ AutoColumn>}
-                        {tokenSet.length > 0 && pieChartData && historicalCollectorData?.tvl ?
-                        <BalPieChart
-                            data={pieChartData}
-                            tokenSet={tokenSet}
-                            height={150}
-                            minHeight={150}
-                        /> : <AutoColumn gap="lg" justify='flex-start'>
-                            <DarkGreyCard>
-                                <TYPE.main fontSize="18px">Fetching historical token data...</TYPE.main>
-                                <LocalLoader fill={false} />
-                            </DarkGreyCard>
-                        </ AutoColumn>}
+                                    </RowFixed>
+                                }
+                            /> : <AutoColumn gap="lg" justify='flex-start'>
+                                {!isEmptySet ?
+                                    <DarkGreyCard>
+                                        <TYPE.main fontSize="18px">Fetching fee collector historical data...</TYPE.main>
+                                        <LocalLoader fill={false} />
+                                    </DarkGreyCard> : (
+                                        <DarkGreyCard>
+                                            <TYPE.main>No historical data available</TYPE.main>
+                                        </DarkGreyCard>)}
+                            </ AutoColumn> : (
+                            totalAmount > 0 && historicalCollectorData?.tvl ?
+                                <StackedAreaChart
+                                    data={historicalCollectorData?.tokenDatas}
+                                    height={220}
+                                    tokenSet={tokenSet}
+                                    minHeight={500}
+                                    color={activeNetwork.primaryColor}
+                                    value={liquidityHover}
+                                    label={leftLabel}
+                                    topLeft={
+                                        <AutoColumn gap="4px">
+                                            <TYPE.mediumHeader fontSize="16px">Historical Treasury Wallet Net Worth</TYPE.mediumHeader>
+                                        </AutoColumn>
+                                    }
+                                    topRight={
+                                        <RowFixed align="center" justify="center" align-items="center">
+                                            <SmallOptionButton
+                                                active={totalView === false}
+                                                onClick={() => setTotalView(true)}
+                                            >
+                                                Show totals
+                                            </SmallOptionButton>
+                                            {debankLink && (
+                                                <StyledExternalLink
+                                                    href={debankLink}
+                                                    style={{ marginLeft: '12px' }}
+                                                    onClickCapture={() => {
+                                                        ReactGA.event({
+                                                            category: 'Debank',
+                                                            action: 'Debank portfolio page click',
+                                                        });
+                                                    }}
+                                                >
+                                                    <StyledDebankLogo src={DebankLogo} />
+                                                </StyledExternalLink>
+                                            )}
+                                            <StyledExternalLink href={getEtherscanLink(1, TREASURY_ADDRESS, 'address', activeNetwork)}>
+                                                <ExternalLink
+                                                    stroke={theme.text2}
+                                                    size={'17px'}
+                                                    style={{ marginLeft: '12px' }}
+                                                />
+                                            </StyledExternalLink>
+                                        </RowFixed>
+                                    }
+                                /> : <AutoColumn gap="lg" justify='flex-start'>
+                                    {!isEmptySet ?
+                                        <DarkGreyCard>
+                                            <TYPE.main fontSize="18px">Fetching token data...</TYPE.main>
+                                            <LocalLoader fill={false} />
+                                        </DarkGreyCard> : (
+                                            <DarkGreyCard>
+                                                <TYPE.main>No token positions could be loaded</TYPE.main>
+                                            </DarkGreyCard>)}
+                                </ AutoColumn>)}
                 </ContentLayout>
                 <ContentLayout>
-                    {totalAmount > 0 && historicalCollectorData?.tvl ?
+                {tokenSet.length > 0 && pieChartData && historicalCollectorData?.tvl ?
+                    <BalPieChart
+                        data={pieChartData}
+                        tokenSet={tokenSet}
+                        height={200}
+                        minHeight={200}
+                    /> : <AutoColumn gap="lg" justify='flex-start'>
                         <DarkGreyCard>
-                            <AutoColumn gap="lg">
-                            <AutoColumn gap="4px">
-                                    <TYPE.main fontWeight={400}>Protocol Fee Income Estimates</TYPE.main>
-                                    <TYPE.label fontSize="24px">{formatDollarAmount(totalAmount)}</TYPE.label>
-                                </AutoColumn>
-                                <GreyCard padding="16px">
-                                    <AutoColumn gap="md">
-                                        <TYPE.main>Distribution to veBAL holders</TYPE.main>
-                                        <RowBetween key={balAddress}>
-                                            <RowFixed>
-                                                <CurrencyLogo address={balAddress} size={'20px'} />
-                                                <TYPE.label fontSize="14px" ml="8px">
-                                                    {'BAL'}
-                                                </TYPE.label>
-                                            </RowFixed>
-                                            <TYPE.label fontSize="14px">{formatDollarAmount(totalAmount)}</TYPE.label>
-                                        </RowBetween>
-                                        <RowBetween key={bbaUsdAddress}>
-                                            <RowFixed>
-                                                <CurrencyLogo address={bbaUsdAddress} size={'20px'} />
-                                                <TYPE.label fontSize="14px" ml="8px">
-                                                    {'bb-a-USD'}
-                                                </TYPE.label>
-                                            </RowFixed>
-                                            <TYPE.label fontSize="14px">{formatDollarAmount(totalAmount * 0.75)}</TYPE.label>
-                                        </RowBetween>
-                                    </AutoColumn>
-                                </GreyCard>
-                                <GreyCard padding="16px">
-                                    <AutoColumn gap="md">
-                                        <TYPE.main>Distribution to DAO Treasury</TYPE.main>
-                                        <RowBetween key={usdcAddress}>
-                                            <RowFixed>
-                                                <CurrencyLogo address={usdcAddress} size={'20px'} />
-                                                <TYPE.label fontSize="14px" ml="8px">
-                                                    {'USDC'}
-                                                </TYPE.label>
-                                            </RowFixed>
-                                            <TYPE.label fontSize="14px">{formatDollarAmount(totalAmount * 0.25)}</TYPE.label>
-                                        </RowBetween>
-                                    </AutoColumn>
-                                    
-                                </GreyCard>
-                                <AutoColumn gap="4px">
-                                    <TYPE.main fontWeight={400}>24h Change</TYPE.main>
-                                    <TYPE.label fontSize="24px">{formatDollarAmount(Math.abs(dailyChange))}</TYPE.label>
-                                    <Percent value={100 / historicalCollectorData?.tvl * dailyChange} />
-                                </AutoColumn> 
-                            </AutoColumn>
-                        </DarkGreyCard>
-                        : 
-                        <AutoColumn gap="lg" justify='flex-start'>
-                            {! isEmptySet ? 
-                        <DarkGreyCard>
-                            <TYPE.main fontSize="18px">Fetching distribution estimates...</TYPE.main>
-                            <LocalLoader fill={false} /> 
-                        </DarkGreyCard> : (
-                                <DarkGreyCard>
-                                <TYPE.main>No fees to distribute</TYPE.main>
-                                </DarkGreyCard> )}
-                    </ AutoColumn>}
-                    {totalAmount > 0 && historicalCollectorData?.tvl ?
-                        <StackedAreaChart
-                            data={historicalCollectorData.tokenDatas}
-                            tokenSet={tokenSet}
-                            height={220}
-                            minHeight={500}
-                        /> : <AutoColumn gap="lg" justify='flex-start'>
-                            <DarkGreyCard>
-                                <TYPE.main fontSize="18px">Fetching historical token data...</TYPE.main>
-                                <LocalLoader fill={false} />
-                            </DarkGreyCard>
-                        </ AutoColumn>}
-                    </ContentLayout>
-                        <ResponsiveRow>
-                        {userTxs.tokenDatas ?
-                        <ChartWrapper> 
-                        <BarChartStacked
-                            data={userTxs.tokenDatas}
-                            tokenSet={['copper', 'feeCollector']}
-                            height={220}
-                            minHeight={332}
-                            color={activeNetwork.primaryColor}
-                            value={liquidityHover}
-                            label={leftLabel}
-                            topLeft={
-                                <AutoColumn gap="4px">
-                                    <TYPE.mediumHeader fontSize="16px">Fee Income</TYPE.mediumHeader>
-                                  
-                                </AutoColumn>
-                            }
-                        />
-                    </ChartWrapper> : null }
-                    {userTxs.cumulativeTokenDatas ?
-                        <ChartWrapper> 
-                        <StackedAreaChart
-                            data={userTxs.cumulativeTokenDatas}
-                            tokenSet={['copper', 'feeCollector']}
-                            height={220}
-                            minHeight={332}
-                            color={activeNetwork.primaryColor}
-                            value={liquidityHover}
-                            label={leftLabel}
-                            topLeft={
-                                <AutoColumn gap="4px">
-                                    <TYPE.mediumHeader fontSize="16px">Cumulative Income</TYPE.mediumHeader>
-                                  
-                                </AutoColumn>
-                            }
-                        />
-                    </ChartWrapper> : null }
-                    </ResponsiveRow> 
-                <TYPE.main> Tokens in treasury wallet </TYPE.main>
+                            <TYPE.main fontSize="18px">Fetching token data distribution...</TYPE.main>
+                            <LocalLoader fill={false} />
+                        </DarkGreyCard> </ AutoColumn>}
                 <TreasuryTokenPortfolioTable tokenDatas={curatedTokenDatas} />
-                <TYPE.main> Investments </TYPE.main>
+                </ContentLayout>
+                <TYPE.main> Balancer Protocol Investments </TYPE.main>
                 <UserPoolTable poolDatas={poolDatasUser} />
+                <TYPE.main> Other Protocol Investments </TYPE.main>
+                <TYPE.small>Coming soon...</TYPE.small>
             </AutoColumn>
         </PageWrapper>
     );

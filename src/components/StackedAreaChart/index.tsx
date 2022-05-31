@@ -43,6 +43,7 @@ export type LineChartProps = {
     data: any[];
     color?: string | undefined;
     tokenSet: string[],
+    labelSet?: string[],
     height?: number | undefined;
     minHeight?: number;
     activeWindow?: VolumeWindow;
@@ -58,6 +59,7 @@ const StackedAreaChart = ({
     data,
     color = '#56B2A4',
     tokenSet,
+    labelSet,
     value,
     label,
     activeWindow,
@@ -114,8 +116,8 @@ const StackedAreaChart = ({
                     formatter={(value:number) => formatDollarAmount(value)}
                     labelFormatter={(time) => dayjs(time).format('DD.MM.YY')}
                     />
-                   { tokenSet.map((el) => 
-                    <Area key={el} fillOpacity={1} stackId="a" dataKey={el} type="monotone" stroke={getChartColor(el, tokenSet.indexOf(el))} fill={"url(#" + getChartColor(el, tokenSet.indexOf(el)) + ")"} strokeWidth={2} />
+                   {tokenSet.map((el) => 
+                    <Area key={el} fillOpacity={1} name={labelSet ? labelSet[tokenSet.indexOf(el)]: el} stackId="a" dataKey={el} type="monotone" stroke={getChartColor(el, tokenSet.indexOf(el))} fill={"url(#" + getChartColor(el, tokenSet.indexOf(el)) + ")"} strokeWidth={2} />
                     )}
                 </AreaChart>
             </ResponsiveContainer>

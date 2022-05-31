@@ -32,7 +32,7 @@ export const EthereumNetworkInfo: NetworkInfo = {
     name: 'Ethereum',
     startTimeStamp: 1619874000,
     appUri: 'https://app.balancer.fi/',
-    clientUri: 'https://api.thegraph.com/subgraphs/name/xeonus/balancer-v2-documentation',
+    clientUri: 'https://api.thegraph.com/subgraphs/name/xeonus/balancer-v2-analytics',
     bgColor: BALANCER_PRIMARY_COLOR,
     primaryColor: BALANCER_PRIMARY_COLOR,
     secondaryColor: BALANCER_SECONDARY_COLOR,

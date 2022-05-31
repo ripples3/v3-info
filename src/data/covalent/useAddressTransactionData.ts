@@ -62,7 +62,7 @@ export function useAddressTransactionData(address: string): AddressTransactionDa
                         const value = logEvent.decoded.params.find((r) => r.name === 'feeAmount');
                         const token = logEvent.decoded.params.find((t) => t.name === 'token');
                        if( receiver?.value === TREASURY_ADDRESS && token?.value === USDC.address.toLowerCase()) {
-                            tokenData.copper = Number(value?.value) / (10 ** 6)
+                            tokenData.copper = Number(value?.value) / (10 ** 6) * 0.25;
                             runningCopperValue += tokenData.copper;
                             cumulativeTokenData.copper = runningCopperValue;
                             

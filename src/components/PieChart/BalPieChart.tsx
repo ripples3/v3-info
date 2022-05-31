@@ -43,6 +43,7 @@ export type PieChartProps = {
     bottomRight?: ReactNode | undefined;
 } & React.HTMLAttributes<HTMLDivElement>;
 
+
 export const BalPieChart = ({
     data,
     color = '#56B2A4',
@@ -75,8 +76,38 @@ export const BalPieChart = ({
                         data={data}
                         cx="50%"
                         cy="50%"
-                        outerRadius={80}
+                        innerRadius={35}
+                        outerRadius={55}
+                        paddingAngle={20}
                         //fill="#8884d8"
+                        label={({
+                            cx,
+                            cy,
+                            midAngle,
+                            innerRadius,
+                            outerRadius,
+                            index
+                          }) => {
+                            const RADIAN = Math.PI / 180;
+                            // eslint-disable-next-line
+                            const radius = 25 + innerRadius + (outerRadius - innerRadius);
+                            // eslint-disable-next-line
+                            const x = cx + radius * Math.cos(-midAngle * RADIAN);
+                            // eslint-disable-next-line
+                            const y = cy + radius * Math.sin(-midAngle * RADIAN);
+                  
+                            return (
+                              <text
+                                x={x}
+                                y={y}
+                                fill={data[index].fill}
+                                textAnchor={x > cx ? "start" : "end"}
+                                dominantBaseline="central"
+                              >
+                                {data[index].name}
+                              </text>
+                            );
+                          }}
                     >
                     </Pie>
                     <Tooltip
@@ -91,7 +122,6 @@ export const BalPieChart = ({
                             }
                             const formattedTime = dayjs(props.payload.time).format('MMM D, YYYY');
                             if (setLabel && label !== formattedTime) setLabel(formattedTime);
-
                             return formatDollarAmount(value);
                         }}
                     />

@@ -115,9 +115,7 @@ export default function TokenPage({
 
     //CandleChart Data
     const { chartData } = useBalancerToken(address);
-
-    console.log("token infos: ", tokenData?.address, ' ', tokenData?.symbol, ' ', backgroundColor);
-
+    
     return (
         <PageWrapper>
             <ThemedBackground backgroundColor={backgroundColor} />

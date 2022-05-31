@@ -100,6 +100,11 @@ export const TOKEN_COLORS = [
         color: '#fc542f'
     },
     {
+        shortName: 'rETH',
+        address: '0xae78736cd615f374d3085123a210448e74fc6393',
+        color: '#fc8c03'
+    },
+    {
         shortName: 'MKR',
         address: '0x9f8f72aa9304c8b593d555f12ef6589cc3a579a2',
         color: '#44a494'
@@ -140,5 +145,16 @@ export const CHAIN_COLORS = [
         name: 'Arbitrum',
         chainId: 42161,
         color: '#00bfe5'
+    }
+]
+
+export const INCOME_SOURCE_COLORS = [
+    {
+        name: 'copper',
+        color: '#8627f2',
+    },
+    {
+        name: 'feeCollector',
+        color: '#2474cc',
     }
 ]
