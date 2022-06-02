@@ -1,18 +1,9 @@
-import { useDeltaTimestamps } from '../../utils/queries';
-import { useBlocksFromTimestamps } from '../../hooks/useBlocksFromTimestamps';
-import { BalancerSwapFragment, useGetProtocolDataLazyQuery } from '../../apollo/generated/graphql-codegen-generated';
-import { useEffect } from 'react';
-import { unixToDate } from '../../utils/date';
+
 import { BalancerChartDataItem } from 'data/balancer/balancerTypes';
-import { useActiveNetworkVersion } from 'state/application/hooks';
-import { GetAddressHistoricalTokenData, WalletHistoryData } from '../../utils/getAddressHistoricalTokenData';
-import { COVALENT_TOKEN_BLACKLIST } from './tokenBlackList';
-import { WalletHistoricalData, BalancerDateChartItem } from './useHistoricalWalletData';
+import { BalancerDateChartItem } from './useHistoricalWalletData';
 import { GetAddressTransactionData } from 'utils/getAddressTransactionData';
 import { WalletTransactiondata } from 'utils/getAddressTransactionData';
-import { TREASURY_ADDRESS, COPPER_LAUNCH_PROXY, FEE_COLLECTOR_ADDRESS, DAO_FEE_MULTISIG } from 'constants/wallets';
-import { USDC } from 'constants/index';
-
+import {  DAO_FEE_MULTISIG } from 'constants/wallets';
 
 export interface AddressTransactionData {
     totalValueData: BalancerChartDataItem[];
@@ -21,8 +12,7 @@ export interface AddressTransactionData {
     tvl?: number;
 }
 
-
-export function useAddressTransactionData(address: string): AddressTransactionData {
+export function useAddressTransactionData(address: string, copperProxy: string, usdcAddress: string): AddressTransactionData {
 
     function getWalletBalancerChartData(walletData: WalletTransactiondata) {
         const chartData: BalancerDateChartItem[] = [];
@@ -40,7 +30,7 @@ export function useAddressTransactionData(address: string): AddressTransactionDa
                         const chartItem = {} as BalancerDateChartItem;
                         const param = logEvent.decoded.params.find((p) => p.name === 'value');
                         const receiver = logEvent.decoded.params.find((r) => r.name === 'to');
-                        if (param && receiver?.value === TREASURY_ADDRESS) {
+                        if (param && receiver?.value === address) {
                             chartItem.value = param.value / 10 ** logEvent.sender_contract_decimals;
                             chartItem.time = new Date(logEvent.block_signed_at);
                             chartData.push(chartItem);
@@ -49,7 +39,7 @@ export function useAddressTransactionData(address: string): AddressTransactionDa
                     if (logEvent.decoded && logEvent.decoded.params) {
                     //Filter Copper launch data - always a param pair of from to and value (alsways in USDC)
                     
-                    if (logEvent.sender_address === COPPER_LAUNCH_PROXY || tx.from_address === DAO_FEE_MULTISIG) {
+                    if (logEvent.sender_address === copperProxy || tx.from_address === DAO_FEE_MULTISIG) {
                         const tokenData = {} as any;
                         const cumulativeTokenData = {} as any;
                         tokenData.time = new Date(logEvent.block_signed_at);
@@ -61,7 +51,7 @@ export function useAddressTransactionData(address: string): AddressTransactionDa
                         const receiver = logEvent.decoded.params.find((r) => r.name === 'feeRecipient' && r.type === 'address');
                         const value = logEvent.decoded.params.find((r) => r.name === 'feeAmount');
                         const token = logEvent.decoded.params.find((t) => t.name === 'token');
-                       if( receiver?.value === TREASURY_ADDRESS && token?.value === USDC.address.toLowerCase()) {
+                       if( receiver?.value === address && token?.value === usdcAddress.toLowerCase()) {
                             tokenData.copper = Number(value?.value) / (10 ** 6) * 0.25;
                             runningCopperValue += tokenData.copper;
                             cumulativeTokenData.copper = runningCopperValue;
@@ -91,9 +81,7 @@ export function useAddressTransactionData(address: string): AddressTransactionDa
             sortedTokenDatas = tokenDatas.sort(
                 (objA, objB) => objA.time.getTime() - objB.time.getTime(),
             );
-
             //2. create view
-
                 sortedTokenDatas.forEach((el) => {
                     const cumulativeTokenData = {} as any;
                     runningCopperValue += el.copper;
@@ -103,9 +91,6 @@ export function useAddressTransactionData(address: string): AddressTransactionDa
                     cumulativeTokenData.feeCollector = runningFeeValue;
                     cumulativeTokenDatas.push(cumulativeTokenData);
                 })
-
-
-            
 
         }
         return [chartData, sortedTokenDatas, cumulativeTokenDatas];

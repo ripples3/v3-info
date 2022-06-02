@@ -25,11 +25,11 @@ import { BalancerChartDataItem } from 'data/balancer/balancerTypes';
 import { ExternalLink as StyledExternalLink } from '../../theme/components';
 import { useHistoricalWalletData } from 'data/covalent/useHistoricalWalletData';
 import DebankLogo from '../../assets/svg/debank.svg';
-import { SupportedNetwork } from 'constants/networks';
+import { EthereumNetworkInfo, SupportedNetwork } from 'constants/networks';
 import curateTokenDatas from 'utils/curateTokenDatas';
 import { TokenData } from 'data/balancer/balancerTypes';
 import { COVALENT_TOKEN_BLACKLIST } from 'data/covalent/tokenBlackList';
-import { TREASURY_ADDRESS } from 'constants/wallets';
+import { getTreasuryConfig, TREASURY_ADDRESS_CONFIG } from 'constants/wallets';
 import TreasuryTokenPortfolioTable from 'components/tokens/TreasuryTokenPortfolioTable';
 import CurrencyLogo from 'components/CurrencyLogo';
 import StackedAreaChart from 'components/StackedAreaChart';
@@ -43,6 +43,7 @@ import BarChartStacked from 'components/BarChartStacked';
 import getChartColor from 'utils/getChartColor';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import dayjs from 'dayjs';
+import curateOtherInvestmentTokenData from 'utils/curateOtherInvestmentTokenData';
 
 
 dayjs.extend(relativeTime);
@@ -73,6 +74,17 @@ const ContentLayout = styled.div`
     }
 `;
 
+const ContentLayoutRight = styled.div`
+    display: grid;
+    grid-template-columns: 1fr 300px ;
+    grid-gap: 1em;
+
+    @media screen and (max-width: 800px) {
+        grid-template-columns: 1fr;
+        grid-template-rows: 1fr 1fr;
+    }
+`;
+
 //Todo: Export interface
 interface BalancerStackedDateChartItem {
     value: number;
@@ -94,33 +106,45 @@ export default function Treasury() {
     const firstDayOfPreviousMonth = dayjs(dayjs().year().toString() + '-' + String(dayjs().month()) + '-' + '1').startOf("month").toDate();
     const avgDays = 30;
     const startDate = dayjs().subtract(avgDays, 'day').toDate();
-    
 
+
+
+    const [activeNetwork] = useActiveNetworkVersion();
     const bbaUsdAddress = '0x7b50775383d3d6f0215a8f290f2c9e2eebbeceb2';
     let usdcAddress = '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48';
     let balAddress = '0xba100000625a3754423978a60c9317c58a424e3d';
-    const [activeNetwork] = useActiveNetworkVersion();
+    let sweepLimit = 0;
+    if (activeNetwork.id === SupportedNetwork.ETHEREUM) {
+        sweepLimit = 10000;
+    } else if (activeNetwork.id == SupportedNetwork.ARBITRUM) {
+        balAddress = '0x040d1edc9569d4bab2d15287dc5a4f10f56a56b8';
+        usdcAddress = '0xff970a61a04b1ca14834a43f5de4533ebddb5cc8';
+        sweepLimit = 5000;
+    } else if (activeNetwork.id == SupportedNetwork.POLYGON) {
+        balAddress = '0x9a71012B13CA4d3D0Cdc72A177DF3ef03b0E76A3';
+        usdcAddress = '0x2791bca1f2de4661ed88a30c99a7a9449aa84174';
+        sweepLimit = 5000;
+    }
+    const TREASURY_CONFIG = getTreasuryConfig(activeNetwork.chainId);
     const protocolData = useBalancerProtocolData();
     const poolData = useBalancerPools();
     const formattedTokens = useBalancerTokens();
-    const userPools = useUserPools(TREASURY_ADDRESS);
-    const walletTokenData = GetAddressTokenBalances(TREASURY_ADDRESS);
-    const historicalCollectorData = useHistoricalWalletData(TREASURY_ADDRESS, [bbaUsdAddress]);
-    const userTxs = useAddressTransactionData(TREASURY_ADDRESS);
-    const debankLink = 'https://debank.com/profile/' + TREASURY_ADDRESS;
+    const userPools = useUserPools(TREASURY_CONFIG.treasury);
+    const walletTokenData = GetAddressTokenBalances(TREASURY_CONFIG.treasury);
+    console.log("walletTokenData", walletTokenData);
+    const historicalCollectorData = useHistoricalWalletData(TREASURY_CONFIG.treasury, [bbaUsdAddress]);
+    const userTxs = useAddressTransactionData(TREASURY_CONFIG.treasury, TREASURY_CONFIG.copper, usdcAddress);
+    const debankLink = 'https://debank.com/profile/' + TREASURY_CONFIG.treasury;
     const [totalView, setTotalView] = useState<boolean | undefined>();
-
-
-
     const [feesHover, setFeesHover] = useState<number | undefined>();
-    const [feesLabel, setFeesLabel] = useState<string | undefined>();
     const [liquidityHover, setLiquidityHover] = useState<number | undefined>();
     const [leftLabel, setLeftLabel] = useState<string | undefined>();
+
 
     useEffect(() => {
         setFeesHover(undefined);
         setLiquidityHover(undefined);
-        setTotalView(false);
+        setTotalView(true);
     }, [activeNetwork]);
 
     useEffect(() => {
@@ -134,25 +158,6 @@ export default function Treasury() {
             setLiquidityHover(historicalCollectorData.tvl)
         }
     }, [liquidityHover, protocolData])
-
-
-    function adjustFees(data: BalancerChartDataItem[] | undefined) {
-        const newData: BalancerChartDataItem[] = [];
-        if (data) {
-            data.forEach((entry) => {
-                const date = new Date(entry.time);
-                if (date > new Date('2022-01-03')) {
-                    const newEntry = {} as BalancerChartDataItem;
-                    newEntry.time = entry.time;
-                    newEntry.value = entry.value * 0.5;
-                    newData.push(newEntry);
-                }
-            })
-
-        }
-        return newData;
-    }
-
 
     //Balancer Pool position data
     //TODO: encapsulate in own function after view is done
@@ -199,37 +204,15 @@ export default function Treasury() {
         dailyChange = historicalCollectorData.totalValueData[historicalCollectorData.totalValueData.length - 1].value - historicalCollectorData.totalValueData[historicalCollectorData.totalValueData.length - 2].value;
     }
 
-
-
-    const tokenSet: string[] = [];
-    const [volumeWindow, setVolumeWindow] = useState(VolumeWindow.daily);
-    const weeklyVolumeData = useTransformedVolumeData(adjustFees(protocolData?.feeData), 'week');
-    const monthlyVolumeData = useTransformedVolumeData(adjustFees(protocolData?.feeData), 'month');
-    
-
-
-
-
     //Get curated token dataset to calcuate BAL and bb-a-USD distribution values
+    const tokenSet: string[] = [];
     let curatedTokenDatas: TokenData[] = [];
+    let curatedInvestmentTokenDatas : TokenData[] = [];
     if (formattedTokens && walletTokenData) {
         curatedTokenDatas = curateTokenDatas(formattedTokens, walletTokenData, 10000, true);
-        curatedTokenDatas = curatedTokenDatas.filter((x) => !!x && !COVALENT_TOKEN_BLACKLIST.includes(x.address) && ! x.symbol.includes('bb-'));
-    }
-
-    //
-    //--------Test for net income estimation----------
-    let sweepLimit = 0;
-    if (activeNetwork.id === SupportedNetwork.ETHEREUM) {
-        sweepLimit = 10000;
-    } else if (activeNetwork.id == SupportedNetwork.ARBITRUM) {
-        balAddress = '0x040d1edc9569d4bab2d15287dc5a4f10f56a56b8';
-        usdcAddress = '0xff970a61a04b1ca14834a43f5de4533ebddb5cc8';
-        sweepLimit = 5000;
-    } else if (activeNetwork.id == SupportedNetwork.POLYGON) {
-        balAddress = '0x9a71012B13CA4d3D0Cdc72A177DF3ef03b0E76A3';
-        usdcAddress = '0x2791bca1f2de4661ed88a30c99a7a9449aa84174';
-        sweepLimit = 5000;
+        curatedTokenDatas = curatedTokenDatas.filter((x) => !!x && !COVALENT_TOKEN_BLACKLIST.includes(x.address) && !x.symbol.includes('bb-'));
+        //Other investments /static
+        curatedInvestmentTokenDatas = curateOtherInvestmentTokenData(formattedTokens, walletTokenData);
     }
 
     //Get curated token dataset to calcuate BAL and bb-a-USD distribution values
@@ -240,7 +223,7 @@ export default function Treasury() {
         curatedProjectionData = curatedProjectionData.filter((x) => !!x && !COVALENT_TOKEN_BLACKLIST.includes(x.address));
         curatedProjectionData.forEach((item) => {
             const token = walletTokenData.data.items.find(x => x.contract_address == item.address)
-            if (token && token.contract_ticker_symbol && ! token.contract_ticker_symbol.includes('bb-')) {
+            if (token && token.contract_ticker_symbol && !token.contract_ticker_symbol.includes('bb-')) {
                 tokenSet.push(token?.contract_ticker_symbol)
             }
             totalAmount += item.valueUSDCollected;
@@ -250,9 +233,21 @@ export default function Treasury() {
 
     //TODO: fix edge case redundancy code here ( this happens right after a sweep):
     let isEmptySet = false;
+    let isEmptyTaxations = false;
+    let isEmptyTokenSet = false;
     if (formattedTokens && walletTokenData) {
         if (formattedTokens.length > 0 && curateTokenDatas(formattedTokens, walletTokenData, sweepLimit, true).length == 0) {
             isEmptySet = true;
+        }
+    }
+    if (userTxs) {
+        if (userTxs.cumulativeTokenDatas.length === 0 && userTxs.tvl && userTxs.tvl > 0) {
+            isEmptyTaxations = true;
+        }
+    }
+    if (curatedTokenDatas && walletTokenData) {
+        if (curatedTokenDatas.length === 0 && walletTokenData.data.items.length > 0) {
+            isEmptyTokenSet = true;
         }
     }
 
@@ -272,129 +267,125 @@ export default function Treasury() {
         }
 
     }
-    //------------------------------------------------
 
-        //---REVENUE STREAM estimates
-        let dailyRevenue = 0;
-        let dailyCopperIncome = 0;
-        let dailyFeeIncome = 0
-        let totalIncome = 0
-        let netIncomeRunningMonth = 0;
-        let percentageChangePrevious = 0;
-        if (userTxs.cumulativeTokenDatas.length > 0) {
-            //Current month
-            const startMonthEntry = userTxs.cumulativeTokenDatas.find((x) => dayjs(x.time).diff(firstDayOfMonth, 'day') == 0 );
-            const rangeEntry = userTxs.cumulativeTokenDatas.find((x) => dayjs(x.time).isAfter(firstDayOfMonth));
-            //Previous month
-            const previousStartMonthEntry = userTxs.cumulativeTokenDatas.find((x) => dayjs(x.time).diff(firstDayOfPreviousMonth, 'day') == 0 );
-            const previousRangeEntry = userTxs.cumulativeTokenDatas.find((x) => dayjs(x.time).isAfter(firstDayOfPreviousMonth));
+    //---REVENUE STREAM estimates
+    let dailyRevenue = 0;
+    let dailyCopperIncome = 0;
+    let dailyFeeIncome = 0
+    let totalIncome = 0
+    let netIncomeRunningMonth = 0;
+    let percentageChangePrevious = 0;
+    if (userTxs.cumulativeTokenDatas.length > 0) {
+        //Current month
+        const startMonthEntry = userTxs.cumulativeTokenDatas.find((x) => dayjs(x.time).diff(firstDayOfMonth, 'day') == 0);
+        const rangeEntry = userTxs.cumulativeTokenDatas.find((x) => dayjs(x.time).isAfter(firstDayOfMonth));
+        //Previous month
+        const previousStartMonthEntry = userTxs.cumulativeTokenDatas.find((x) => dayjs(x.time).diff(firstDayOfPreviousMonth, 'day') == 0);
+        const previousRangeEntry = userTxs.cumulativeTokenDatas.find((x) => dayjs(x.time).isAfter(firstDayOfPreviousMonth));
 
-            dailyCopperIncome = (userTxs.cumulativeTokenDatas[userTxs.cumulativeTokenDatas.length-1].copper ) / daysSinceFirstIncomeTx;
-            dailyFeeIncome = (userTxs.cumulativeTokenDatas[userTxs.cumulativeTokenDatas.length-1].feeCollector) / daysSinceFirstIncomeTx;
-            dailyRevenue = dailyCopperIncome + dailyFeeIncome;
-            totalIncome = (userTxs.cumulativeTokenDatas[userTxs.cumulativeTokenDatas.length-1].copper) + (userTxs.cumulativeTokenDatas[userTxs.cumulativeTokenDatas.length-1].feeCollector);
-            //Income for the running month
-            if (startMonthEntry) {
-                netIncomeRunningMonth = totalIncome - startMonthEntry.copper - startMonthEntry.feeCollector;
-            } else if (rangeEntry) {
-                netIncomeRunningMonth = totalIncome - rangeEntry.copper - rangeEntry.feeCollector;
-            }
-            if (previousStartMonthEntry) {
-                percentageChangePrevious = 100 / (netIncomeRunningMonth - previousStartMonthEntry.copper - previousStartMonthEntry.feeCollector) * netIncomeRunningMonth;
-            } else if (previousRangeEntry) {
-                percentageChangePrevious = 100 / (netIncomeRunningMonth - previousRangeEntry.copper - previousRangeEntry.feeCollector) * netIncomeRunningMonth;
-            }
+        dailyCopperIncome = (userTxs.cumulativeTokenDatas[userTxs.cumulativeTokenDatas.length - 1].copper) / daysSinceFirstIncomeTx;
+        dailyFeeIncome = (userTxs.cumulativeTokenDatas[userTxs.cumulativeTokenDatas.length - 1].feeCollector) / daysSinceFirstIncomeTx;
+        dailyRevenue = dailyCopperIncome + dailyFeeIncome;
+        totalIncome = (userTxs.cumulativeTokenDatas[userTxs.cumulativeTokenDatas.length - 1].copper) + (userTxs.cumulativeTokenDatas[userTxs.cumulativeTokenDatas.length - 1].feeCollector);
+        //Income for the running month
+        if (startMonthEntry) {
+            netIncomeRunningMonth = totalIncome - startMonthEntry.copper - startMonthEntry.feeCollector;
+        } else if (rangeEntry) {
+            netIncomeRunningMonth = totalIncome - rangeEntry.copper - rangeEntry.feeCollector;
         }
-
-        //Rolling window average
-        let avgDailyRevenue = 0;
-        let avgDailyCopperIncome = 0;
-        let avgDailyFeeIncome = 0
-        if (userTxs.cumulativeTokenDatas.length > 0) {
-            const startWindowEntry = userTxs.cumulativeTokenDatas.find((x) => dayjs(x.time).diff(startDate, 'day') == 0 );
-            const startWindowRangeEntry = userTxs.cumulativeTokenDatas.find((x) => dayjs(x.time).isAfter(startDate));
-            if (startWindowEntry) {
-                avgDailyCopperIncome = (userTxs.cumulativeTokenDatas[userTxs.cumulativeTokenDatas.length-1].copper - startWindowEntry.copper) / avgDays;
-                avgDailyFeeIncome = (userTxs.cumulativeTokenDatas[userTxs.cumulativeTokenDatas.length-1].feeCollector - startWindowEntry.feeCollector) / avgDays;
-                avgDailyRevenue = dailyCopperIncome + dailyFeeIncome;
-
-            } else if (startWindowRangeEntry)
-                avgDailyCopperIncome = (userTxs.cumulativeTokenDatas[userTxs.cumulativeTokenDatas.length-1].copper - startWindowRangeEntry.copper) / avgDays;
-                avgDailyFeeIncome = (userTxs.cumulativeTokenDatas[userTxs.cumulativeTokenDatas.length-1].feeCollector - startWindowRangeEntry.feeCollector) / avgDays;
-                avgDailyRevenue = avgDailyCopperIncome + avgDailyFeeIncome;
+        if (previousStartMonthEntry) {
+            percentageChangePrevious = 100 / ((startMonthEntry.copper + startMonthEntry.feeCollector) - (previousStartMonthEntry.copper + previousStartMonthEntry.feeCollector)) * netIncomeRunningMonth - 100;
+        } else if (previousRangeEntry) {
+            percentageChangePrevious = 100 / ((rangeEntry.copper + rangeEntry.feeCollector) - (previousRangeEntry.copper + previousRangeEntry.feeCollector)) * netIncomeRunningMonth - 100;
         }
-
-
-
-
-
-    if (activeNetwork.id !== SupportedNetwork.ETHEREUM) {
-        return (
-            <AutoColumn gap="lg">
-                <TYPE.largeHeader>Please switch back to Mainnet!</TYPE.largeHeader>
-            </AutoColumn>
-        );
     }
+
+    //Rolling window average
+    let avgDailyRevenue = 0;
+    let avgDailyCopperIncome = 0;
+    let avgDailyFeeIncome = 0
+    if (userTxs.cumulativeTokenDatas.length > 0) {
+        const startWindowEntry = userTxs.cumulativeTokenDatas.find((x) => dayjs(x.time).diff(startDate, 'day') == 0);
+        const startWindowRangeEntry = userTxs.cumulativeTokenDatas.find((x) => dayjs(x.time).isAfter(startDate));
+        if (startWindowEntry) {
+            avgDailyCopperIncome = (userTxs.cumulativeTokenDatas[userTxs.cumulativeTokenDatas.length - 1].copper - startWindowEntry.copper) / avgDays;
+            avgDailyFeeIncome = (userTxs.cumulativeTokenDatas[userTxs.cumulativeTokenDatas.length - 1].feeCollector - startWindowEntry.feeCollector) / avgDays;
+            avgDailyRevenue = dailyCopperIncome + dailyFeeIncome;
+
+        } else if (startWindowRangeEntry)
+            avgDailyCopperIncome = (userTxs.cumulativeTokenDatas[userTxs.cumulativeTokenDatas.length - 1].copper - startWindowRangeEntry.copper) / avgDays;
+        avgDailyFeeIncome = (userTxs.cumulativeTokenDatas[userTxs.cumulativeTokenDatas.length - 1].feeCollector - startWindowRangeEntry.feeCollector) / avgDays;
+        avgDailyRevenue = avgDailyCopperIncome + avgDailyFeeIncome;
+    }
+
+    /*     if (activeNetwork.id !== SupportedNetwork.ETHEREUM) {
+            return (
+                <AutoColumn gap="lg">
+                    <TYPE.largeHeader>Please switch back to Mainnet!</TYPE.largeHeader>
+                </AutoColumn>
+            );
+        } */
     return (
         <PageWrapper>
             <AutoColumn gap="lg">
                 <TYPE.largeHeader>Balancer DAO Treasury</TYPE.largeHeader>
                 <TYPE.main> Revenue streams </TYPE.main>
-                <ContentLayout>
-                    {avgDailyRevenue > 0 && historicalCollectorData?.tvl ?
-                        <DarkGreyCard>
-                            <AutoColumn gap="lg">
-                                <AutoColumn gap="4px">
-                                    <TYPE.main fontWeight={400}>Daily Revenue (30d average)</TYPE.main>
-                                    <TYPE.label fontSize="24px">{formatDollarAmount(avgDailyRevenue)}</TYPE.label>
-                                </AutoColumn>
-                                <GreyCard padding="16px">
-                                <AutoColumn gap="md">
-                                        <TYPE.main>Daily Copper Revenue</TYPE.main>
-                                        <RowBetween key={usdcAddress}>
-                                            <RowFixed>
-                                                <CurrencyLogo address={usdcAddress} size={'20px'} />
-                                                <TYPE.label fontSize="14px" ml="8px">
-                                                    {'USDC'}
-                                                </TYPE.label>
-                                            </RowFixed>
-                                            <TYPE.label fontSize="14px">{formatDollarAmount(avgDailyCopperIncome)}</TYPE.label>
-                                        </RowBetween>
+                {avgDailyRevenue > 0 && userTxs.cumulativeTokenDatas.length > 0 ?
+                    <ContentLayout>
+                        {avgDailyRevenue > 0 ?
+                            <DarkGreyCard>
+                                <AutoColumn gap="lg">
+                                    <AutoColumn gap="4px">
+                                        <TYPE.main fontWeight={400}>Daily Revenue (30d average)</TYPE.main>
+                                        <TYPE.label fontSize="24px">{formatDollarAmount(avgDailyRevenue)}</TYPE.label>
                                     </AutoColumn>
-                                </GreyCard>
-                                <GreyCard padding="16px">
-                                    <AutoColumn gap="md">
-                                        <TYPE.main>Daily Protocol Fee Revenue</TYPE.main>
-                                        <RowBetween key={usdcAddress}>
-                                            <RowFixed>
-                                                <CurrencyLogo address={usdcAddress} size={'20px'} />
-                                                <TYPE.label fontSize="14px" ml="8px">
-                                                    {'USDC'}
-                                                </TYPE.label>
-                                            </RowFixed>
-                                            <TYPE.label fontSize="14px">{formatDollarAmount(avgDailyFeeIncome)}</TYPE.label>
-                                        </RowBetween>
-                                    </AutoColumn>
+                                    <GreyCard padding="16px">
+                                        <AutoColumn gap="md">
+                                            <TYPE.main>Daily Copper Revenue</TYPE.main>
+                                            <RowBetween key={usdcAddress}>
+                                                <RowFixed>
+                                                    <CurrencyLogo address={usdcAddress} size={'20px'} />
+                                                    <TYPE.label fontSize="14px" ml="8px">
+                                                        {'USDC'}
+                                                    </TYPE.label>
+                                                </RowFixed>
+                                                <TYPE.label fontSize="14px">{formatDollarAmount(avgDailyCopperIncome)}</TYPE.label>
+                                            </RowBetween>
+                                        </AutoColumn>
+                                    </GreyCard>
+                                    <GreyCard padding="16px">
+                                        <AutoColumn gap="md">
+                                            <TYPE.main>Daily Protocol Fee Revenue</TYPE.main>
+                                            <RowBetween key={usdcAddress}>
+                                                <RowFixed>
+                                                    <CurrencyLogo address={usdcAddress} size={'20px'} />
+                                                    <TYPE.label fontSize="14px" ml="8px">
+                                                        {'USDC'}
+                                                    </TYPE.label>
+                                                </RowFixed>
+                                                <TYPE.label fontSize="14px">{formatDollarAmount(avgDailyFeeIncome)}</TYPE.label>
+                                            </RowBetween>
+                                        </AutoColumn>
 
-                                </GreyCard>
-                                <AutoColumn gap="4px">
-                                    <TYPE.main fontWeight={400}>Net Income running Month</TYPE.main>
-                                    <TYPE.label fontSize="24px">{formatDollarAmount(Math.abs(netIncomeRunningMonth))}</TYPE.label>
-                                    <Percent value={percentageChangePrevious} />
+                                    </GreyCard>
+                                    <AutoColumn gap="4px">
+                                        <TYPE.main fontWeight={400}>Net Income running Month</TYPE.main>
+                                        <TYPE.label fontSize="24px">{formatDollarAmount(Math.abs(netIncomeRunningMonth))}</TYPE.label>
+                                        <Percent value={percentageChangePrevious} />
+                                    </AutoColumn>
                                 </AutoColumn>
-                            </AutoColumn>
-                        </DarkGreyCard>
-                        :
-                        <AutoColumn gap="lg" justify='flex-start'>
-                            {!isEmptySet ?
-                                <DarkGreyCard>
-                                    <TYPE.main fontSize="18px">Fetching distribution estimates...</TYPE.main>
-                                    <LocalLoader fill={false} />
-                                </DarkGreyCard> : (
+                            </DarkGreyCard>
+                            :
+                            <AutoColumn gap="lg" justify='flex-start'>
+                                {!isEmptySet ?
                                     <DarkGreyCard>
-                                        <TYPE.main>No fees to distribute</TYPE.main>
-                                    </DarkGreyCard>)}
-                        </ AutoColumn>}
+                                        <TYPE.main fontSize="18px">Fetching distribution estimates...</TYPE.main>
+                                        <LocalLoader fill={false} />
+                                    </DarkGreyCard> : (
+                                        <DarkGreyCard>
+                                            <TYPE.main>No fees accumulated</TYPE.main>
+                                        </DarkGreyCard>)}
+                            </ AutoColumn>}
                         {userTxs.cumulativeTokenDatas.length > 0 ?
                             <StackedAreaChart
                                 data={userTxs.cumulativeTokenDatas}
@@ -412,18 +403,18 @@ export default function Treasury() {
                                 }
                             /> :
                             <AutoColumn gap="lg" justify='flex-start'>
-                            <DarkGreyCard>
-                                <TYPE.main fontSize="18px">Fetching treasury wallet taxations...</TYPE.main>
-                                <LocalLoader fill={false} />
-                            </DarkGreyCard>
-                        </ AutoColumn>}
-                </ContentLayout>
+                                <DarkGreyCard>
+                                    <TYPE.main fontSize="18px">Fetching treasury wallet taxations...</TYPE.main>
+                                    <LocalLoader fill={false} />
+                                </DarkGreyCard>
+                            </ AutoColumn>}
+                    </ContentLayout> : (!isEmptyTaxations ? <Loader /> : (<TYPE.gray>No income taxations found</TYPE.gray>))}
                 <TYPE.main> Tokens in treasury wallet </TYPE.main>
                 <ContentLayout>
-                    {historicalCollectorData?.tvl && balAssets ?
+                    {historicalCollectorData?.tvl ?
                         <DarkGreyCard>
-
                             <AutoColumn gap="lg">
+                                {balAssets && (activeNetwork.chainId === EthereumNetworkInfo.chainId) ? 
                                 <GreyCard padding="8x">
                                     <AutoColumn gap="4px">
                                         <TYPE.main>BAL reserves</TYPE.main>
@@ -437,28 +428,29 @@ export default function Treasury() {
                                             <TYPE.label fontSize="14px">{formatAmount(balAssets.valueUSDCollected / balAssets.priceUSD)}</TYPE.label>
                                         </RowBetween>
                                     </AutoColumn>
-                                </GreyCard>
+                                </GreyCard> : 
+                                null }
                                 <AutoColumn gap="4px">
-                                <TYPE.main>Treasury wallet trends</TYPE.main>
+                                    <TYPE.main>Treasury wallet trends</TYPE.main>
                                 </AutoColumn>
                                 <GreyCard padding="8x">
-                                <AutoColumn gap="lg">
-                                    <AutoColumn gap="4px">
-                                        <TYPE.main fontWeight={400}>30d High</TYPE.main>
-                                        <TYPE.label fontSize="24px">{formatDollarAmount(monthlyHigh)}</TYPE.label>
-                                        <Percent value={100 / monthlyHigh * historicalCollectorData?.tvl - 100} />
+                                    <AutoColumn gap="lg">
+                                        <AutoColumn gap="4px">
+                                            <TYPE.main fontWeight={400}>30d High</TYPE.main>
+                                            <TYPE.label fontSize="24px">{formatDollarAmount(monthlyHigh)}</TYPE.label>
+                                            <Percent value={100 / monthlyHigh * historicalCollectorData?.tvl - 100} />
+                                        </AutoColumn>
+                                        <AutoColumn gap="4px">
+                                            <TYPE.main fontWeight={400}>30d Low</TYPE.main>
+                                            <TYPE.label fontSize="24px">{formatDollarAmount(monthlyLow)}</TYPE.label>
+                                            <Percent value={100 / monthlyLow * historicalCollectorData?.tvl - 100} />
+                                        </AutoColumn>
+                                        <AutoColumn gap="4px">
+                                            <TYPE.main fontWeight={400}>24h Change</TYPE.main>
+                                            <TYPE.label fontSize="24px">{formatDollarAmount(Math.abs(dailyChange))}</TYPE.label>
+                                            <Percent value={100 / historicalCollectorData?.tvl * dailyChange} />
+                                        </AutoColumn>
                                     </AutoColumn>
-                                    <AutoColumn gap="4px">
-                                        <TYPE.main fontWeight={400}>30d Low</TYPE.main>
-                                        <TYPE.label fontSize="24px">{formatDollarAmount(monthlyLow)}</TYPE.label>
-                                        <Percent value={100 / monthlyLow * historicalCollectorData?.tvl - 100} />
-                                    </AutoColumn>
-                                    <AutoColumn gap="4px">
-                                        <TYPE.main fontWeight={400}>24h Change</TYPE.main>
-                                        <TYPE.label fontSize="24px">{formatDollarAmount(Math.abs(dailyChange))}</TYPE.label>
-                                        <Percent value={100 / historicalCollectorData?.tvl * dailyChange} />
-                                    </AutoColumn>
-                                </AutoColumn>
                                 </GreyCard>
                             </AutoColumn>
                         </DarkGreyCard>
@@ -512,7 +504,7 @@ export default function Treasury() {
                                                 <StyledDebankLogo src={DebankLogo} />
                                             </StyledExternalLink>
                                         )}
-                                        <StyledExternalLink href={getEtherscanLink(1, TREASURY_ADDRESS, 'address', activeNetwork)}>
+                                        <StyledExternalLink href={getEtherscanLink(1, TREASURY_CONFIG.treasury, 'address', activeNetwork)}>
                                             <ExternalLink
                                                 stroke={theme.text2}
                                                 size={'17px'}
@@ -524,7 +516,7 @@ export default function Treasury() {
                             /> : <AutoColumn gap="lg" justify='flex-start'>
                                 {!isEmptySet ?
                                     <DarkGreyCard>
-                                        <TYPE.main fontSize="18px">Fetching fee collector historical data...</TYPE.main>
+                                        <TYPE.main fontSize="18px">Fetching historical data...</TYPE.main>
                                         <LocalLoader fill={false} />
                                     </DarkGreyCard> : (
                                         <DarkGreyCard>
@@ -567,7 +559,7 @@ export default function Treasury() {
                                                     <StyledDebankLogo src={DebankLogo} />
                                                 </StyledExternalLink>
                                             )}
-                                            <StyledExternalLink href={getEtherscanLink(1, TREASURY_ADDRESS, 'address', activeNetwork)}>
+                                            <StyledExternalLink href={getEtherscanLink(1, TREASURY_CONFIG.treasury, 'address', activeNetwork)}>
                                                 <ExternalLink
                                                     stroke={theme.text2}
                                                     size={'17px'}
@@ -587,24 +579,25 @@ export default function Treasury() {
                                             </DarkGreyCard>)}
                                 </ AutoColumn>)}
                 </ContentLayout>
-                <ContentLayout>
-                {tokenSet.length > 0 && pieChartData && historicalCollectorData?.tvl ?
-                    <BalPieChart
-                        data={pieChartData}
-                        tokenSet={tokenSet}
-                        height={200}
-                        minHeight={200}
-                    /> : <AutoColumn gap="lg" justify='flex-start'>
-                        <DarkGreyCard>
-                            <TYPE.main fontSize="18px">Fetching token data distribution...</TYPE.main>
-                            <LocalLoader fill={false} />
-                        </DarkGreyCard> </ AutoColumn>}
+                <ContentLayoutRight>
                 <TreasuryTokenPortfolioTable tokenDatas={curatedTokenDatas} />
-                </ContentLayout>
+                    {tokenSet.length > 0 && pieChartData && historicalCollectorData?.tvl ?
+                        <BalPieChart
+                            data={pieChartData}
+                            tokenSet={tokenSet}
+                            height={200}
+                            minHeight={200}
+                        /> : <AutoColumn gap="lg" justify='flex-start'>
+                            <DarkGreyCard>
+                                <TYPE.main fontSize="18px">Fetching token data distribution...</TYPE.main>
+                                <LocalLoader fill={false} />
+                            </DarkGreyCard> </ AutoColumn>}
+                </ContentLayoutRight>
                 <TYPE.main> Balancer Protocol Investments </TYPE.main>
                 <UserPoolTable poolDatas={poolDatasUser} />
                 <TYPE.main> Other Protocol Investments </TYPE.main>
-                <TYPE.small>Coming soon...</TYPE.small>
+                {activeNetwork.chainId === EthereumNetworkInfo.chainId ?
+                <TreasuryTokenPortfolioTable tokenDatas={curatedInvestmentTokenDatas} /> : <TYPE.gray>None</TYPE.gray> }
             </AutoColumn>
         </PageWrapper>
     );

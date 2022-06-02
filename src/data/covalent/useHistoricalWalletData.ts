@@ -32,7 +32,7 @@ export function useHistoricalWalletData(address: string, tokenFilterList?: strin
                 const tokenData = {} as any;
                 chartItem.value = 0;
                 chartItem.time = new Date(walletData.data.items[0].holdings[holdingsIndex].timestamp);
-                tokenData.time = new Date(walletData.data.items[0].holdings[holdingsIndex].timestamp);
+                tokenData.time = chartItem.time ;
                 //Sum up all token holdings
                 walletData.data.items.forEach((item) => {
                     if (!COVALENT_TOKEN_BLACKLIST.includes(item.contract_address) && !tokenFilterList?.includes(item.contract_address)) {
@@ -59,8 +59,11 @@ export function useHistoricalWalletData(address: string, tokenFilterList?: strin
             tokenDatas: [], 
         };
     }
+    //console.log("walletHistoricalData", walletHistoricalData)
 
     const [walletChartData, walletTokenChartDatas] = getWalletBalancerChartData(walletHistoricalData);
+    //console.log("walletChartData", walletChartData)
+    //console.log("walletTokenChartDatas", walletTokenChartDatas)
 
     //Sort data
     const sortedAsc = walletChartData.sort(

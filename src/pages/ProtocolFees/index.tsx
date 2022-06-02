@@ -39,6 +39,7 @@ import StackedAreaChart from 'components/StackedAreaChart';
 import { DEFAULT_FEE_SYMBOLS } from 'constants/index';
 import { AreaChart } from 'recharts';
 
+
 const ChartWrapper = styled.div`
     width: 49%;
 
@@ -75,12 +76,13 @@ const today = new Date();
 today.setUTCHours(0, 0, 0, 0);
 
 export default function ProtocolFees() {
+
+
     useEffect(() => {
         window.scrollTo(0, 0);
     }, []);
 
     const theme = useTheme();
-
     const [activeNetwork] = useActiveNetworkVersion();
     const protocolData = useBalancerProtocolData();
     const formattedTokens = useBalancerTokens();
@@ -91,6 +93,18 @@ export default function ProtocolFees() {
     let balAddress = '0xba100000625a3754423978a60c9317c58a424e3d';
     let usdcAddress = '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48';
     const bbaUsdAddress = '0x7b50775383d3d6f0215a8f290f2c9e2eebbeceb2';
+    let sweepLimit = 0;
+    if (activeNetwork.id === SupportedNetwork.ETHEREUM) {
+        sweepLimit = 10000;
+    } else if (activeNetwork.id == SupportedNetwork.ARBITRUM) {
+        balAddress = '0x040d1edc9569d4bab2d15287dc5a4f10f56a56b8';
+        usdcAddress = '0xff970a61a04b1ca14834a43f5de4533ebddb5cc8';
+        sweepLimit = 5000;
+    } else if (activeNetwork.id == SupportedNetwork.POLYGON) {
+        balAddress = '0x9a71012B13CA4d3D0Cdc72A177DF3ef03b0E76A3';
+        usdcAddress = '0x2791bca1f2de4661ed88a30c99a7a9449aa84174';
+        sweepLimit = 5000;
+    }
 
     const [feesHover, setFeesHover] = useState<number | undefined>();
     const [feesLabel, setFeesLabel] = useState<string | undefined>();
@@ -139,18 +153,6 @@ export default function ProtocolFees() {
     const weeklyVolumeData = useTransformedVolumeData(adjustFees(protocolData?.feeData), 'week');
     const monthlyVolumeData = useTransformedVolumeData(adjustFees(protocolData?.feeData), 'month');
 
-    let sweepLimit = 0;
-    if (activeNetwork.id === SupportedNetwork.ETHEREUM) {
-        sweepLimit = 10000;
-    } else if (activeNetwork.id == SupportedNetwork.ARBITRUM) {
-        balAddress = '0x040d1edc9569d4bab2d15287dc5a4f10f56a56b8';
-        usdcAddress = '0xff970a61a04b1ca14834a43f5de4533ebddb5cc8';
-        sweepLimit = 5000;
-    } else if (activeNetwork.id == SupportedNetwork.POLYGON) {
-        balAddress = '0x9a71012B13CA4d3D0Cdc72A177DF3ef03b0E76A3';
-        usdcAddress = '0x2791bca1f2de4661ed88a30c99a7a9449aa84174';
-        sweepLimit = 5000;
-    }
 
     //Get curated token dataset to calcuate BAL and bb-a-USD distribution values
     let balAmount = 0;
