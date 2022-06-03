@@ -45,6 +45,7 @@ export function useHistoricalWalletData(address: string, tokenFilterList?: strin
 
                 })
                 chartData.push(chartItem);
+                //console.log(holdingsIndex.toString() + " " + tokenData.time);
                 tokenDatas.push(tokenData);
             }
         }

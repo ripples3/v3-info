@@ -3,11 +3,11 @@ import styled from 'styled-components';
 import CurrencyLogo from '../CurrencyLogo';
 import { PoolTokenData } from '../../data/balancer/balancerTypes';
 
-const Wrapper = styled.div<{ margin: boolean; sizeraw: number , numberOfTokens: number  }>`
+const Wrapper = styled.div<{ margin: boolean; sizeraw: number , numberoftokens: number  }>`
     position: relative;
     display: flex;
     flex-direction: row;
-    margin-right: ${({ sizeraw, margin, numberOfTokens }) => margin && (sizeraw * (numberOfTokens - 1 ) / 1.5 + 10).toString() + 'px'};
+    margin-right: ${({ sizeraw, margin, numberoftokens }) => margin && (sizeraw * (numberoftokens - 1 ) / 1.5 + 10).toString() + 'px'};
 `;
 
 interface PoolCurrencyLogoProps {
@@ -16,7 +16,7 @@ interface PoolCurrencyLogoProps {
     tokens: { address: string }[];
 }
 
-const HigherLogo = styled(CurrencyLogo)<{numberOfTokens: number }>`
+const HigherLogo = styled(CurrencyLogo)<{numberoftokens: number }>`
     z-index: 0;
 `;
 const CoveredLogo = styled(CurrencyLogo)<{ sizeraw: number, index: number }>`
@@ -26,14 +26,14 @@ const CoveredLogo = styled(CurrencyLogo)<{ sizeraw: number, index: number }>`
 
 export default function PoolCurrencyLogo({ tokens, size = 20, margin = true }: PoolCurrencyLogoProps) {
     return (
-        <Wrapper numberOfTokens={tokens.length} sizeraw={size} margin={margin}>
+        <Wrapper numberoftokens={tokens.length} sizeraw={size} margin={margin}>
             {tokens.map((token, index) =>
                 index === 0 ? (
                     <HigherLogo 
                     address={token.address} 
                     size={size.toString() + 'px'} 
                     key={token.address}
-                    numberOfTokens={tokens.length}
+                    numberoftokens={tokens.length}
                     />
                 ) : (
                     <CoveredLogo

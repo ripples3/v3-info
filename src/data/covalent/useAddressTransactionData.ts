@@ -4,6 +4,7 @@ import { BalancerDateChartItem } from './useHistoricalWalletData';
 import { GetAddressTransactionData } from 'utils/getAddressTransactionData';
 import { WalletTransactiondata } from 'utils/getAddressTransactionData';
 import {  DAO_FEE_MULTISIG } from 'constants/wallets';
+import dayjs from 'dayjs';
 
 export interface AddressTransactionData {
     totalValueData: BalancerChartDataItem[];
@@ -38,7 +39,6 @@ export function useAddressTransactionData(address: string, copperProxy: string, 
                     }
                     if (logEvent.decoded && logEvent.decoded.params) {
                     //Filter Copper launch data - always a param pair of from to and value (alsways in USDC)
-                    
                     if (logEvent.sender_address === copperProxy || tx.from_address === DAO_FEE_MULTISIG) {
                         const tokenData = {} as any;
                         const cumulativeTokenData = {} as any;
@@ -84,12 +84,19 @@ export function useAddressTransactionData(address: string, copperProxy: string, 
             //2. create view
                 sortedTokenDatas.forEach((el) => {
                     const cumulativeTokenData = {} as any;
+                    
                     runningCopperValue += el.copper;
                     runningFeeValue += el.feeCollector
-                    cumulativeTokenData.time = el.time;
-                    cumulativeTokenData.copper = runningCopperValue;
-                    cumulativeTokenData.feeCollector = runningFeeValue;
-                    cumulativeTokenDatas.push(cumulativeTokenData);
+                    const existingDateEntry = cumulativeTokenDatas.find((c) => dayjs(c.time).format('DD/MM/YYYY') == dayjs(el.time).format('DD/MM/YYYY'));
+                    if (existingDateEntry) {
+                        cumulativeTokenDatas[cumulativeTokenDatas.indexOf(existingDateEntry)].copper = runningCopperValue;
+                        cumulativeTokenDatas[cumulativeTokenDatas.indexOf(existingDateEntry)].feeCollector = runningFeeValue;
+                    } else {
+                        cumulativeTokenData.time = el.time;
+                        cumulativeTokenData.copper = runningCopperValue;
+                        cumulativeTokenData.feeCollector = runningFeeValue;
+                        cumulativeTokenDatas.push(cumulativeTokenData);
+                    }
                 })
 
         }

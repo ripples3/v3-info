@@ -131,7 +131,6 @@ export default function Treasury() {
     const formattedTokens = useBalancerTokens();
     const userPools = useUserPools(TREASURY_CONFIG.treasury);
     const walletTokenData = GetAddressTokenBalances(TREASURY_CONFIG.treasury);
-    console.log("walletTokenData", walletTokenData);
     const historicalCollectorData = useHistoricalWalletData(TREASURY_CONFIG.treasury, [bbaUsdAddress]);
     const userTxs = useAddressTransactionData(TREASURY_CONFIG.treasury, TREASURY_CONFIG.copper, usdcAddress);
     const debankLink = 'https://debank.com/profile/' + TREASURY_CONFIG.treasury;
@@ -180,7 +179,7 @@ export default function Treasury() {
                 poolDataUser.userTVL = userPool?.tvlUSD * pool.relativeShare;
                 poolDataUser.dailyFees = userPool.feesUSD * pool.relativeShare * 0.5;
                 poolDataUser.tvlUSD = userPool.tvlUSD;
-                poolDataUser.volumeUSD = userPool.volumeUSD * pool.relativeShare
+                poolDataUser.volumeUSD = userPool.volumeUSD;
             }
             poolDatasUser.push(poolDataUser);
         })
@@ -252,9 +251,9 @@ export default function Treasury() {
     }
 
     //Token holdings
-    const rawData = historicalCollectorData.tokenDatas[historicalCollectorData.tokenDatas.length - 1];
+    const rawData = {... historicalCollectorData.tokenDatas[historicalCollectorData.tokenDatas.length - 1]};
     if (rawData && rawData.time) {
-        delete rawData['time'];
+      delete rawData['time'];
     }
     const pieChartData: any[] = [];
     for (const key in rawData) {
