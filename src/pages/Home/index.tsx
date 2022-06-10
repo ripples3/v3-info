@@ -55,41 +55,43 @@ export default function Home() {
     const [feesLabel, setFeesLabel] = useState<string | undefined>();
     
     useEffect(() => {
-        setLiquidityHover(undefined);
-        setVolumeHover(undefined);
-        setFeesHover(undefined);
-        setSwapsHover(undefined);
-    }, [activeNetwork]);
+        if (protocolData) {
+            setLiquidityHover(protocolData.tvl);
+            setVolumeHover(protocolData.volume24);
+            setFeesHover(protocolData.fees24);
+            setSwapsHover(protocolData.swaps24);
+        }
+    }, [activeNetwork, protocolData.tvl, protocolData.fees24, protocolData.swaps24, protocolData.volume24]);
 
-    const [volumeWindow, setVolumeWindow] = useState(VolumeWindow.weekly);
-    const [feeWindow, setFeeWindow] = useState(VolumeWindow.weekly);
-    const [swapWindow, setSwapWindow] = useState(VolumeWindow.weekly);
+    const [volumeWindow, setVolumeWindow] = useState(VolumeWindow.daily);
+    const [feeWindow, setFeeWindow] = useState(VolumeWindow.daily);
+    const [swapWindow, setSwapWindow] = useState(VolumeWindow.daily);
 
 
     // if hover value undefined, reset to current day value
     useEffect(() => {
-        if (!volumeHover && protocolData) {
+        if (volumeHover === undefined && protocolData) {
             setVolumeHover(protocolData.volume24);
         }
-    }, [volumeHover, protocolData]);
+    }, [protocolData, volumeHover]);
 
     useEffect(() => {
         if (liquidityHover === undefined && protocolData) {
           setLiquidityHover(protocolData.tvl)
         }
-      }, [liquidityHover, protocolData])
+      }, [liquidityHover, protocolData.tvl])
 
     useEffect(() => {
-        if (!feesHover && protocolData) {
+        if (feesHover === undefined && protocolData) {
             setFeesHover(protocolData.fees24);
         }
-    }, [feesHover, protocolData]);
+    }, [feesHover, protocolData.fees24]);
 
     useEffect(() => {
-        if (!swapsHover && protocolData?.swaps24) {
+        if (swapsHover === undefined && protocolData?.swaps24) {
             setSwapsHover(protocolData.swaps24);
         }
-    }, [swapsHover, protocolData]);
+    }, [swapsHover, protocolData.swaps24]);
 
 
     //Sorted by time-window
