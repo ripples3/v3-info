@@ -190,10 +190,11 @@ export default function TokenPage({
                                             />
                                         )}
                                     </RowFixed>
+                                    {priceData[priceData.length-1].value ?
                                     <RowFlat style={{ marginTop: '8px' }}>
                                         <PriceText mr="10px"> {formatDollarAmount(priceData[priceData.length-1].value)}</PriceText>
                                         (<Percent value={(priceData[priceData.length-1].value - priceData[priceData.length-2].value) / priceData[priceData.length-1].value * 100} />)
-                                    </RowFlat>
+                                    </RowFlat> : null }
                                 </AutoColumn>
                                 {activeNetwork !== EthereumNetworkInfo ? null : (
                                     <RowFixed>
@@ -231,10 +232,6 @@ export default function TokenPage({
                                         <TYPE.label fontSize="24px">
                                             {formatDollarAmount(tokenData.volumeUSDWeek)}
                                         </TYPE.label>
-                                    </AutoColumn>
-                                    <AutoColumn gap="4px">
-                                        <TYPE.main fontWeight={400}>24h Fees</TYPE.main>
-                                        <TYPE.label fontSize="24px">{formatDollarAmount(tokenData.feesUSD)}</TYPE.label>
                                     </AutoColumn>
                                 </AutoColumn>
                             </DarkGreyCard>

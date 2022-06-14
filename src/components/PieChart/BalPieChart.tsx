@@ -1,5 +1,5 @@
 import React, { Dispatch, ReactNode, SetStateAction } from 'react';
-import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts';
+import { Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts';
 import styled from 'styled-components';
 import Card from 'components/Card';
 import { RowBetween } from 'components/Row';
@@ -7,8 +7,6 @@ import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import useTheme from 'hooks/useTheme';
 import { formatDollarAmount } from '../../utils/numbers';
-import getChartColor from '../../utils/getChartColor';
-import { ALTERNATIVE_COLORS } from "constants/tokenColorList";
 
 dayjs.extend(utc);
 
@@ -32,6 +30,7 @@ export type PieChartProps = {
     color?: string | undefined;
     tokenSet: string[],
     height?: number | undefined;
+    cxcy?: string[],
     minHeight?: number;
     setValue?: Dispatch<SetStateAction<number | undefined>>; // used for value on hover
     setLabel?: Dispatch<SetStateAction<string | undefined>>; // used for label of value
@@ -48,6 +47,7 @@ export const BalPieChart = ({
     data,
     color = '#56B2A4',
     tokenSet,
+    cxcy = ['50%', '59%'],
     value,
     label,
     setValue,
@@ -72,13 +72,14 @@ export const BalPieChart = ({
                 <PieChart width={minHeight} height={minHeight}>
                     <Pie
                         dataKey="value"
+                        stroke="#959eb2"
                         isAnimationActive={true}
                         data={data}
-                        cx="50%"
-                        cy="50%"
+                        cx={cxcy[0]}
+                        cy={cxcy[1]}
                         innerRadius={35}
-                        outerRadius={55}
-                        paddingAngle={20}
+                        outerRadius={70}
+                        paddingAngle={18}
                         //fill="#8884d8"
                         label={({
                             cx,
@@ -101,6 +102,7 @@ export const BalPieChart = ({
                                 x={x}
                                 y={y}
                                 fill={data[index].fill}
+                                fontSize='80%'
                                 textAnchor={x > cx ? "start" : "end"}
                                 dominantBaseline="central"
                               >

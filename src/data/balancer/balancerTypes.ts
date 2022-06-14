@@ -80,12 +80,17 @@ export interface PoolData {
 
 
 export interface PoolDataUser extends PoolData {
-
     userTVL: number;
     userRelativeTVL: number,
     tokenSet: TokenSet[],
     dailyFees: number,
+}
 
+export interface AssetData {
+    name: string,
+    type: string,
+    relativeWeight: number,
+    valueUSD: number,
 }
 
 

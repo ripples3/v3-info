@@ -54,7 +54,7 @@ export function useHistoricalWalletData(address: string, tokenFilterList?: strin
 
     const walletHistoricalData = GetAddressHistoricalTokenData(address)
 
-    if (!walletHistoricalData) {
+    if (!walletHistoricalData || walletHistoricalData.error === true) {
         return { 
             totalValueData: [],
             tokenDatas: [], 

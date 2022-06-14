@@ -44,6 +44,11 @@ import getChartColor from 'utils/getChartColor';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import dayjs from 'dayjs';
 import curateOtherInvestmentTokenData from 'utils/curateOtherInvestmentTokenData';
+import getCuratedTokenName from 'utils/getCuratedTokenName';
+import getCuratedAssetData from 'utils/getCuratedAssetData';
+import { getShortPoolName } from "utils/getShortPoolName";
+import TreasuryAssetTable from 'components/assets/TreasuryAssetsTable';
+
 
 
 dayjs.extend(relativeTime);
@@ -76,10 +81,21 @@ const ContentLayout = styled.div`
 
 const ContentLayoutRight = styled.div`
     display: grid;
-    grid-template-columns: 1fr 300px ;
+    grid-template-columns: 1fr 400px ;
     grid-gap: 1em;
 
-    @media screen and (max-width: 800px) {
+    @media screen and (max-width: 700px) {
+        grid-template-columns: 1fr;
+        grid-template-rows: 1fr 1fr;
+    }
+`;
+
+const ContentLayoutRightLarge = styled.div`
+    display: grid;
+    grid-template-columns: 1fr 500px ;
+    grid-gap: 1em;
+
+    @media screen and (max-width: 600px) {
         grid-template-columns: 1fr;
         grid-template-rows: 1fr 1fr;
     }
@@ -211,7 +227,7 @@ export default function Treasury() {
         curatedTokenDatas = curateTokenDatas(formattedTokens, walletTokenData, 10000, true);
         curatedTokenDatas = curatedTokenDatas.filter((x) => !!x && !COVALENT_TOKEN_BLACKLIST.includes(x.address) && !x.symbol.includes('bb-'));
         //Other investments /static
-        curatedInvestmentTokenDatas = curateOtherInvestmentTokenData(formattedTokens, walletTokenData);
+        curatedInvestmentTokenDatas = curateOtherInvestmentTokenData(formattedTokens, walletTokenData, activeNetwork.chainId);
     }
 
     //Get curated token dataset to calcuate BAL and bb-a-USD distribution values
@@ -250,22 +266,47 @@ export default function Treasury() {
         }
     }
 
-    //Token holdings
-    const rawData = {... historicalCollectorData.tokenDatas[historicalCollectorData.tokenDatas.length - 1]};
-    if (rawData && rawData.time) {
-      delete rawData['time'];
-    }
+    //Create pie chart
     const pieChartData: any[] = [];
-    for (const key in rawData) {
-        if (rawData[key] > 1 && !key.includes('bb-')) {
+    //Token holdings
+    const rawTokenData = {... historicalCollectorData.tokenDatas[historicalCollectorData.tokenDatas.length - 1]};
+    if (rawTokenData && rawTokenData.time) {
+      delete rawTokenData['time'];
+    }
+    for (const key in rawTokenData) {
+        if (rawTokenData[key] > 1 ) {
             const entry: any = {};
             entry.name = key;
-            entry.value = rawData[key];
+            entry.value = rawTokenData[key];
             entry.fill = getChartColor(key, 1);
             pieChartData.push(entry);
         }
 
     }
+
+    //Alternative pie chart data
+    const cumulativePieChartData: any[] = [];
+    cumulativePieChartData.push(...pieChartData);
+        //Liquidity positions
+        poolDatasUser.forEach((bpt) => {
+            const entry: any = {};
+            let shortName = getShortPoolName(bpt);
+        if (shortName.includes('bb-')) {
+            shortName = 'Stab3l Boosted'
+        }
+            entry.name = shortName;
+            entry.value = bpt.userTVL;
+            entry.fill = getChartColor(bpt.symbol, Math.round(Math.random() * 10));
+            cumulativePieChartData.push(entry);
+        });
+        //Other positions
+        curatedInvestmentTokenDatas.forEach((token) => {
+            const entry: any = {};
+            entry.name = getCuratedTokenName(token);
+            entry.value = token.valueUSDCollected;
+            entry.fill = getChartColor(token.symbol, 1);
+            cumulativePieChartData.push(entry);
+        });
 
     //---REVENUE STREAM estimates
     let dailyRevenue = 0;
@@ -317,6 +358,11 @@ export default function Treasury() {
         avgDailyRevenue = avgDailyCopperIncome + avgDailyFeeIncome;
     }
 
+
+    //Curated assets aggregated
+    //if (curatedTokenDatas && curatedInvestmentTokenDatas && poolDatasUser) 
+    const {aggregatedAssetDatas, netWorth} = getCuratedAssetData(curatedTokenDatas, curatedInvestmentTokenDatas, poolDatasUser);
+
     /*     if (activeNetwork.id !== SupportedNetwork.ETHEREUM) {
             return (
                 <AutoColumn gap="lg">
@@ -328,7 +374,7 @@ export default function Treasury() {
         <PageWrapper>
             <AutoColumn gap="lg">
                 <TYPE.largeHeader>Balancer DAO Treasury</TYPE.largeHeader>
-                <TYPE.main> Revenue streams </TYPE.main>
+                <TYPE.white> Revenue streams </TYPE.white>
                 {avgDailyRevenue > 0 && userTxs.cumulativeTokenDatas.length > 0 ?
                     <ContentLayout>
                         {avgDailyRevenue > 0 ?
@@ -408,7 +454,29 @@ export default function Treasury() {
                                 </DarkGreyCard>
                             </ AutoColumn>}
                     </ContentLayout> : (!isEmptyTaxations ? <Loader /> : (<TYPE.gray>No income taxations found</TYPE.gray>))}
-                <TYPE.main> Tokens in treasury wallet </TYPE.main>
+                <TYPE.white> Treasury assets </TYPE.white>
+                <ContentLayoutRight>
+                <TreasuryAssetTable assetDatas={aggregatedAssetDatas}/>
+                <DarkGreyCard>
+                <AutoColumn gap="4px">
+                    <TYPE.main fontWeight={400}>Total Asset Net Worth</TYPE.main>
+                    <TYPE.label fontSize="24px">{formatDollarAmount(netWorth)}</TYPE.label>
+                </AutoColumn>
+                {tokenSet.length > 0 && cumulativePieChartData && historicalCollectorData?.tvl ?
+                        <BalPieChart
+                            data={cumulativePieChartData}
+                            tokenSet={tokenSet}
+                            cxcy={['60%', '40%']}
+                            height={400}
+                            minHeight={400}
+                        /> : <AutoColumn gap="lg" justify='flex-start'>
+                            <DarkGreyCard>
+                                <TYPE.main fontSize="18px">Calculating asset distribution...</TYPE.main>
+                                <LocalLoader fill={false} />
+                            </DarkGreyCard> </ AutoColumn>}
+                </DarkGreyCard>
+                </ContentLayoutRight>
+                <TYPE.white> Tokens in treasury wallet </TYPE.white>
                 <ContentLayout>
                     {historicalCollectorData?.tvl ?
                         <DarkGreyCard>
@@ -588,13 +656,13 @@ export default function Treasury() {
                             minHeight={200}
                         /> : <AutoColumn gap="lg" justify='flex-start'>
                             <DarkGreyCard>
-                                <TYPE.main fontSize="18px">Fetching token data distribution...</TYPE.main>
+                                <TYPE.main fontSize="18px">Fetching token distribution...</TYPE.main>
                                 <LocalLoader fill={false} />
                             </DarkGreyCard> </ AutoColumn>}
                 </ContentLayoutRight>
-                <TYPE.main> Balancer Protocol Investments </TYPE.main>
+                <TYPE.white> Balancer Protocol Investments </TYPE.white>
                 <UserPoolTable poolDatas={poolDatasUser} />
-                <TYPE.main> Other Protocol Investments </TYPE.main>
+                <TYPE.white> Other/External Protocol Investments </TYPE.white>
                 {activeNetwork.chainId === EthereumNetworkInfo.chainId ?
                 <TreasuryTokenPortfolioTable tokenDatas={curatedInvestmentTokenDatas} /> : <TYPE.gray>None</TYPE.gray> }
             </AutoColumn>

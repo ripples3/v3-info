@@ -109,6 +109,16 @@ export const TOKEN_COLORS = [
         address: '0x9f8f72aa9304c8b593d555f12ef6589cc3a579a2',
         color: '#44a494'
     },
+    {
+        shortName: 'MTA',
+        address: '0xa3bed4e1c75d00fa6f4e5e6922db7261b5e9acd2',
+        color: '#7f7f7f'
+    },
+    {
+        shortName: 'TRIBE',
+        address: '0xc7283b66eb1eb5fb86327f08e1b5816b0720212b',
+        color: '#2474cc'
+    },
 ];
 
 export const ALTERNATIVE_COLORS = [
@@ -117,11 +127,11 @@ export const ALTERNATIVE_COLORS = [
     '#e25667',
     '#6556bc',
     '#1a238b',
-    '#8198a6',
-    '#5b5f68',
-    '#292c51',
-    '#fff2cc',
-    '#ffd966',
+    '#edf0f0',
+    '#c9d4d3',
+    '#a5b7b6',
+    '#5e7e7d',
+    '#819a99',
     '#092c48',
     '#8196ab',
     '#a5acba',
@@ -147,6 +157,8 @@ export const CHAIN_COLORS = [
         color: '#00bfe5'
     }
 ]
+
+
 
 export const INCOME_SOURCE_COLORS = [
     {

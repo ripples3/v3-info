@@ -105,7 +105,7 @@ export function useAddressTransactionData(address: string, copperProxy: string, 
 
     const walletHistoricalData = GetAddressTransactionData(address)
 
-    if (!walletHistoricalData) {
+    if (!walletHistoricalData || walletHistoricalData.error === true) {
         return { 
             totalValueData: [],
             tokenDatas: [], 

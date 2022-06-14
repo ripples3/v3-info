@@ -159,7 +159,7 @@ export default function ProtocolFees() {
     let bbaUsdAmount = 0;
     let totalAmount = 0;
     let curatedTokenDatas: TokenData[] = [];
-    if (formattedTokens && walletTokenData) {
+    if (formattedTokens && walletTokenData?.error === false) {
         curatedTokenDatas = curateTokenDatas(formattedTokens, walletTokenData, sweepLimit, true);
         curatedTokenDatas = curatedTokenDatas.filter((x) => !!x && !COVALENT_TOKEN_BLACKLIST.includes(x.address));
         curatedTokenDatas.forEach((item) => {
@@ -183,7 +183,7 @@ export default function ProtocolFees() {
 
     //TODO: fix edge case redundancy code here ( this happens right after a sweep):
     let isEmptySet = false;
-    if (formattedTokens && walletTokenData) {
+    if (formattedTokens && walletTokenData?.error === false) {
         //Temp fix for blacklisted tokens!
         const curatedTokens = curatedTokenDatas.filter((x) => !!x && !COVALENT_TOKEN_BLACKLIST.includes(x.address));
         if (formattedTokens.length > 0 && curateTokenDatas(formattedTokens, walletTokenData, sweepLimit, true).filter((x) => !!x && !COVALENT_TOKEN_BLACKLIST.includes(x.address)).length == 0) {
