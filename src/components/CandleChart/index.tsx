@@ -93,7 +93,7 @@ const CandleChart = ({
           borderVisible: false,
           secondsVisible: true,
           tickMarkFormatter: (unixTime: number) => {
-            return dayjs.unix(unixTime).format('MM/DD h:mm A')
+            return dayjs.unix(unixTime).format('DD.MM.YYYY')
           },
         },
         watermark: {
@@ -108,19 +108,7 @@ const CandleChart = ({
           },
         },
         crosshair: {
-          horzLine: {
-            visible: false,
-            labelVisible: false,
-          },
-          mode: 1,
-          vertLine: {
-            visible: true,
-            labelVisible: false,
-            style: 3,
-            width: 1,
-            color: '#505050',
-            labelBackgroundColor: color,
-          },
+          mode: 2,
         },
       })
 
@@ -142,28 +130,7 @@ const CandleChart = ({
 
       series.setData(data)
 
-      // update the title when hovering on the chart
-      chartCreated.subscribeCrosshairMove(function (param) {
-        if (
-          chartRef?.current &&
-          (param === undefined ||
-            param.time === undefined ||
-            (param && param.point && param.point.x < 0) ||
-            (param && param.point && param.point.x > chartRef.current.clientWidth) ||
-            (param && param.point && param.point.y < 0) ||
-            (param && param.point && param.point.y > height))
-        ) {
-          // reset values
-          setValue && setValue(undefined)
-          setLabel && setLabel(undefined)
-        } else if (series && param) {
-          const timestamp = param.time as number
-          const time = dayjs.unix(timestamp).utc().format('MMM D, YYYY h:mm A') + ' (UTC)'
-          const parsed = param.seriesPrices.get(series) as { open: number } | undefined
-          setValue && setValue(parsed?.open)
-          setLabel && setLabel(time)
-        }
-      })
+
     }
   }, [chartCreated, color, data, height, setValue, setLabel, theme.bg0])
 

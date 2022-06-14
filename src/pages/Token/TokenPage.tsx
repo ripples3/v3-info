@@ -36,7 +36,7 @@ import { useBalancerTokenData, useBalancerTokenPageData } from '../../data/balan
 import { useBalancerPoolsForToken } from '../../data/balancer/usePools';
 import { useBalancerTransactionData } from '../../data/balancer/useTransactions';
 import { useBalancerToken } from 'data/balancer/useToken';
-
+import CandleChart from 'components/CandleChart';
 const PriceText = styled(TYPE.label)`
     font-size: 36px;
     line-height: 0.8;
@@ -103,6 +103,8 @@ export default function TokenPage({
         poolData.map((pool) => pool.id),
     );
     const { tvlData, volumeData, priceData } = useBalancerTokenPageData(address);
+    //CandleChart Data
+     const { chartData } = useBalancerToken(address);
 
     // chart labels
     const [view, setView] = useState(ChartView.VOL);
@@ -113,9 +115,7 @@ export default function TokenPage({
     // watchlist
     const [savedTokens, addSavedToken] = useSavedTokens();
 
-    //CandleChart Data
-    const { chartData } = useBalancerToken(address);
-    
+
     return (
         <PageWrapper>
             <ThemedBackground backgroundColor={backgroundColor} />
@@ -247,7 +247,7 @@ export default function TokenPage({
                                                         ? formatDollarAmount(volumeData[volumeData.length - 1]?.value)
                                                         : view === ChartView.TVL
                                                         ? formatDollarAmount(tvlData[tvlData.length - 1]?.value)
-                                                        : formatDollarAmount(tokenData.priceUSD, 2)}
+                                                        : (chartData[chartData.length -1] ? formatDollarAmount(chartData[chartData.length -1].open, 2) : 0)}
                                                 </MonoSpace>
                                             </TYPE.label>
                                         </RowFixed>
@@ -310,7 +310,14 @@ export default function TokenPage({
                                         setLabel={setValueLabel}
                                     />
                                 ) : view === ChartView.PRICE ? (
-                                    priceData.length > 0 ? (
+                                    chartData.length > 10 ? (
+                                    <CandleChart
+                                    data={chartData}
+                                    setValue={setLatestValue}
+                                    setLabel={setValueLabel}
+                                    color={backgroundColor}
+                    />
+                                    ) : ( priceData.length > 0 ? (
                                         <LineChart
                                             data={priceData}
                                             color={backgroundColor}
@@ -319,8 +326,7 @@ export default function TokenPage({
                                             label={valueLabel}
                                             setValue={setLatestValue}
                                             setLabel={setValueLabel}
-                                        />
-                                    ) : (
+                                        />) : 
                                         <LocalLoader fill={false} />
                                     )
                                 ) : null}

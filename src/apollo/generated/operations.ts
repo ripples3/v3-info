@@ -37,6 +37,7 @@ export const BalancerChartTokenPrice = gql`
         id
         timestamp
         price
+        priceUSD
         amount
     }
 `;

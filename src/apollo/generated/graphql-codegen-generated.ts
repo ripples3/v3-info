@@ -4154,12 +4154,54 @@ export type BalancerChartTokenPricesQueryVariables = Exact<{
 
 export type BalancerChartTokenPricesQuery = {
     __typename: 'Query';
-    prices1: Array<{ __typename: 'TokenPrice'; id: string; timestamp: number; price: string; amount: string }>;
-    prices2: Array<{ __typename: 'TokenPrice'; id: string; timestamp: number; price: string; amount: string }>;
-    prices3: Array<{ __typename: 'TokenPrice'; id: string; timestamp: number; price: string; amount: string }>;
-    prices4: Array<{ __typename: 'TokenPrice'; id: string; timestamp: number; price: string; amount: string }>;
-    prices5: Array<{ __typename: 'TokenPrice'; id: string; timestamp: number; price: string; amount: string }>;
-    prices6: Array<{ __typename: 'TokenPrice'; id: string; timestamp: number; price: string; amount: string }>;
+    prices1: Array<{
+        __typename: 'TokenPrice';
+        id: string;
+        timestamp: number;
+        price: string;
+        priceUSD: string;
+        amount: string;
+    }>;
+    prices2: Array<{
+        __typename: 'TokenPrice';
+        id: string;
+        timestamp: number;
+        price: string;
+        priceUSD: string;
+        amount: string;
+    }>;
+    prices3: Array<{
+        __typename: 'TokenPrice';
+        id: string;
+        timestamp: number;
+        price: string;
+        priceUSD: string;
+        amount: string;
+    }>;
+    prices4: Array<{
+        __typename: 'TokenPrice';
+        id: string;
+        timestamp: number;
+        price: string;
+        priceUSD: string;
+        amount: string;
+    }>;
+    prices5: Array<{
+        __typename: 'TokenPrice';
+        id: string;
+        timestamp: number;
+        price: string;
+        priceUSD: string;
+        amount: string;
+    }>;
+    prices6: Array<{
+        __typename: 'TokenPrice';
+        id: string;
+        timestamp: number;
+        price: string;
+        priceUSD: string;
+        amount: string;
+    }>;
 };
 
 export type BalancerChartTokenPriceFragment = {
@@ -4167,6 +4209,7 @@ export type BalancerChartTokenPriceFragment = {
     id: string;
     timestamp: number;
     price: string;
+    priceUSD: string;
     amount: string;
 };
 
@@ -4898,6 +4941,7 @@ export const BalancerChartTokenPriceFragmentDoc = gql`
         id
         timestamp
         price
+        priceUSD
         amount
     }
 `;

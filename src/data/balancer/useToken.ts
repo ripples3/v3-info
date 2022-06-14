@@ -3,7 +3,7 @@ import { groupBy, head, map, orderBy, sumBy } from 'lodash';
 //import { OHLC } from '../../components/Chart/OHLC';
 import { PriceChartEntry } from 'types';
 
-const TIME_INTERVAL = 15 * 60;
+const TIME_INTERVAL = 60*60;
 
 export interface BalancerTokenData {
     chartData: PriceChartEntry[];
@@ -28,7 +28,7 @@ export function useBalancerToken(tokenAddress: string): BalancerTokenData {
 
     const formatted = prices.map((price) => ({
         ...price,
-        priceUSD: parseFloat(price.price),
+        priceUSD: parseFloat(price.priceUSD),
         amount: parseFloat(price.amount),
     }));
     const grouped = groupBy(formatted, (price) => `${Math.ceil(price.timestamp / TIME_INTERVAL) * TIME_INTERVAL}`);
@@ -46,7 +46,8 @@ export function useBalancerToken(tokenAddress: string): BalancerTokenData {
         };
     });
 
-    const filtered = chartData.filter((item, idx) => {
+    const sortedChartData = chartData.sort((a,b) => a.time - b.time)
+    const filtered = sortedChartData.filter((item, idx) => {
         if (idx === 0) {
             return true;
         }
