@@ -37,6 +37,9 @@ import { useBalancerPoolsForToken } from '../../data/balancer/usePools';
 import { useBalancerTransactionData } from '../../data/balancer/useTransactions';
 import { useBalancerToken } from 'data/balancer/useToken';
 import CandleChart from 'components/CandleChart';
+import { useCoingeckoLink } from 'hooks/useCoingeckoLink';
+import CoingeckoLogo from '../../assets/images/coingecko.png';
+
 const PriceText = styled(TYPE.label)`
     font-size: 36px;
     line-height: 0.8;
@@ -95,7 +98,7 @@ export default function TokenPage({
         window.scrollTo(0, 0);
     }, []);
 
-    const cmcLink = useCMCLink(address);
+    const coingeckoLink = useCoingeckoLink(address);
     const tokenData = useBalancerTokenData(address);
     const poolData = useBalancerPoolsForToken(address);
     const { swaps, joinExits } = useBalancerTransactionData(
@@ -115,6 +118,14 @@ export default function TokenPage({
     // watchlist
     const [savedTokens, addSavedToken] = useSavedTokens();
 
+    //calcuate token fees -> extraction of 24h fees relative to token weight
+    let tokenFees = 0;
+    poolData.forEach((pool) => {
+        const token = pool.tokens.find((t) => t.address === address);
+        if (token && token.weight) {
+            tokenFees += pool.feesUSD * token?.weight;
+        }
+    })
 
     return (
         <PageWrapper>
@@ -149,9 +160,9 @@ export default function TokenPage({
                                         fill={savedTokens.includes(address)}
                                         onClick={() => addSavedToken(address)}
                                     />
-                                    {cmcLink && (
+                                    {coingeckoLink && (
                                         <StyledExternalLink
-                                            href={cmcLink}
+                                            href={coingeckoLink}
                                             style={{ marginLeft: '12px' }}
                                             onClickCapture={() => {
                                                 ReactGA.event({
@@ -160,7 +171,7 @@ export default function TokenPage({
                                                 });
                                             }}
                                         >
-                                            <StyledCMCLogo src={CMCLogo} />
+                                            <StyledCMCLogo src={CoingeckoLogo} />
                                         </StyledExternalLink>
                                     )}
                                     <StyledExternalLink href={getEtherscanLink(1, address, 'address', activeNetwork)}>
@@ -190,7 +201,7 @@ export default function TokenPage({
                                             />
                                         )}
                                     </RowFixed>
-                                    {priceData[priceData.length-1].value ?
+                                    {priceData[priceData.length-1]?.value ?
                                     <RowFlat style={{ marginTop: '8px' }}>
                                         <PriceText mr="10px"> {formatDollarAmount(priceData[priceData.length-1].value)}</PriceText>
                                         (<Percent value={(priceData[priceData.length-1].value - priceData[priceData.length-2].value) / priceData[priceData.length-1].value * 100} />)
@@ -233,6 +244,10 @@ export default function TokenPage({
                                             {formatDollarAmount(tokenData.volumeUSDWeek)}
                                         </TYPE.label>
                                     </AutoColumn>
+                                    <AutoColumn gap="4px">
+                                        <TYPE.main fontWeight={400}>24h Fees</TYPE.main>
+                                        <TYPE.label fontSize="24px">{formatDollarAmount(tokenFees)}</TYPE.label>
+                                    </AutoColumn>
                                 </AutoColumn>
                             </DarkGreyCard>
                             <DarkGreyCard>
@@ -247,7 +262,8 @@ export default function TokenPage({
                                                         ? formatDollarAmount(volumeData[volumeData.length - 1]?.value)
                                                         : view === ChartView.TVL
                                                         ? formatDollarAmount(tvlData[tvlData.length - 1]?.value)
-                                                        : (chartData[chartData.length -1] ? formatDollarAmount(chartData[chartData.length -1].open, 2) : 0)}
+                                                        : (chartData[chartData.length -1] ? formatDollarAmount(chartData[chartData.length -1].open, 2) 
+                                                        : (priceData[priceData.length-1] ? formatDollarAmount(priceData[priceData.length-1].value, 2) : 0 ))}
                                                 </MonoSpace>
                                             </TYPE.label>
                                         </RowFixed>

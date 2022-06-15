@@ -57,7 +57,7 @@ const TopBar = () => {
                 <AutoRow gap="6px">
                     <RowFixed>
                         <StyledPolling>
-                        <Item>ETH Price:</Item>
+                        <Item>ETH:</Item>
                         <Item fontWeight="700" ml="4px">
                             {formatDollarAmount(eth)}
                         </Item>
@@ -65,7 +65,7 @@ const TopBar = () => {
                     </RowFixed>
                     <RowFixed>
                     <StyledPolling>
-                        <Item>BAL Price:</Item>
+                        <Item>BAL:</Item>
                         <Item fontWeight="700" ml="4px">
                             {formatDollarAmount(bal)}
                         </Item>

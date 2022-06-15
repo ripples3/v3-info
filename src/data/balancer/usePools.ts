@@ -33,7 +33,7 @@ function getPoolValues(
         tvl: parseFloat(pool.totalLiquidity),
         volume: parseFloat(pool.totalSwapVolume),
         fees: parseFloat(pool.totalSwapFee),
-        feesEpoch: epochFees * 0.5,
+        feesEpoch: epochFees,
         swapCount: parseFloat(pool.swapsCount),
        poolType: pool.poolType,
     };
@@ -61,8 +61,6 @@ function getEpochSwapFees(
     })
     if (endFee === 0 || startFee === 0) {
         snapshotFee = 0;
-    } else if (endFee > startFee) {
-        snapshotFee = endFee - startFee;
     } else {
         snapshotFee = startFee - endFee;
     }
@@ -71,14 +69,12 @@ function getEpochSwapFees(
 
 
 //Poolsnapshots are taken OO:OO UTC. Generate previous snapshot date and previous Thu. Used to calculate weekly sweep fee generators
-const target = 2 // Wednesday
+const target = 3 // Wednesday
 const prevThuDate = new Date()
 prevThuDate.setDate(prevThuDate.getDate() - ( prevThuDate.getDay() == target ? 7 : (prevThuDate.getDay() + (7 - target)) % 7 ));
 prevThuDate.setUTCHours(0,0,0,0);
 const today = new Date();
 today.setUTCHours(0,0,0,0);
-//console.log("epochStartDate: ", prevThuDate, ", timestamp: ", Math.floor(prevThuDate.getTime() / 1000));
-//console.log("epochEndDate: ", today, ", timestamp: ",Math.floor(today.getTime() / 1000));
 
 export function useBalancerPools(): PoolData[] {
     const [activeNetwork] = useActiveNetworkVersion();
