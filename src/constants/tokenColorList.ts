@@ -119,6 +119,16 @@ export const TOKEN_COLORS = [
         address: '0xc7283b66eb1eb5fb86327f08e1b5816b0720212b',
         color: '#2474cc'
     },
+    {
+        shortName: 'AURA',
+        address: '0xc0c293ce456ff0ed870add98a0828dd4d2903dbf',
+        color: '#c934eb'
+    },
+    {
+        shortName: 'AAVE',
+        address: '0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9',
+        color: '#34c3eb'
+    },
 ];
 
 export const ALTERNATIVE_COLORS = [

@@ -10,14 +10,4 @@ export const STATIC_TREASURY_INVESTMENTS = [
         chainId: '1',
         amount: 334000,
     },
-    {
-        tokenSymbol: 'TRIBE',
-        chainId: '1',
-        amount: 2598001.34
-    },
-    {
-        tokenSymbol: 'FEI',
-        chainId: '1',
-        amount: 2513616.1
-    }
 ];

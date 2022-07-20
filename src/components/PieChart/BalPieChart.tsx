@@ -47,7 +47,7 @@ export const BalPieChart = ({
     data,
     color = '#56B2A4',
     tokenSet,
-    cxcy = ['50%', '59%'],
+    cxcy = ['50%', '50%'],
     value,
     label,
     setValue,
@@ -78,8 +78,8 @@ export const BalPieChart = ({
                         cx={cxcy[0]}
                         cy={cxcy[1]}
                         innerRadius={35}
-                        outerRadius={70}
-                        paddingAngle={18}
+                        outerRadius={75}
+                        paddingAngle={15}
                         //fill="#8884d8"
                         label={({
                             cx,

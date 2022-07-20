@@ -5,7 +5,7 @@ import Logo from '../Logo'
 import { useCombinedActiveList } from 'state/lists/hooks'
 import useHttpLocations from 'hooks/useHttpLocations'
 import { useActiveNetworkVersion } from 'state/application/hooks'
-import { SupportedNetwork } from 'constants/networks'
+import { EthereumNetworkInfo, SupportedNetwork } from 'constants/networks'
 
 //TODO: Refactor with uni-v3 tokenlist nesting methods
 export const getTokenLogoURL = (address: string, networkId: SupportedNetwork) => {
@@ -62,6 +62,11 @@ export default function CurrencyLogo({
 
   const [activeNetwork] = useActiveNetworkVersion()
 
+  let assetLoc = 'master';
+  if (activeNetwork !== EthereumNetworkInfo) {
+    assetLoc = 'refactor-for-multichain'
+  }
+
   const checkSummed = isAddress(address)
 
   const polygonURI = useMemo(() => {
@@ -84,7 +89,7 @@ export default function CurrencyLogo({
   const tempSources: { [address: string]: string } = useMemo(() => {
     return {
       [`${address}`]:
-        `https://raw.githubusercontent.com/balancer-labs/assets/refactor-for-multichain/assets/${address}.png`,
+        `https://raw.githubusercontent.com/balancer-labs/assets/${assetLoc}/assets/${address}.png`,
     }
   }, [])
 

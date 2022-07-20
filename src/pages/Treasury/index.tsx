@@ -466,7 +466,7 @@ export default function Treasury() {
                         <BalPieChart
                             data={cumulativePieChartData}
                             tokenSet={tokenSet}
-                            cxcy={['60%', '40%']}
+                            cxcy={['45%', '55%']}
                             height={400}
                             minHeight={400}
                         /> : <AutoColumn gap="lg" justify='flex-start'>
@@ -648,17 +648,22 @@ export default function Treasury() {
                 </ContentLayout>
                 <ContentLayoutRight>
                 <TreasuryTokenPortfolioTable tokenDatas={curatedTokenDatas} />
+                <DarkGreyCard>
+                <AutoColumn gap="4px">
+                    <TYPE.main fontWeight={400}>Token distribution</TYPE.main>
+                </AutoColumn>
                     {tokenSet.length > 0 && pieChartData && historicalCollectorData?.tvl ?
                         <BalPieChart
                             data={pieChartData}
                             tokenSet={tokenSet}
                             height={200}
-                            minHeight={200}
+                            minHeight={400}
                         /> : <AutoColumn gap="lg" justify='flex-start'>
                             <DarkGreyCard>
                                 <TYPE.main fontSize="18px">Fetching token distribution...</TYPE.main>
                                 <LocalLoader fill={false} />
                             </DarkGreyCard> </ AutoColumn>}
+                </DarkGreyCard>
                 </ContentLayoutRight>
                 <TYPE.white> Balancer Protocol Investments </TYPE.white>
                 <UserPoolTable poolDatas={poolDatasUser} />
